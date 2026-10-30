@@ -1,0 +1,26 @@
+---
+import HorizontalShowreel from '../HorizontalShowreel';
+import type { HorizontalShowreelBlock, ProjectItem } from '../../utils/types';
+import { normalizeStrapiProject } from '../../utils/loaders';
+
+interface Props {
+  data: HorizontalShowreelBlock;
+  projects: ProjectItem[];
+}
+
+const { data, projects } = Astro.props;
+const blockProjects =
+  Array.isArray(data.projects) && data.projects.length > 0
+    ? data.projects.map(normalizeStrapiProject)
+    : projects;
+---
+
+<HorizontalShowreel
+  client:load
+  projects={blockProjects}
+  sectionId={data.sectionId || 'showreel'}
+  eyebrow={data.eyebrow}
+  heading={data.heading || '3D & Motion Showreel'}
+  subHeading={data.subHeading}
+  onlyFeatured={data.onlyFeatured !== false}
+/>

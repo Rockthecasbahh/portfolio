@@ -1,0 +1,64 @@
+---
+import type { CardGridBlock } from '../../utils/types';
+
+interface Props {
+  data: CardGridBlock;
+}
+
+const { data } = Astro.props;
+const isCobalt = data.stratumTheme === 'cobalt';
+const isIce = data.stratumTheme === 'ice';
+---
+
+<section class="py-12">
+  <div class="max-w-[1440px] mx-auto px-4 sm:px-8">
+    <div
+      class={`cv-wave-slab p-7 sm:p-10 md:p-12 ${
+        isCobalt
+          ? 'cv-stratum-cobalt'
+          : isIce
+          ? 'cv-stratum-ice border border-white'
+          : 'cv-stratum-paper border border-[#d9ebf4]'
+      }`}
+    >
+      {(data.heading || data.subHeading) && (
+        <div class="mb-8">
+          {data.subHeading && (
+            <div class={`font-mono-tech text-xs font-bold uppercase tracking-wider mb-1 ${isCobalt ? 'text-[#fbd5cd]' : 'text-[#1c72b4]'}`}>
+              {data.subHeading}
+            </div>
+          )}
+          {data.heading && (
+            <h2 class={`font-display font-extrabold text-2xl md:text-4xl ${isCobalt ? 'text-white' : 'text-[#172a3b]'}`}>
+              {data.heading}
+            </h2>
+          )}
+        </div>
+      )}
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {(data.cards || []).map((card) => (
+          <div class="rounded-2xl bg-white/90 text-[#172a3b] p-6 border border-[#d9ebf4] shadow-sm flex flex-col justify-between gap-3">
+            <div>
+              {card.badge && (
+                <span class="inline-block px-2.5 py-0.5 rounded-full bg-[#304774] text-white font-mono-tech text-[11px] font-bold mb-2">
+                  {card.badge}
+                </span>
+              )}
+              <h3 class="font-display font-bold text-lg text-[#172a3b]">{card.heading}</h3>
+              {card.subHeading && (
+                <div class="font-mono-tech text-xs text-[#304774] font-semibold mt-0.5">{card.subHeading}</div>
+              )}
+              <p class="text-sm text-[#29323e] leading-relaxed mt-2">{card.text}</p>
+            </div>
+            {card.href && (
+              <a href={card.href} class="font-mono-tech text-xs font-bold text-[#1c72b4] hover:underline mt-2 inline-block">
+                Learn more →
+              </a>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>

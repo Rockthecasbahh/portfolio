@@ -1,0 +1,47 @@
+{
+  "collectionName": "components_blocks_content_with_images",
+  "info": {
+    "displayName": "Content With Image",
+    "description": "Two-column editorial text and image stratum"
+  },
+  "options": {},
+  "attributes": {
+    "heading": {
+      "type": "string"
+    },
+    "subHeading": {
+      "type": "string"
+    },
+    "content": {
+      "type": "text"
+    },
+    "imageUrl": {
+      "type": "string"
+    },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "reversed": {
+      "type": "boolean",
+      "default": false
+    },
+    "stratumTheme": {
+      "type": "enumeration",
+      "enum": [
+        "ice",
+        "cobalt",
+        "paper"
+      ],
+      "default": "paper"
+    },
+    "link": {
+      "type": "component",
+      "repeatable": false,
+      "component": "shared.link"
+    }
+  }
+}

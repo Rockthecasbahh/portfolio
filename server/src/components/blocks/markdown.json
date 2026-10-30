@@ -1,0 +1,25 @@
+{
+  "collectionName": "components_blocks_markdowns",
+  "info": {
+    "displayName": "Markdown Block",
+    "description": "Rich text / Markdown block in a CV topographic wave stratum"
+  },
+  "options": {},
+  "attributes": {
+    "heading": {
+      "type": "string"
+    },
+    "content": {
+      "type": "richtext"
+    },
+    "stratumTheme": {
+      "type": "enumeration",
+      "enum": [
+        "ice",
+        "cobalt",
+        "paper"
+      ],
+      "default": "paper"
+    }
+  }
+}

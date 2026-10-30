@@ -1,0 +1,27 @@
+{
+  "title": "Inside FINS Initiative - Integrated National Financing Frameworks",
+  "chapterNumber": "01",
+  "category": "video",
+  "madeFor": "UN DESA",
+  "year": "2025",
+  "location": "Dominican Republic · New York HQ",
+  "track": "both",
+  "featuredInReel": true,
+  "sortOrder": 2,
+  "shortDescription": "High-level documentary series and 15 animated training modules filmed on location in the Dominican Republic, translating sovereign development financing (INFFs) into actionable stories for national ministries.",
+  "mandateChallenge": "Make complex macroeconomic policy and sovereign financing mechanisms tangible and relatable for Small Island Developing States (SIDS) policymakers and international development partners.",
+  "executionCraft": "Directed location shoots in the Dominican Republic, engineered a modular After Effects motion system for 15 training modules, and structured the companion Drupal 10 video platform.",
+  "impactMetric": "20 Multimedia Deliverables · +45% Platform Engagement",
+  "thumbnail": "/assets/projects/inside-fins-dominican-republic-undesa/sids-finance.webp",
+  "secondaryImage": "",
+  "videoYoutubeId": "w0tVOWbm8",
+  "externalUrl": "https://financing.desa.un.org/capacity-development/topics/fins/home",
+  "externalLabel": "Explore FINS Initiative",
+  "tools": [
+    "Premiere Pro",
+    "After Effects",
+    "Drupal 10",
+    "Location Directing",
+    "Sound Design"
+  ]
+}

@@ -1,0 +1,60 @@
+{
+  "name": "Matteo Louis Casling",
+  "tagline": "Senior Multimedia Producer, 3D Motion Designer & UN Communications Strategist",
+  "location": "New York, USA · Vienna · Rome",
+  "email": "matteocasling@gmail.com",
+  "phone": "+1 332 262 9369",
+  "welcomeHeadline": "Translating Complex Global Mandates & Technical Systems into High-Retention Visual Cinema.",
+  "welcomeBody": "As a communications specialist and multimedia producer with over six years of experience across the United Nations system (UN DESA, IAEA, FAO, IFAD) and broadcast news (PBS News), I build versatile, impact-oriented visual ecosystems that blend strategy, storytelling, and engineering. My work spans the full spectrum of multimedia production - from location directing and 3D Blender/Unreal animations to Drupal 10 digital platforms and flagship COP summit cinema.",
+  "dualTrackUnSummary": "Direct background in sovereign development finance (INFFs), climate science diplomacy (COP28 Dubai / COP29 Baku), and emergency agricultural crisis communications across 4 UN agencies.",
+  "dualTrackTechSummary": "End-to-end timeline & pipeline ownership combining Premiere Pro, After Effects, Blender 3D, Unreal Engine 5, Remotion, Audition sound mastering, and Drupal 10 / Astro web engineering.",
+  "softwareMeters": [
+    {
+      "name": "ADOBE CREATIVE SUITE",
+      "subtitle": "Premiere Pro · After Effects · Illustrator · InDesign · Audition",
+      "segmentsFilled": 8
+    },
+    {
+      "name": "BLENDER 3D & MOTION",
+      "subtitle": "3D Modeling · Cycles/EEVEE · Procedural Shaders · GLTF Pipelines",
+      "segmentsFilled": 7
+    },
+    {
+      "name": "UNREAL ENGINE 5",
+      "subtitle": "Real-Time Environments · Virtual Production · Sequencer",
+      "segmentsFilled": 6
+    },
+    {
+      "name": "WEB & CMS ARCHITECTURE",
+      "subtitle": "Drupal 10 · WordPress · HTML5 · CSS3 · JavaScript · Astro",
+      "segmentsFilled": 7
+    },
+    {
+      "name": "CODE & AUTOMATION",
+      "subtitle": "Python · Remotion · GSAP 3D · Analytics & Telemetry",
+      "segmentsFilled": 6
+    }
+  ],
+  "metrics": [
+    {
+      "value": "41.5M",
+      "label": "People Protected - FAO Desert Locust Emergency Campaign",
+      "agency": "FAO · 3 Languages (EN / FR / AR)"
+    },
+    {
+      "value": "3.0M+",
+      "label": "Global Views - World Water Day Flagship Scrollytelling",
+      "agency": "Joint FAO/IAEA Centre"
+    },
+    {
+      "value": "+45%",
+      "label": "Monthly User Engagement Lift on FINS Drupal 10 Platform",
+      "agency": "UN DESA · New York"
+    },
+    {
+      "value": "+35%",
+      "label": "Multi-Channel Impressions Growth Across COP28 & COP29",
+      "agency": "IAEA · Vienna & Dubai"
+    }
+  ]
+}

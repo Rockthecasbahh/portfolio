@@ -1,0 +1,37 @@
+{
+  "kind": "singleType",
+  "collectionName": "globals",
+  "info": {
+    "singularName": "global",
+    "pluralName": "globals",
+    "displayName": "Global",
+    "description": "Global header, footer, SEO, and 3D Topographic Rig configuration"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "text"
+    },
+    "header": {
+      "type": "component",
+      "repeatable": false,
+      "component": "layout.header"
+    },
+    "footer": {
+      "type": "component",
+      "repeatable": false,
+      "component": "layout.footer"
+    },
+    "studio3d": {
+      "type": "component",
+      "repeatable": false,
+      "component": "layout.studio-3d-settings"
+    }
+  }
+}

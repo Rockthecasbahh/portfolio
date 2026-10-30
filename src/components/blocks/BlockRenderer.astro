@@ -1,0 +1,46 @@
+---
+import type { ComponentType, BlockData, ProjectItem, ExperienceItem } from '../../utils/types';
+import HeroStratum from './HeroStratum.astro';
+import LogoWall from './LogoWall.astro';
+import EducationSkillsStratum from './EducationSkillsStratum.astro';
+import HorizontalShowreelBlock from './HorizontalShowreelBlock.astro';
+import PortfolioChaptersBlock from './PortfolioChaptersBlock.astro';
+import ExperienceCascade from './ExperienceCascade.astro';
+import DossierContact from './DossierContact.astro';
+import SectionHeading from './SectionHeading.astro';
+import CardsGrid from './CardsGrid.astro';
+import ContentWithImage from './ContentWithImage.astro';
+import MarkdownBlock from './MarkdownBlock.astro';
+
+interface Props {
+  blocks: BlockData[];
+  projects?: ProjectItem[];
+  experiences?: ExperienceItem[];
+}
+
+const componentMap: Record<ComponentType, any> = {
+  'blocks.hero-stratum': HeroStratum,
+  'blocks.logo-wall': LogoWall,
+  'blocks.education-skills-stratum': EducationSkillsStratum,
+  'blocks.horizontal-showreel': HorizontalShowreelBlock,
+  'blocks.portfolio-chapters': PortfolioChaptersBlock,
+  'blocks.experience-cascade': ExperienceCascade,
+  'blocks.dossier-contact': DossierContact,
+  'blocks.heading-section': SectionHeading,
+  'blocks.card-grid': CardsGrid,
+  'blocks.content-with-image': ContentWithImage,
+  'blocks.markdown': MarkdownBlock,
+};
+
+const { blocks = [], projects = [], experiences = [] } = Astro.props;
+---
+
+<div class="block-renderer">
+  {
+    blocks.map((block: BlockData) => {
+      const Component = componentMap[block.__component];
+      if (!Component) return null;
+      return <Component data={block} projects={projects} experiences={experiences} />;
+    })
+  }
+</div>

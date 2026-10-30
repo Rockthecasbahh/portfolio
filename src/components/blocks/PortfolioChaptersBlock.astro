@@ -1,0 +1,27 @@
+---
+import PortfolioChapters from '../PortfolioChapters';
+import type { PortfolioChaptersBlock, ProjectItem } from '../../utils/types';
+import { normalizeStrapiProject } from '../../utils/loaders';
+
+interface Props {
+  data: PortfolioChaptersBlock;
+  projects: ProjectItem[];
+}
+
+const { data, projects } = Astro.props;
+const blockProjects =
+  Array.isArray(data.projects) && data.projects.length > 0
+    ? data.projects.map(normalizeStrapiProject)
+    : projects;
+---
+
+<PortfolioChapters
+  client:load
+  projects={blockProjects}
+  sectionId={data.sectionId || 'work'}
+  eyebrow={data.eyebrow}
+  heading={data.heading}
+  subHeading={data.subHeading}
+  defaultTrackFilter={data.defaultTrackFilter || 'all'}
+  customChapters={data.chapters}
+/>

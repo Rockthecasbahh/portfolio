@@ -1,0 +1,48 @@
+{
+  "kind": "collectionType",
+  "collectionName": "pages",
+  "info": {
+    "singularName": "page",
+    "pluralName": "pages",
+    "displayName": "Page",
+    "description": "Custom dynamic-zone pages rendered at /[slug]"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "slug": {
+      "type": "uid",
+      "targetField": "title"
+    },
+    "description": {
+      "type": "text"
+    },
+    "template": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::page-builder.template"
+    },
+    "blocks": {
+      "type": "dynamiczone",
+      "components": [
+        "blocks.hero-stratum",
+        "blocks.logo-wall",
+        "blocks.education-skills-stratum",
+        "blocks.horizontal-showreel",
+        "blocks.portfolio-chapters",
+        "blocks.experience-cascade",
+        "blocks.dossier-contact",
+        "blocks.heading-section",
+        "blocks.card-grid",
+        "blocks.content-with-image",
+        "blocks.markdown"
+      ]
+    }
+  }
+}

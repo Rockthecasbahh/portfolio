@@ -1,0 +1,27 @@
+{
+  "title": "Desert Locust - Everything You Need to Know About FAO’s 2019-2021 Crisis Response",
+  "chapterNumber": "01",
+  "category": "video",
+  "madeFor": "FAO",
+  "year": "2022",
+  "location": "Greater Horn of Africa · Rome HQ",
+  "track": "both",
+  "featuredInReel": true,
+  "sortOrder": 3,
+  "shortDescription": "Produced and edited utilizing field footage gathered throughout the 2019-2021 Desert Locust upsurge to brief international donors on how rapid intervention protected 41.5 million people from food insecurity.",
+  "mandateChallenge": "Synthesize two years of emergency biopesticide aerial operations, satellite telemetry, and field campaigns across East Africa and Southwest Asia into a high-impact multilingual donor briefing film.",
+  "executionCraft": "Coordinated, scripted, edited, and animated custom telemetry overlays and bold kinetic impact counters in English, French, and Arabic.",
+  "impactMetric": "41.5M People Protected · Produced in EN / FR / AR",
+  "thumbnail": "/assets/projects/desert-locust-crisis-response-fao/fao-desert-locust-video.png",
+  "secondaryImage": "/assets/projects/desert-locust-crisis-response-fao/locust-3d-sculpture.png",
+  "videoYoutubeId": "vGciHWRNWQQ",
+  "externalUrl": "https://www.youtube.com/watch?v=vGciHWRNWQQ",
+  "externalLabel": "Watch Crisis Documentary",
+  "tools": [
+    "Premiere Pro",
+    "After Effects",
+    "Blender 3D",
+    "Multilingual Localization",
+    "Motion Graphics"
+  ]
+}

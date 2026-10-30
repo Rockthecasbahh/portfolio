@@ -1,0 +1,19 @@
+{
+  "collectionName": "components_shared_education_items",
+  "info": {
+    "displayName": "Education Item",
+    "description": "Degree, university/school, and academic years"
+  },
+  "options": {},
+  "attributes": {
+    "degree": {
+      "type": "string"
+    },
+    "school": {
+      "type": "string"
+    },
+    "years": {
+      "type": "string"
+    }
+  }
+}

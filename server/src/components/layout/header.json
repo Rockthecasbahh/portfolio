@@ -1,0 +1,33 @@
+{
+  "collectionName": "components_layout_headers",
+  "info": {
+    "displayName": "Header",
+    "description": "Global fixed navigation header"
+  },
+  "options": {},
+  "attributes": {
+    "monogram": {
+      "type": "string",
+      "default": "MC"
+    },
+    "fullName": {
+      "type": "string",
+      "default": "Matteo Louis Casling"
+    },
+    "navItems": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.link"
+    },
+    "cmsCta": {
+      "type": "component",
+      "repeatable": false,
+      "component": "shared.link"
+    },
+    "primaryCta": {
+      "type": "component",
+      "repeatable": false,
+      "component": "shared.link"
+    }
+  }
+}

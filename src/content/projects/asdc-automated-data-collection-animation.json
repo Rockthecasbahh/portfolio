@@ -1,0 +1,27 @@
+{
+  "title": "Automated System for Data Collection (ASDC) - 3D & 2D Technical Animation",
+  "chapterNumber": "02",
+  "category": "animation",
+  "madeFor": "FAO",
+  "year": "2022",
+  "location": "Caucasus & Central Asia · Rome",
+  "track": "tech-motion",
+  "featuredInReel": true,
+  "sortOrder": 4,
+  "shortDescription": "Instructional 3D/2D animation and custom sculpted Desert Locust visual assets produced to train field officers on the Automated System for Data Collection (ASDC), significantly reducing field reporting errors.",
+  "mandateChallenge": "Field locust officers across the Caucasus and Central Asia needed a crystal-clear visual walkthrough of geospatial tablet logging and satellite transmission under harsh field conditions.",
+  "executionCraft": "Combined custom 3D anatomical locust modeling in Blender with crisp UI workflow animation in After Effects, localized across English, French, and Russian.",
+  "impactMetric": "Measurable Reduction in Field Data Errors · EN / FR / RU",
+  "thumbnail": "/assets/projects/asdc-automated-data-collection-animation/fao-asdc-animation.png",
+  "secondaryImage": "/assets/projects/asdc-automated-data-collection-animation/locust-3d-sculpture.png",
+  "videoYoutubeId": "5kdXRocsOkQ",
+  "externalUrl": "https://www.youtube.com/watch?v=5kdXRocsOkQ",
+  "externalLabel": "Watch Technical Animation",
+  "tools": [
+    "Blender 3D",
+    "After Effects",
+    "Illustrator",
+    "Audition",
+    "UI Motion Systems"
+  ]
+}

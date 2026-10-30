@@ -1,0 +1,37 @@
+---
+import type { MarkdownBlock } from '../../utils/types';
+import { marked } from 'marked';
+
+interface Props {
+  data: MarkdownBlock;
+}
+
+const { data } = Astro.props;
+const htmlContent = marked.parse(data.content || '');
+const isCobalt = data.stratumTheme === 'cobalt';
+const isIce = data.stratumTheme === 'ice';
+---
+
+<section class="py-12">
+  <div class="max-w-[1440px] mx-auto px-4 sm:px-8">
+    <div
+      class={`cv-wave-slab p-7 sm:p-10 md:p-12 ${
+        isCobalt
+          ? 'cv-stratum-cobalt'
+          : isIce
+          ? 'cv-stratum-ice border border-white'
+          : 'cv-stratum-paper border border-[#d9ebf4]'
+      }`}
+    >
+      {data.heading && (
+        <h2 class={`font-display font-extrabold text-2xl md:text-4xl mb-4 ${isCobalt ? 'text-white' : 'text-[#172a3b]'}`}>
+          {data.heading}
+        </h2>
+      )}
+      <div
+        class={`prose max-w-none leading-relaxed space-y-4 ${isCobalt ? 'text-white/90' : 'text-[#29323e]'}`}
+        set:html={htmlContent}
+      />
+    </div>
+  </div>
+</section>

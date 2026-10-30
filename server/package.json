@@ -1,0 +1,39 @@
+{
+  "name": "matteo-portfolio-strapi-server",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Strapi v5 Headless CMS Backend for Matteo Louis Casling Portfolio",
+  "scripts": {
+    "build": "strapi build",
+    "deploy": "strapi deploy",
+    "develop": "strapi develop",
+    "start": "strapi start",
+    "strapi": "strapi",
+    "clean": "rm -rf dist .strapi",
+    "seed": "node scripts/seed.js"
+  },
+  "dependencies": {
+    "@strapi/plugin-cloud": "5.58.0",
+    "@strapi/plugin-users-permissions": "5.58.0",
+    "@strapi/strapi": "5.58.0",
+    "@wecre8websites/strapi-page-builder": "^1.2.0",
+    "better-sqlite3": "13.0.3",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "react-router-dom": "^6.30.3",
+    "styled-components": "^6.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "typescript": "^5"
+  },
+  "engines": {
+    "node": ">=20.0.0 <=26.x.x",
+    "npm": ">=6.0.0"
+  },
+  "strapi": {
+    "uuid": "7b91a255-d9bf-4477-ab87-181cdf03bcbd"
+  }
+}

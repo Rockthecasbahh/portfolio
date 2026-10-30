@@ -1,0 +1,27 @@
+{
+  "collectionName": "components_blocks_experience_cascades",
+  "info": {
+    "displayName": "Experience Cascade",
+    "description": "Alternating CV topographic wave strata for career timeline & UN missions"
+  },
+  "options": {},
+  "attributes": {
+    "sectionId": {
+      "type": "string",
+      "default": "experience"
+    },
+    "heading": {
+      "type": "string",
+      "default": "Work Experience"
+    },
+    "subHeading": {
+      "type": "text",
+      "default": "Six years of end-to-end multimedia production, location directing, 3D animation, and Drupal/WordPress web architecture across United Nations agencies and broadcast news."
+    },
+    "experiences": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::experience.experience"
+    }
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "name": "matteo-casling-portfolio",
+  "type": "module",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Matteo Louis Casling Portfolio - Astro 5 Frontend + Strapi 5 Headless CMS Backend",
+  "scripts": {
+    "client": "astro dev --port 4321",
+    "server": "npm --prefix server run develop",
+    "dev": "concurrently -n \"STRAPI,ASTRO\" -c \"cyan,magenta\" \"npm --prefix server run develop\" \"astro dev --port 4321\"",
+    "start": "npm run dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "seed": "npm --prefix server run seed",
+    "setup": "npm install && npm --prefix server install"
+  },
+  "dependencies": {
+    "@astrojs/node": "^9.1.2",
+    "@astrojs/react": "^4.2.1",
+    "@fontsource-variable/plus-jakarta-sans": "^5.3.0",
+    "@fontsource-variable/syne": "^5.3.0",
+    "@phosphor-icons/react": "^2.1.7",
+    "@strapi/client": "^1.2.0",
+    "@tailwindcss/vite": "^4.0.9",
+    "@wecre8websites/strapi-page-builder-react": "^1.2.0",
+    "astro": "^5.4.1",
+    "concurrently": "^9.1.2",
+    "gsap": "^3.12.7",
+    "handlebars": "^4.7.10",
+    "lenis": "^1.2.3",
+    "marked": "^15.0.7",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "tailwindcss": "^4.0.9",
+    "three": "^0.173.0",
+    "wait-on": "^8.0.1"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
+    "@types/three": "^0.173.0",
+    "typescript": "^5.7.3"
+  }
+}

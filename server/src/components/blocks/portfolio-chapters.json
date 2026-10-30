@@ -1,0 +1,45 @@
+{
+  "collectionName": "components_blocks_portfolio_chapters",
+  "info": {
+    "displayName": "Portfolio Chapters",
+    "description": "Curated Un-Portfolio Chapters 01-05 with dual-track audience filter"
+  },
+  "options": {},
+  "attributes": {
+    "sectionId": {
+      "type": "string",
+      "default": "work"
+    },
+    "eyebrow": {
+      "type": "string",
+      "default": "Curated Un-Portfolio Index (Chapters 01 - 05)"
+    },
+    "heading": {
+      "type": "string",
+      "default": "Work Samples & Production Archive"
+    },
+    "subHeading": {
+      "type": "text",
+      "default": "Filter by audience focus or jump directly across the five chapters of Matteo's portfolio."
+    },
+    "defaultTrackFilter": {
+      "type": "enumeration",
+      "enum": [
+        "all",
+        "un-policy",
+        "tech-motion"
+      ],
+      "default": "all"
+    },
+    "chapters": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.chapter-meta"
+    },
+    "projects": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::project.project"
+    }
+  }
+}

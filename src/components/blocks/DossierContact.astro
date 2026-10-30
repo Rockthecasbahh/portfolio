@@ -1,0 +1,128 @@
+---
+import type { DossierContactBlock } from '../../utils/types';
+import {
+  FilePdf,
+  FilmSlate,
+  Browsers,
+  EnvelopeSimple,
+  Sliders,
+} from '@phosphor-icons/react';
+
+interface Props {
+  data: DossierContactBlock;
+}
+
+const { data } = Astro.props;
+---
+
+<section id={data.sectionId || 'documents'} class="py-20">
+  <div class="max-w-[1440px] mx-auto px-4 sm:px-8">
+    <div class="cv-wave-slab cv-stratum-cobalt p-8 sm:p-12">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+        <div class="lg:col-span-7 space-y-6">
+          <h2 class="font-display font-extrabold text-3xl md:text-4xl text-white">
+            {data.heading || 'CV Dossiers & Strapi Headless CMS'}
+          </h2>
+          {data.description && (
+            <p class="text-base text-[#d9ebf4] leading-relaxed max-w-[60ch]">
+              {data.description}
+            </p>
+          )}
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+            {(data.dossierCards || []).map((card) => (
+              <a
+                href={card.href}
+                target="_blank"
+                rel="noreferrer"
+                class="rounded-2xl p-5 bg-white text-[#172a3b] hover:bg-[#d9ebf4] transition-colors flex flex-col justify-between gap-4 shadow-md group"
+              >
+                {card.iconType === 'film' ? (
+                  <FilmSlate size={28} weight="duotone" className="text-[#304774]" />
+                ) : card.iconType === 'browser' ? (
+                  <Browsers size={28} weight="duotone" className="text-[#304774]" />
+                ) : (
+                  <FilePdf size={28} weight="duotone" className="text-[#304774]" />
+                )}
+                <div>
+                  <div class="font-display font-bold text-base group-hover:text-[#1c72b4]">
+                    {card.title}
+                  </div>
+                  <div class="font-mono-tech text-xs text-[#52637a] mt-1">
+                    {card.subtitle}
+                  </div>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+
+        <div class="lg:col-span-5 rounded-[28px] bg-[#d9ebf4] text-[#172a3b] p-7 sm:p-8 space-y-5 shadow-xl">
+          <h3 class="font-display font-extrabold text-2xl text-[#172a3b]">
+            {data.contactHeading || 'Direct Contact'}
+          </h3>
+          <div class="space-y-3 font-mono-tech text-xs">
+            {data.email && (
+              <div class="flex items-center justify-between py-2 border-b border-[#304774]/15">
+                <span class="text-[#52637a]">EMAIL</span>
+                <a href={`mailto:${data.email}`} class="text-[#1c72b4] hover:underline font-bold">
+                  {data.email}
+                </a>
+              </div>
+            )}
+            {data.phone && (
+              <div class="flex items-center justify-between py-2 border-b border-[#304774]/15">
+                <span class="text-[#52637a]">MOBILE</span>
+                <a href={`tel:${data.phone}`} class="text-[#172a3b] font-bold hover:text-[#1c72b4]">
+                  {data.phone}
+                </a>
+              </div>
+            )}
+            {data.location && (
+              <div class="flex items-center justify-between py-2 border-b border-[#304774]/15">
+                <span class="text-[#52637a]">BASE</span>
+                <span class="text-[#172a3b] font-bold">{data.location}</span>
+              </div>
+            )}
+            <div class="flex items-center justify-between py-2 border-b border-[#304774]/15">
+              <span class="text-[#52637a]">HEADLESS CMS</span>
+              <a
+                href={data.cmsUrl || 'http://localhost:1337/admin'}
+                target="_blank"
+                rel="noreferrer"
+                class="text-[#304774] font-bold hover:underline"
+              >
+                {data.cmsLabel || 'Strapi v5 Admin'}
+              </a>
+            </div>
+          </div>
+
+          <div class="pt-2 flex flex-wrap gap-3">
+            {data.primaryCta && (
+              <a
+                href={data.primaryCta.href}
+                target={data.primaryCta.isExternal ? '_blank' : undefined}
+                rel={data.primaryCta.isExternal ? 'noreferrer' : undefined}
+                class="px-5 py-3 rounded-full bg-[#304774] text-white hover:bg-[#172a3b] font-mono-tech text-xs font-bold inline-flex items-center gap-2 transition-colors"
+              >
+                <EnvelopeSimple size={16} weight="bold" />
+                <span>{data.primaryCta.label}</span>
+              </a>
+            )}
+            {data.secondaryCta && (
+              <a
+                href={data.secondaryCta.href}
+                target={data.secondaryCta.isExternal ? '_blank' : undefined}
+                rel={data.secondaryCta.isExternal ? 'noreferrer' : undefined}
+                class="px-4 py-3 rounded-full bg-white border border-[#304774]/25 text-[#172a3b] hover:bg-[#304774] hover:text-white font-mono-tech text-xs font-bold inline-flex items-center gap-2 transition-colors"
+              >
+                <Sliders size={15} weight="bold" />
+                <span>{data.secondaryCta.label}</span>
+              </a>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

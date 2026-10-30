@@ -1,0 +1,10 @@
+{
+  "engineMode": "procedural-sculpture",
+  "splineUrl": "",
+  "glbPath": "",
+  "primaryGoldHex": "#304774",
+  "deepNavyHex": "#172A3B",
+  "iceBlueHex": "#D9EBF4",
+  "showWireframeCage": false,
+  "scrollMorphIntensity": 1.15
+}

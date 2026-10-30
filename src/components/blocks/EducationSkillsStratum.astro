@@ -1,0 +1,116 @@
+---
+import type { EducationSkillsStratumBlock } from '../../utils/types';
+import { GraduationCap, Lightning } from '@phosphor-icons/react';
+
+interface Props {
+  data: EducationSkillsStratumBlock;
+}
+
+const { data } = Astro.props;
+---
+
+<section id={data.sectionId || 'education-skills'} class="py-16">
+  <div class="max-w-[1440px] mx-auto px-4 sm:px-8 space-y-10">
+    <!-- 4-Cell Verified UN Impact Telemetry Row -->
+    {(data.metrics || []).length > 0 && (
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        {data.metrics.map((metric, i) => {
+          const isPaper = metric.theme ? metric.theme === 'paper' : i % 2 === 0;
+          return (
+            <div
+              class={`rounded-[28px] p-6 border shadow-md transition-transform hover:-translate-y-0.5 ${
+                isPaper
+                  ? 'bg-white border-[#d9ebf4] text-[#172a3b]'
+                  : 'bg-[#304774] border-[#304774] text-white'
+              }`}
+            >
+              <div
+                class={`font-display font-extrabold text-3xl md:text-4xl ${
+                  isPaper ? 'text-[#304774]' : 'text-[#d9ebf4]'
+                }`}
+              >
+                {metric.value}
+              </div>
+              <div class="font-sans font-bold text-sm mt-1.5 leading-snug">
+                {metric.label}
+              </div>
+              <div
+                class={`font-mono-tech text-xs mt-2 ${
+                  isPaper ? 'text-[#1c72b4]' : 'text-[#fbd5cd]'
+                }`}
+              >
+                {metric.agency}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    )}
+
+    <!-- Direct Recreation of the CV's Education + Skills Two-Column Ice-Blue Topographic Band -->
+    <div class="relative">
+      <div
+        aria-hidden="true"
+        class="cv-wave-slab bg-[#304774] absolute -left-3 right-4 -top-3 bottom-3 opacity-90 pointer-events-none"
+      ></div>
+
+      <div class="relative ml-2 sm:ml-5 cv-wave-slab cv-stratum-ice p-7 sm:p-10 md:p-12 border border-white">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+          <!-- Left Column: Education (Exact CV Hierarchy) -->
+          <div class="lg:col-span-6 space-y-6">
+            <div class="flex items-center gap-3 pb-3 border-b-2 border-[#172a3b]">
+              <GraduationCap size={28} weight="duotone" className="text-[#304774]" />
+              <h2 class="font-display font-extrabold text-2xl md:text-3xl text-[#172a3b]">
+                {data.educationHeading || 'Education'}
+              </h2>
+            </div>
+
+            <div class="space-y-5">
+              {(data.educationItems || []).map((edu) => (
+                <div class="bg-white/80 rounded-2xl p-5 border border-white shadow-xs">
+                  <h3 class="font-display font-bold text-base md:text-lg text-[#172a3b] leading-snug">
+                    {edu.degree}
+                  </h3>
+                  <div class="text-sm font-semibold text-[#304774] mt-1">
+                    {edu.school}
+                  </div>
+                  <div class="font-mono-tech text-xs text-[#52637a] mt-0.5">
+                    {edu.years}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <!-- Right Column: Skills & Production Stack (Exact CV Structure + Meters) -->
+          <div class="lg:col-span-6 space-y-6">
+            <div class="flex items-center gap-3 pb-3 border-b-2 border-[#172a3b]">
+              <Lightning size={28} weight="duotone" className="text-[#304774]" />
+              <h2 class="font-display font-extrabold text-2xl md:text-3xl text-[#172a3b]">
+                {data.skillsHeading || 'Skills & 3D Pipeline'}
+              </h2>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {(data.softwareMeters || []).map((sw) => (
+                <div class="bg-white/85 rounded-2xl p-4 border border-white shadow-xs flex flex-col justify-between gap-2">
+                  <div class="flex items-center justify-between gap-2">
+                    <span class="font-display font-bold text-sm text-[#172a3b]">
+                      {sw.name}
+                    </span>
+                    <span class="px-2 py-0.5 rounded-full bg-[#304774] text-white font-mono-tech text-[11px] font-bold">
+                      {sw.segmentsFilled}/8
+                    </span>
+                  </div>
+                  <p class="text-xs text-[#29323e] leading-relaxed">
+                    {sw.subtitle}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

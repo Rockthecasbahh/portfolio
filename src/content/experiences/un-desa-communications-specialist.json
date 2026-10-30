@@ -1,0 +1,17 @@
+{
+  "roleSlug": "un-desa-communications-specialist",
+  "roleTitle": "Communications & Multimedia Specialist",
+  "organization": "United Nations Department of Economic and Social Affairs (UN DESA)",
+  "organizationShort": "UN DESA",
+  "location": "New York, USA",
+  "period": "June 2025 - December 2025",
+  "sortOrder": 1,
+  "logoPath": "/assets/logos/un-desa.png",
+  "trackHighlight": "Drupal 10 Platform (+45% Engagement) · 20 INFF Multimedia Deliverables",
+  "highlights": [
+    "Produced 20 multimedia assets for the FINS initiative translating technical research on sustainable development financing and Integrated National Financing Frameworks (INFFs) into accessible narratives for governments.",
+    "Directed, filmed on location in the Dominican Republic, and edited 5 high-level advocacy videos and 15 animated training modules used by national finance ministries.",
+    "Built and maintained the FINS digital platform on Drupal 10, structuring video galleries and learning resources to lift monthly user engagement by 45%.",
+    "Engineered modular motion graphic templates for rapid 48-hour turnarounds across 16:9, 9:16, and 1:1 formats."
+  ]
+}

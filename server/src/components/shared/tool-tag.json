@@ -1,0 +1,13 @@
+{
+  "collectionName": "components_shared_tool_tags",
+  "info": {
+    "displayName": "Tool Tag",
+    "description": "Software or production tool tag on a project"
+  },
+  "options": {},
+  "attributes": {
+    "name": {
+      "type": "string"
+    }
+  }
+}

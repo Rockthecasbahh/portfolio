@@ -1,0 +1,19 @@
+{
+  "collectionName": "components_blocks_heading_sections",
+  "info": {
+    "displayName": "Heading Section",
+    "description": "Reusable section heading block"
+  },
+  "options": {},
+  "attributes": {
+    "heading": {
+      "type": "string"
+    },
+    "subHeading": {
+      "type": "string"
+    },
+    "anchorLink": {
+      "type": "string"
+    }
+  }
+}

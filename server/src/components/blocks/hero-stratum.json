@@ -1,0 +1,56 @@
+{
+  "collectionName": "components_blocks_hero_strata",
+  "info": {
+    "displayName": "Hero Stratum",
+    "description": "CV-styled stepped topographic hero with portrait halo and 3D artifact badge"
+  },
+  "options": {},
+  "attributes": {
+    "taglineBadge": {
+      "type": "string"
+    },
+    "fullName": {
+      "type": "string"
+    },
+    "quoteText": {
+      "type": "text"
+    },
+    "portraitImageUrl": {
+      "type": "string",
+      "default": "/assets/matteo-portrait-cutout.webp"
+    },
+    "portraitImage": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "primaryCta": {
+      "type": "component",
+      "repeatable": false,
+      "component": "shared.link"
+    },
+    "secondaryCta": {
+      "type": "component",
+      "repeatable": false,
+      "component": "shared.link"
+    },
+    "floatingArtifactTitle": {
+      "type": "string",
+      "default": "3D & Motion Layers"
+    },
+    "floatingArtifactSubtitle": {
+      "type": "string",
+      "default": "Blender + Three.js + GSAP"
+    },
+    "floatingArtifactHref": {
+      "type": "string",
+      "default": "#chapter-02"
+    },
+    "floatingArtifactImageUrl": {
+      "type": "string",
+      "default": "/assets/projects/locust-3d-sculpture.png"
+    }
+  }
+}

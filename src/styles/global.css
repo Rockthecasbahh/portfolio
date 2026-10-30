@@ -1,0 +1,210 @@
+@import "tailwindcss";
+
+/* ==========================================================================
+   CREATIVE SELF-HOSTED TYPOGRAPHY
+   - Syne Variable (700-800): Expressive European Art-Directed Display
+   - Plus Jakarta Sans Variable (400-700): Crisp Geometric Body & UI
+   - JetBrains Mono Variable: Topographic Coordinates & Elevation Telemetry
+   ========================================================================== */
+
+@font-face {
+  font-family: 'Syne';
+  src: url('/fonts/syne-latin-wght-normal.woff2') format('woff2-variations');
+  font-weight: 400 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  src: url('/fonts/plus-jakarta-sans-latin-wght-normal.woff2') format('woff2-variations');
+  font-weight: 200 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  src: url('/fonts/plus-jakarta-sans-latin-wght-italic.woff2') format('woff2-variations');
+  font-weight: 200 800;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('/fonts/jetbrains-mono-latin-wght-normal.woff2') format('woff2-variations');
+  font-weight: 100 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ==========================================================================
+   MATTEO'S STYLED CV TOPOGRAPHIC COLOUR PALETTE
+   Extracted directly from Matteo_Casling_CV.pdf & Casling CV_Runpod.pdf
+   ========================================================================== */
+
+:root {
+  --cv-paper: #ffffff;
+  --cv-paper-mist: #f4f9fc;
+  --cv-ice: #d9ebf4;
+  --cv-ice-deep: #c5e0ee;
+  --cv-cobalt: #304774;
+  --cv-cobalt-deep: #24375c;
+  --cv-navy-ink: #172a3b;
+  --cv-body-ink: #29323e;
+  --cv-muted-ink: #52637a;
+
+  --cv-gold: #c9a345;
+  --cv-azure: #1c72b4;
+  --cv-coral-light: #fbd5cd;
+  --cv-coral-warm: #f29f8b;
+  --cv-contour-warm: #d8c8ca;
+  --cv-contour-slate: #b6bece;
+
+  --font-display: 'Syne', system-ui, -apple-system, sans-serif;
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+html {
+  background-color: var(--cv-paper-mist);
+  color: var(--cv-navy-ink);
+  font-family: var(--font-sans);
+  scroll-behavior: auto;
+  overflow-x: hidden;
+}
+
+body {
+  background-color: var(--cv-paper-mist);
+  color: var(--cv-navy-ink);
+  overflow-x: hidden;
+}
+
+::selection {
+  background: var(--cv-cobalt);
+  color: #ffffff;
+}
+
+/* Typography Helpers */
+.font-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.03em;
+}
+
+.font-sans-body {
+  font-family: var(--font-sans);
+}
+
+.font-mono-tech {
+  font-family: var(--font-mono);
+}
+
+/* ==========================================================================
+   CV TOPOGRAPHIC LAYER & STEPPED WAVE GEOMETRY
+   Mirrors the exact overlapping rounded-corner strata from Matteo's CV
+   ========================================================================== */
+
+/* Signature CV Opposite-Corner Leaf Slab (Top-Left + Bottom-Right Curve) */
+.cv-wave-slab {
+  border-top-left-radius: 64px;
+  border-bottom-right-radius: 64px;
+  border-top-right-radius: 14px;
+  border-bottom-left-radius: 14px;
+}
+
+/* Signature CV Hero Card (Bottom-Left + Top-Right Curve over Cobalt Spine) */
+.cv-hero-slab {
+  border-top-left-radius: 20px;
+  border-top-right-radius: 76px;
+  border-bottom-left-radius: 76px;
+  border-bottom-right-radius: 20px;
+}
+
+/* 1. Glacier Ice-Blue Stratum (#d9ebf4) */
+.cv-stratum-ice {
+  background-color: rgba(217, 235, 244, 0.9);
+  backdrop-filter: blur(8px);
+  color: var(--cv-navy-ink);
+  box-shadow:
+    0 22px 48px -12px rgba(23, 42, 59, 0.14),
+    0 4px 12px -2px rgba(48, 71, 116, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.75);
+}
+
+/* 2. Slate-Cobalt Navy Wave Stratum (#304774) */
+.cv-stratum-cobalt {
+  background: linear-gradient(135deg, #304774 0%, #263a61 100%);
+  color: #ffffff;
+  box-shadow:
+    0 24px 52px -12px rgba(23, 42, 59, 0.28),
+    0 6px 16px -4px rgba(23, 42, 59, 0.18),
+    inset 0 1px 0 rgba(217, 235, 244, 0.22);
+}
+
+/* 3. Porcelain Paper White Stratum (#ffffff) */
+.cv-stratum-paper {
+  background-color: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8px);
+  color: var(--cv-navy-ink);
+  box-shadow:
+    0 20px 44px -12px rgba(23, 42, 59, 0.11),
+    0 3px 10px -2px rgba(48, 71, 116, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
+}
+
+/* 4. Warm Coral-Apricot Portrait Circle from CV Top-Right */
+.cv-portrait-halo {
+  background: radial-gradient(
+    circle at 50% 42%,
+    #fde2dc 0%,
+    #fbd5cd 48%,
+    #f29f8b 100%
+  );
+  box-shadow:
+    0 20px 45px rgba(23, 42, 59, 0.22),
+    inset 0 2px 6px rgba(255, 255, 255, 0.8);
+}
+
+/* 5. Technical Leader-Line Metadata */
+.leader-line {
+  display: inline-flex;
+  align-items: center;
+}
+
+.leader-line::before {
+  content: '';
+  display: inline-block;
+  width: 28px;
+  height: 1.5px;
+  background-color: currentColor;
+  opacity: 0.45;
+}
+
+.leader-line::after {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background-color: var(--cv-gold);
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
+/* Custom Scrollbar matching CV palette */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #d9ebf4;
+}
+::-webkit-scrollbar-thumb {
+  background: #304774;
+  border-radius: 9999px;
+  border: 2px solid #d9ebf4;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #172a3b;
+}

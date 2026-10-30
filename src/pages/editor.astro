@@ -1,0 +1,38 @@
+---
+import PageBuilderEditor from '../page-builder/PageBuilderEditor';
+import { PUBLIC_STRAPI_URL, STRAPI_ADMIN_ORIGIN } from '../page-builder/server';
+import { getGlobalPageData, getAllProjects, getAllExperiences } from '../utils/loaders';
+
+export const prerender = false;
+
+const [globalData, projects, experiences] = await Promise.all([
+  getGlobalPageData(),
+  getAllProjects(),
+  getAllExperiences(),
+]);
+
+// Same shape the public site passes as Puck metadata, so previews match the live page.
+const additionalContent = {
+  projects,
+  experiences,
+  studio3d: globalData.studio3d,
+};
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Page Builder Editor</title>
+  </head>
+  <body style="margin:0">
+    <PageBuilderEditor
+      client:only="react"
+      strapiUrl={PUBLIC_STRAPI_URL}
+      strapiAdminOrigin={STRAPI_ADMIN_ORIGIN}
+      additionalContent={additionalContent}
+    />
+  </body>
+</html>

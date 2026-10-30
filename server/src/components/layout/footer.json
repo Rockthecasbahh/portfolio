@@ -1,0 +1,19 @@
+{
+  "collectionName": "components_layout_footers",
+  "info": {
+    "displayName": "Footer",
+    "description": "Global site footer"
+  },
+  "options": {},
+  "attributes": {
+    "copyrightName": {
+      "type": "string",
+      "default": "Matteo Louis Casling"
+    },
+    "links": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.link"
+    }
+  }
+}

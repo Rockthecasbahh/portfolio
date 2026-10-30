@@ -1,0 +1,62 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import BlockRenderer from '../../components/blocks/BlockRenderer.astro';
+import PageBuilderRender from '../../page-builder/PageBuilderRender';
+import { buildTemplateRender, PUBLIC_STRAPI_URL } from '../../page-builder/server';
+import {
+  getGlobalPageData,
+  getPageBySlug,
+  getAllProjects,
+  getAllExperiences,
+} from '../../utils/loaders';
+
+export const prerender = false;
+
+const { slug } = Astro.params;
+if (!slug) {
+  return Astro.redirect('/');
+}
+
+const [globalData, pageData, projects, experiences] = await Promise.all([
+  getGlobalPageData(),
+  getPageBySlug(slug),
+  getAllProjects(),
+  getAllExperiences(),
+]);
+
+if (!pageData) {
+  return new Response('Page not found in Strapi CMS', { status: 404 });
+}
+
+const pbRender = await buildTemplateRender(pageData, globalData, {
+  projects,
+  experiences,
+});
+const effectiveGlobal = pbRender ? pbRender.globalData : globalData;
+const rootTitle = pbRender?.data?.root?.props?.title;
+---
+
+<BaseLayout
+  globalData={effectiveGlobal}
+  title={`${rootTitle || pageData.title} | ${effectiveGlobal.header.fullName}`}
+  description={pageData.description || effectiveGlobal.description}
+>
+  <div class="pt-20">
+    {
+      pbRender ? (
+        <PageBuilderRender
+          client:load
+          data={pbRender.data}
+          metadata={pbRender.metadata}
+          strapiImageUrl={PUBLIC_STRAPI_URL}
+        />
+      ) : (
+        <BlockRenderer
+          blocks={pageData.blocks}
+          projects={projects}
+          experiences={experiences}
+        />
+      )
+    }
+  </div>
+</BaseLayout>

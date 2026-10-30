@@ -1,0 +1,28 @@
+{
+  "collectionName": "components_shared_dossier_cards",
+  "info": {
+    "displayName": "Dossier Card",
+    "description": "Downloadable CV or Portfolio PDF card"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "subtitle": {
+      "type": "string"
+    },
+    "href": {
+      "type": "string"
+    },
+    "iconType": {
+      "type": "enumeration",
+      "enum": [
+        "pdf",
+        "film",
+        "browser"
+      ],
+      "default": "pdf"
+    }
+  }
+}

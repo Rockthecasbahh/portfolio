@@ -1,0 +1,35 @@
+{
+  "collectionName": "components_blocks_horizontal_showreels",
+  "info": {
+    "displayName": "Horizontal Showreel",
+    "description": "GSAP ScrollTrigger horizontal 3D & documentary cinema showreel"
+  },
+  "options": {},
+  "attributes": {
+    "sectionId": {
+      "type": "string",
+      "default": "showreel"
+    },
+    "eyebrow": {
+      "type": "string",
+      "default": "GSAP ScrollTrigger Horizontal Cinema"
+    },
+    "heading": {
+      "type": "string",
+      "default": "3D & Motion Showreel"
+    },
+    "subHeading": {
+      "type": "text",
+      "default": "Scroll to scrub through selected UN documentary films, Blender 3D scientific visualizations, and motion graphics."
+    },
+    "onlyFeatured": {
+      "type": "boolean",
+      "default": true
+    },
+    "projects": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::project.project"
+    }
+  }
+}

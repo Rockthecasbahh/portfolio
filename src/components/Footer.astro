@@ -1,0 +1,27 @@
+---
+import type { GlobalFooterData } from '../utils/types';
+
+interface Props {
+  footer: GlobalFooterData;
+}
+
+const { footer } = Astro.props;
+---
+
+<footer class="relative z-10 py-8">
+  <div class="max-w-[1440px] mx-auto px-6 md:px-12 flex flex-wrap items-center justify-between gap-4 font-mono-tech text-xs text-[#52637a]">
+    <div class="font-bold text-[#172a3b]">{footer.copyrightName}</div>
+    <div class="flex items-center gap-6">
+      {(footer.links || []).map((link) => (
+        <a
+          href={link.href}
+          target={link.isExternal ? '_blank' : undefined}
+          rel={link.isExternal ? 'noreferrer' : undefined}
+          class="hover:text-[#304774] transition-colors"
+        >
+          {link.label}
+        </a>
+      ))}
+    </div>
+  </div>
+</footer>

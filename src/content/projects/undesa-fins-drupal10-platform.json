@@ -1,0 +1,28 @@
+{
+  "title": "UN DESA FINS Digital Platform & FAO Transboundary Knowledge Portal",
+  "chapterNumber": "04",
+  "category": "web",
+  "madeFor": "UN DESA & FAO",
+  "year": "2025",
+  "location": "New York, USA · Rome, Italy",
+  "track": "tech-motion",
+  "featuredInReel": false,
+  "sortOrder": 10,
+  "shortDescription": "Architected, built, and maintained the Financing for Small Island Developing States (FINS) digital platform on Drupal 10 and the FAO Transboundary Plant Pests portal, structuring interactive video galleries and policy repositories.",
+  "mandateChallenge": "Legacy UN web pages buried critical training videos and financing tools under fragmented navigation, hurting retention among ministry officials.",
+  "executionCraft": "Built custom Drupal 10 content architectures, responsive HTML/CSS/JS component layouts, and structured video learning hubs accompanied by Google Analytics telemetry.",
+  "impactMetric": "+45% Monthly User Engagement Lift on Drupal 10",
+  "thumbnail": "/assets/projects/undesa-fins-drupal10-platform/climate-diplomacy.webp",
+  "secondaryImage": "/assets/projects/undesa-fins-drupal10-platform/fao-locust-upsurge-story.png",
+  "videoYoutubeId": "",
+  "externalUrl": "https://www.fao.org/transboundary-plant-pests-diseases/en",
+  "externalLabel": "Visit Live UN Portal",
+  "tools": [
+    "Drupal 10",
+    "WordPress",
+    "HTML5 / CSS3",
+    "JavaScript",
+    "Google Analytics",
+    "Information Architecture"
+  ]
+}

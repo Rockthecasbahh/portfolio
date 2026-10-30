@@ -1,0 +1,19 @@
+{
+  "collectionName": "components_blocks_logo_walls",
+  "info": {
+    "displayName": "Logo Wall",
+    "description": "United Nations agencies and broadcast partner logo strip"
+  },
+  "options": {},
+  "attributes": {
+    "ariaLabel": {
+      "type": "string",
+      "default": "United Nations Agencies and Broadcast Partners"
+    },
+    "logos": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.partner-logo"
+    }
+  }
+}

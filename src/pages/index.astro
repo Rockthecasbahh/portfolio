@@ -1,0 +1,51 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import BlockRenderer from '../components/blocks/BlockRenderer.astro';
+import PageBuilderRender from '../page-builder/PageBuilderRender';
+import { buildTemplateRender, PUBLIC_STRAPI_URL } from '../page-builder/server';
+import {
+  getGlobalPageData,
+  getLandingPageData,
+  getAllProjects,
+  getAllExperiences,
+} from '../utils/loaders';
+
+export const prerender = false;
+
+const [globalData, landingPage, projects, experiences] = await Promise.all([
+  getGlobalPageData(),
+  getLandingPageData(),
+  getAllProjects(),
+  getAllExperiences(),
+]);
+
+const pbRender = await buildTemplateRender(landingPage, globalData, {
+  projects,
+  experiences,
+});
+const effectiveGlobal = pbRender ? pbRender.globalData : globalData;
+const rootTitle = pbRender?.data?.root?.props?.title;
+---
+
+<BaseLayout
+  globalData={effectiveGlobal}
+  title={rootTitle || landingPage.title || effectiveGlobal.title}
+  description={landingPage.description || effectiveGlobal.description}
+>
+  {
+    pbRender ? (
+      <PageBuilderRender
+        client:load
+        data={pbRender.data}
+        metadata={pbRender.metadata}
+        strapiImageUrl={PUBLIC_STRAPI_URL}
+      />
+    ) : (
+      <BlockRenderer
+        blocks={landingPage.blocks}
+        projects={projects}
+        experiences={experiences}
+      />
+    )
+  }
+</BaseLayout>

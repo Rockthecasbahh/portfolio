@@ -1,0 +1,58 @@
+{
+  "kind": "collectionType",
+  "collectionName": "experiences",
+  "info": {
+    "singularName": "experience",
+    "pluralName": "experiences",
+    "displayName": "Experience",
+    "description": "Career Timeline & United Nations Missions"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "roleTitle": {
+      "type": "string",
+      "required": true
+    },
+    "slug": {
+      "type": "uid",
+      "targetField": "roleTitle"
+    },
+    "organization": {
+      "type": "string"
+    },
+    "organizationShort": {
+      "type": "string"
+    },
+    "location": {
+      "type": "string"
+    },
+    "period": {
+      "type": "string"
+    },
+    "sortOrder": {
+      "type": "integer",
+      "default": 1
+    },
+    "logoPath": {
+      "type": "string"
+    },
+    "logoImage": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "trackHighlight": {
+      "type": "string"
+    },
+    "highlights": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.highlight-bullet"
+    }
+  }
+}

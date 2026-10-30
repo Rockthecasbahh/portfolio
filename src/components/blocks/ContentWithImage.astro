@@ -1,0 +1,72 @@
+---
+import type { ContentWithImageBlock } from '../../utils/types';
+import { getStrapiMediaUrl } from '../../utils/strapi-client';
+import { ArrowUpRight } from '@phosphor-icons/react';
+
+interface Props {
+  data: ContentWithImageBlock;
+}
+
+const { data } = Astro.props;
+const imgSrc = getStrapiMediaUrl(data.image, data.imageUrl);
+const isCobalt = data.stratumTheme === 'cobalt';
+const isIce = data.stratumTheme === 'ice';
+---
+
+<section class="py-12">
+  <div class="max-w-[1440px] mx-auto px-4 sm:px-8">
+    <div
+      class={`cv-wave-slab p-7 sm:p-10 md:p-12 ${
+        isCobalt
+          ? 'cv-stratum-cobalt'
+          : isIce
+          ? 'cv-stratum-ice border border-white'
+          : 'cv-stratum-paper border border-[#d9ebf4]'
+      }`}
+    >
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        <div class={`lg:col-span-7 space-y-4 ${data.reversed ? 'lg:order-2' : ''}`}>
+          {data.subHeading && (
+            <div class={`font-mono-tech text-xs font-bold uppercase tracking-wider ${isCobalt ? 'text-[#fbd5cd]' : 'text-[#1c72b4]'}`}>
+              {data.subHeading}
+            </div>
+          )}
+          <h2 class={`font-display font-extrabold text-2xl md:text-4xl ${isCobalt ? 'text-white' : 'text-[#172a3b]'}`}>
+            {data.heading}
+          </h2>
+          <p class={`text-base leading-relaxed ${isCobalt ? 'text-white/90' : 'text-[#29323e]'}`}>
+            {data.content}
+          </p>
+          {data.link && (
+            <div class="pt-2">
+              <a
+                href={data.link.href}
+                target={data.link.isExternal ? '_blank' : undefined}
+                rel={data.link.isExternal ? 'noreferrer' : undefined}
+                class={`px-5 py-3 rounded-full font-mono-tech text-xs font-bold inline-flex items-center gap-2 transition-colors ${
+                  isCobalt
+                    ? 'bg-white text-[#172a3b] hover:bg-[#d9ebf4]'
+                    : 'bg-[#304774] text-white hover:bg-[#172a3b]'
+                }`}
+              >
+                <span>{data.link.label}</span>
+                <ArrowUpRight size={15} weight="bold" />
+              </a>
+            </div>
+          )}
+        </div>
+
+        {imgSrc && (
+          <div class={`lg:col-span-5 ${data.reversed ? 'lg:order-1' : ''}`}>
+            <img
+              src={imgSrc}
+              alt={data.heading}
+              loading="lazy"
+              class="w-full rounded-2xl object-cover shadow-lg border border-white/40"
+            />
+          </div>
+        )}
+      </div>
+    </div>
+  </div>
+</section>

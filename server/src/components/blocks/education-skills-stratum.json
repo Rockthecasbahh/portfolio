@@ -1,0 +1,37 @@
+{
+  "collectionName": "components_blocks_education_skills_strata",
+  "info": {
+    "displayName": "Education & Skills Stratum",
+    "description": "4-cell UN impact telemetry row + two-column Education and Software Meters stratum"
+  },
+  "options": {},
+  "attributes": {
+    "sectionId": {
+      "type": "string",
+      "default": "education-skills"
+    },
+    "metrics": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.impact-metric"
+    },
+    "educationHeading": {
+      "type": "string",
+      "default": "Education"
+    },
+    "educationItems": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.education-item"
+    },
+    "skillsHeading": {
+      "type": "string",
+      "default": "Skills & 3D Pipeline"
+    },
+    "softwareMeters": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.software-meter"
+    }
+  }
+}

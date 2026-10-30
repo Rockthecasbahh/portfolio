@@ -1,0 +1,27 @@
+{
+  "collectionName": "components_shared_impact_metrics",
+  "info": {
+    "displayName": "Impact Metric",
+    "description": "Verified UN or production impact telemetry card"
+  },
+  "options": {},
+  "attributes": {
+    "value": {
+      "type": "string"
+    },
+    "label": {
+      "type": "string"
+    },
+    "agency": {
+      "type": "string"
+    },
+    "theme": {
+      "type": "enumeration",
+      "enum": [
+        "paper",
+        "cobalt"
+      ],
+      "default": "paper"
+    }
+  }
+}

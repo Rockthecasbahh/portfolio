@@ -1,0 +1,26 @@
+{
+  "title": "3D Anatomical & Scientific Visualization Rig - Schistocerca Gregaria",
+  "chapterNumber": "02",
+  "category": "animation",
+  "madeFor": "FAO / Editorial Portfolio",
+  "year": "2024",
+  "location": "Rome · Vienna",
+  "track": "tech-motion",
+  "featuredInReel": true,
+  "sortOrder": 6,
+  "shortDescription": "High-resolution 3D digital sculpture and procedural material study created in Blender & Unreal Engine 5, anchoring the visual identity of the UN-Portfolio cover and technical training suites.",
+  "mandateChallenge": "Bridge scientific entomological accuracy with striking editorial design so technical UN manuals and animations command immediate visual authority.",
+  "executionCraft": "Sculpted and retopologized in Blender, shaded with subsurface scattering and studio rim lighting, and integrated into print layouts and motion sequences.",
+  "impactMetric": "Featured Cover Artifact · Print & Motion Pipeline",
+  "thumbnail": "/assets/projects/blender-3d-biological-scientific-visualization/locust-3d-sculpture.png",
+  "secondaryImage": "/assets/projects/blender-3d-biological-scientific-visualization/fao-asdc-animation.png",
+  "videoYoutubeId": "",
+  "externalUrl": "/documents/Matteo_Casling_Portfolio_Book.pdf",
+  "externalLabel": "Inspect in Portfolio Book",
+  "tools": [
+    "Blender 3D",
+    "Unreal Engine 5",
+    "Cycles Render",
+    "Procedural Shaders"
+  ]
+}

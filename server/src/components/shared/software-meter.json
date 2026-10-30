@@ -1,0 +1,22 @@
+{
+  "collectionName": "components_shared_software_meters",
+  "info": {
+    "displayName": "Software Meter",
+    "description": "Production tool & proficiency meter (1-8 segments)"
+  },
+  "options": {},
+  "attributes": {
+    "name": {
+      "type": "string"
+    },
+    "subtitle": {
+      "type": "string"
+    },
+    "segmentsFilled": {
+      "type": "integer",
+      "default": 8,
+      "min": 1,
+      "max": 8
+    }
+  }
+}

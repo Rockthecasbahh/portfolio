@@ -1,0 +1,30 @@
+{
+  "collectionName": "components_shared_partner_logos",
+  "info": {
+    "displayName": "Partner Logo",
+    "description": "UN Agency or Broadcast Partner Logo"
+  },
+  "options": {},
+  "attributes": {
+    "name": {
+      "type": "string"
+    },
+    "alt": {
+      "type": "string"
+    },
+    "imageUrl": {
+      "type": "string"
+    },
+    "darkBg": {
+      "type": "boolean",
+      "default": false
+    },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images"
+      ]
+    }
+  }
+}

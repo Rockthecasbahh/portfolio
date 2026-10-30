@@ -1,0 +1,26 @@
+{
+  "title": "Manual for the Implementation of Environmental, Health, and Safety Standards",
+  "chapterNumber": "03",
+  "category": "design",
+  "madeFor": "FAO",
+  "year": "2021",
+  "location": "Rome, Italy",
+  "track": "un-policy",
+  "featuredInReel": false,
+  "sortOrder": 9,
+  "shortDescription": "Technical book design and vector botanical/entomological wireframe cover illustration defining Standard Operating Procedures (SOPs) to minimize insecticide impact on human health and ecosystems.",
+  "mandateChallenge": "Turn complex toxicology, PPE compliance, and environmental monitoring SOPs into a durable, highly legible reference manual for field operations.",
+  "executionCraft": "Created intricate white-wireframe locust vector illustrations over botanical photography, structured long-form typographic hierarchies, and delivered with zero errata across publishing cycles.",
+  "impactMetric": "Zero Errata Across Publishing Cycles · Global SOP Standard",
+  "thumbnail": "/assets/projects/environmental-health-safety-locust-manual/fao-ehs-locust-manual.png",
+  "secondaryImage": "",
+  "videoYoutubeId": "",
+  "externalUrl": "https://www.fao.org/3/cc1840en/cc1840en.pdf",
+  "externalLabel": "Download Technical Manual PDF",
+  "tools": [
+    "InDesign",
+    "Illustrator",
+    "Long-Form Typography",
+    "Vector Wireframes"
+  ]
+}

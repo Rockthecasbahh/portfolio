@@ -1,0 +1,22 @@
+---
+import type { HeadingSectionBlock } from '../../utils/types';
+
+interface Props {
+  data: HeadingSectionBlock;
+}
+
+const { data } = Astro.props;
+---
+
+<section id={data.anchorLink || undefined} class="pt-16 pb-4">
+  <div class="max-w-[1440px] mx-auto px-4 sm:px-8">
+    {data.subHeading && (
+      <div class="font-mono-tech text-xs font-bold uppercase tracking-wider text-[#1c72b4] mb-1.5">
+        {data.subHeading}
+      </div>
+    )}
+    <h2 class="font-display font-extrabold text-3xl md:text-5xl text-[#172a3b]">
+      {data.heading}
+    </h2>
+  </div>
+</section>

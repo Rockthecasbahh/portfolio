@@ -1,0 +1,13 @@
+{
+  "collectionName": "components_shared_highlight_bullets",
+  "info": {
+    "displayName": "Highlight Bullet",
+    "description": "Individual bullet point in a career experience card"
+  },
+  "options": {},
+  "attributes": {
+    "text": {
+      "type": "text"
+    }
+  }
+}

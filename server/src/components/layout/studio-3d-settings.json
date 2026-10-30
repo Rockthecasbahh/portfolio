@@ -1,0 +1,75 @@
+{
+  "collectionName": "components_layout_studio_3d_settings",
+  "info": {
+    "displayName": "Studio 3D Settings",
+    "description": "Three.js Topographic Strata, Cinema Camera & Video Light Rig settings"
+  },
+  "options": {},
+  "attributes": {
+    "engineMode": {
+      "type": "enumeration",
+      "enum": [
+        "procedural-sculpture",
+        "spline",
+        "glb"
+      ],
+      "default": "procedural-sculpture"
+    },
+    "splineUrl": {
+      "type": "string",
+      "default": ""
+    },
+    "glbPath": {
+      "type": "string",
+      "default": ""
+    },
+    "deepNavyHex": {
+      "type": "string",
+      "default": "#172a3b"
+    },
+    "cobaltHex": {
+      "type": "string",
+      "default": "#304774"
+    },
+    "iceBlueHex": {
+      "type": "string",
+      "default": "#d9ebf4"
+    },
+    "coralAccentHex": {
+      "type": "string",
+      "default": "#f29f8b"
+    },
+    "scrollMorphIntensity": {
+      "type": "float",
+      "default": 1.15
+    },
+    "cameraRigScale": {
+      "type": "float",
+      "default": 1.15
+    },
+    "videoLightIntensity": {
+      "type": "float",
+      "default": 3.0
+    },
+    "videoLightColor": {
+      "type": "string",
+      "default": "#d9ebf4"
+    },
+    "strataSpread": {
+      "type": "float",
+      "default": 1.15
+    },
+    "sceneOffsetX": {
+      "type": "float",
+      "default": 2.55
+    },
+    "sceneOffsetY": {
+      "type": "float",
+      "default": -0.1
+    },
+    "showTopographicContours": {
+      "type": "boolean",
+      "default": true
+    }
+  }
+}

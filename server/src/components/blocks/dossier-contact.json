@@ -1,0 +1,61 @@
+{
+  "collectionName": "components_blocks_dossier_contacts",
+  "info": {
+    "displayName": "Dossier & Contact",
+    "description": "Downloadable PDF CVs, Un-Portfolio Book, and Direct Contact stratum"
+  },
+  "options": {},
+  "attributes": {
+    "sectionId": {
+      "type": "string",
+      "default": "documents"
+    },
+    "heading": {
+      "type": "string",
+      "default": "CV Dossiers & Strapi Headless CMS"
+    },
+    "description": {
+      "type": "text",
+      "default": "Download Matteo's original topographic PDF CVs and 13-page portfolio book, or launch the Strapi v5 Admin Panel to manage page blocks, projects, career milestones, and 3D topographic scenes visually."
+    },
+    "dossierCards": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.dossier-card"
+    },
+    "contactHeading": {
+      "type": "string",
+      "default": "Direct Contact"
+    },
+    "email": {
+      "type": "string",
+      "default": "matteocasling@gmail.com"
+    },
+    "phone": {
+      "type": "string",
+      "default": "+39 327 662 4932"
+    },
+    "location": {
+      "type": "string",
+      "default": "New York, NY / Rome, Italy"
+    },
+    "cmsLabel": {
+      "type": "string",
+      "default": "Strapi v5 Admin"
+    },
+    "cmsUrl": {
+      "type": "string",
+      "default": "http://localhost:1337/admin"
+    },
+    "primaryCta": {
+      "type": "component",
+      "repeatable": false,
+      "component": "shared.link"
+    },
+    "secondaryCta": {
+      "type": "component",
+      "repeatable": false,
+      "component": "shared.link"
+    }
+  }
+}
