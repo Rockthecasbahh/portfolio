@@ -10,7 +10,9 @@ import {
   getAllExperiences,
 } from '../../utils/loaders';
 
-export const prerender = false;
+export async function getStaticPaths() {
+  return [];
+}
 
 const { slug } = Astro.params;
 if (!slug) {
