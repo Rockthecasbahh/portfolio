@@ -53,14 +53,16 @@ export const POST: APIRoute = async ({ request }) => {
 
     // Persist privately on the backend filesystem (never exposed publicly)
     try {
-      const storageDir = path.resolve(process.cwd(), 'server', '.tmp');
-      fs.mkdirSync(storageDir, { recursive: true });
-      const submissionsFile = path.join(storageDir, 'contact-submissions.json');
-      const existing = fs.existsSync(submissionsFile)
-        ? JSON.parse(fs.readFileSync(submissionsFile, 'utf-8'))
-        : [];
-      const updated = Array.isArray(existing) ? [submissionRecord, ...existing] : [submissionRecord];
-      fs.writeFileSync(submissionsFile, JSON.stringify(updated, null, 2), 'utf-8');
+      if (typeof fs?.mkdirSync === 'function' && typeof process?.cwd === 'function') {
+        const storageDir = path.resolve(process.cwd(), 'server', '.tmp');
+        fs.mkdirSync(storageDir, { recursive: true });
+        const submissionsFile = path.join(storageDir, 'contact-submissions.json');
+        const existing = fs.existsSync(submissionsFile)
+          ? JSON.parse(fs.readFileSync(submissionsFile, 'utf-8'))
+          : [];
+        const updated = Array.isArray(existing) ? [submissionRecord, ...existing] : [submissionRecord];
+        fs.writeFileSync(submissionsFile, JSON.stringify(updated, null, 2), 'utf-8');
+      }
     } catch {
       // Non-fatal if filesystem is read-only in a serverless environment
     }

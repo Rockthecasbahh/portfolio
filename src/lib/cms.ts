@@ -1,5 +1,5 @@
-import fs from 'node:fs';
-import path from 'node:path';
+import profileJson from '../content/profile/index.json';
+import studio3dJson from '../content/studio3d/index.json';
 
 export interface SoftwareMeter {
   name: string;
@@ -118,68 +118,52 @@ export interface ExperienceItem {
   highlights: string[];
 }
 
-const contentRoot = path.resolve(process.cwd(), 'src/content');
-const dataRoot = path.resolve(process.cwd(), 'src/data');
-
 export function getProfile(): ProfileData {
-  const filePath = path.join(contentRoot, 'profile/index.json');
-  return JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+  return profileJson as unknown as ProfileData;
 }
 
 export function getVisualOverrides(): VisualOverridesData {
-  const filePath = path.join(dataRoot, 'visual-overrides.json');
-  if (!fs.existsSync(filePath)) {
-    return {
-      elementEdits: {},
-      sectionOrder: [
-        'hero-section',
-        'logos-section',
-        'education-skills',
-        'showreel',
-        'work',
-        'experience',
-        'documents',
-      ],
-      hiddenSections: [],
-      customBlocks: [],
-      studio3dOverrides: {},
-    };
-  }
-  return JSON.parse(fs.readFileSync(filePath, 'utf-8'));
-}
-
-export function getStudio3DSettings(): Studio3DSettings {
-  const filePath = path.join(contentRoot, 'studio3d/index.json');
-  const base = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
-  const overrides = getVisualOverrides().studio3dOverrides || {};
   return {
-    ...base,
-    ...overrides,
+    elementEdits: {},
+    sectionOrder: [
+      'hero-section',
+      'logos-section',
+      'education-skills',
+      'showreel',
+      'work',
+      'experience',
+      'documents',
+    ],
+    hiddenSections: [],
+    customBlocks: [],
+    studio3dOverrides: {},
   };
 }
 
+export function getStudio3DSettings(): Studio3DSettings {
+  return studio3dJson as unknown as Studio3DSettings;
+}
+
+const rawProjects = import.meta.glob('../content/projects/*.json', { eager: true });
 export function getProjects(): ProjectItem[] {
-  const dirPath = path.join(contentRoot, 'projects');
-  if (!fs.existsSync(dirPath)) return [];
-  const files = fs.readdirSync(dirPath).filter((f) => f.endsWith('.json'));
-  const items: ProjectItem[] = files.map((file) => {
-    const slug = file.replace(/\.json$/, '');
-    const raw = JSON.parse(fs.readFileSync(path.join(dirPath, file), 'utf-8'));
-    return {
+  const items: ProjectItem[] = [];
+  for (const [pathKey, mod] of Object.entries(rawProjects)) {
+    const slug = pathKey.split('/').pop()?.replace(/\.json$/, '') || '';
+    const raw = (mod as any).default || mod;
+    items.push({
       slug,
       ...raw,
-    };
-  });
+    });
+  }
   return items.sort((a, b) => (a.sortOrder ?? 99) - (b.sortOrder ?? 99));
 }
 
+const rawExperiences = import.meta.glob('../content/experiences/*.json', { eager: true });
 export function getExperiences(): ExperienceItem[] {
-  const dirPath = path.join(contentRoot, 'experiences');
-  if (!fs.existsSync(dirPath)) return [];
-  const files = fs.readdirSync(dirPath).filter((f) => f.endsWith('.json'));
-  const items: ExperienceItem[] = files.map((file) => {
-    const raw = JSON.parse(fs.readFileSync(path.join(dirPath, file), 'utf-8'));
-    return raw;
-  });
+  const items: ExperienceItem[] = [];
+  for (const [, mod] of Object.entries(rawExperiences)) {
+    const raw = (mod as any).default || mod;
+    items.push(raw);
+  }
   return items.sort((a, b) => (a.sortOrder ?? 99) - (b.sortOrder ?? 99));
 }

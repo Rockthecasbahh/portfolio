@@ -1,22 +1,22 @@
 ---
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import BlockRenderer from '../../components/blocks/BlockRenderer.astro';
-import PageBuilderRender from '../../page-builder/PageBuilderRender';
-import { buildTemplateRender, PUBLIC_STRAPI_URL } from '../../page-builder/server';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import BlockRenderer from '../components/blocks/BlockRenderer.astro';
+import PageBuilderRender from '../page-builder/PageBuilderRender';
+import { buildTemplateRender, PUBLIC_STRAPI_URL } from '../page-builder/server';
 import {
   getGlobalPageData,
   getPageBySlug,
   getAllProjects,
   getAllExperiences,
-} from '../../utils/loaders';
+} from '../utils/loaders';
 
 export async function getStaticPaths() {
   return [];
 }
 
 const { slug } = Astro.params;
-if (!slug) {
-  return Astro.redirect('/');
+if (!slug || slug === 'index') {
+  return new Response('Not found', { status: 404 });
 }
 
 const [globalData, pageData, projects, experiences] = await Promise.all([
