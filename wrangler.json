@@ -6,6 +6,20 @@
   "compatibility_flags": [
     "nodejs_compat"
   ],
+  "workers_dev": true,
+  "preview_urls": true,
+  "routes": [
+    {
+      "pattern": "matteocasling.com",
+      "zone_name": "matteocasling.com",
+      "custom_domain": true
+    },
+    {
+      "pattern": "www.matteocasling.com",
+      "zone_name": "matteocasling.com",
+      "custom_domain": true
+    }
+  ],
   "vars": {
     "STRAPI_BASE_URL": "https://cms.matteocasling.com",
     "PUBLIC_STRAPI_URL": "https://cms.matteocasling.com",
