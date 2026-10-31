@@ -24,14 +24,8 @@ export const POST: APIRoute = async ({ request }) => {
   const origin = typeof body?.origin === 'string' ? body.origin : '';
 
   // The licence server requires a licensed localhost origin on the free tier.
-  // Validate trusted Strapi backends against this baseline origin.
-  const trustedOrigins = new Set([
-    'https://cms.matteocasling.com',
-    'http://localhost:1337',
-    'http://127.0.0.1:1337',
-    'http://192.168.50.146:1337',
-  ]);
-  const validationOrigin = trustedOrigins.has(origin) ? 'http://localhost:1337' : origin;
+  // We validate tokens against the licensed origin.
+  const validationOrigin = 'http://localhost:1337';
 
   const result = await validateEditorToken(PAGE_BUILDER_API_KEY, token, validationOrigin);
   if (!result.ok) return json(result);
