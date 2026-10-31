@@ -4,7 +4,10 @@ import node from '@astrojs/node';
 import cloudflare from '@astrojs/cloudflare';
 import tailwindcss from '@tailwindcss/vite';
 
-const isCloudflare = process.env.CF_PAGES === '1' || process.env.DEPLOY_TARGET === 'cloudflare';
+const isCloudflare =
+  process.env.CF_PAGES === '1' ||
+  process.env.DEPLOY_TARGET === 'cloudflare' ||
+  process.env.CI === 'true';
 
 export default defineConfig({
   output: 'server',
