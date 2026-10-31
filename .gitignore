@@ -29,6 +29,10 @@ yarn-error.log*
 .system_generated/
 scratch/
 
+# Archives
+*.tar
+*.tar.gz
+
 # OS / Editor files
 .DS_Store
 Thumbs.db

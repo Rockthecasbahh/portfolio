@@ -5,9 +5,7 @@
 
 services:
   strapi:
-    build:
-      context: https://github.com/Rockthecasbahh/portfolio.git#main:server
-      dockerfile: Dockerfile
+    image: strapi-server:latest
     container_name: portfolio-strapi
     restart: unless-stopped
     ports:
