@@ -48,7 +48,7 @@ for (const file of targets) {
   fs.writeFileSync(file, content);
 }
 
-// Patch Sharp pixel limit in @strapi/upload
+// Patch Sharp pixel limit & GIF performance in @strapi/upload
 const uploadServiceFile = path.join(__dirname, '../node_modules/@strapi/upload/dist/server/services/image-manipulation.js');
 if (fs.existsSync(uploadServiceFile)) {
   let uploadContent = fs.readFileSync(uploadServiceFile, 'utf8');
@@ -68,7 +68,29 @@ if (fs.existsSync(uploadServiceFile)) {
 
   if (uploadContent.includes(sharpNeedle)) {
     uploadContent = uploadContent.replace(sharpNeedle, sharpRepl);
-    fs.writeFileSync(uploadServiceFile, uploadContent, 'utf8');
     console.log('[patch-page-builder] Patched sharp limitInputPixels in', uploadServiceFile);
   }
+
+  // Fast GIF processing: skip multi-breakpoint animated resizing and only extract frame 0 for thumbnails
+  const responsiveTarget = 'const generateResponsiveFormats = async (file)=>{\n    const { responsiveDimensions = false }';
+  const responsiveRepl = 'const generateResponsiveFormats = async (file)=>{\n    if (file.mime === \'image/gif\' || file.ext === \'.gif\') return [];\n    const { responsiveDimensions = false }';
+  if (uploadContent.includes(responsiveTarget)) {
+    uploadContent = uploadContent.replace(responsiveTarget, responsiveRepl);
+    console.log('[patch-page-builder] Patched skip GIF responsive breakpoints in', uploadServiceFile);
+  }
+
+  const animTarget = 'const resizeFileTo = async (file, options, { name, hash })=>{\n    const filePath = file.tmpWorkingDirectory ? path.join(file.tmpWorkingDirectory, hash) : hash;\n    let newInfo;\n    if (!file.filepath) {\n        const transform = sharp__default.default({\n            animated: true\n        })';
+  const animRepl = 'const resizeFileTo = async (file, options, { name, hash })=>{\n    const isGif = file.mime === \'image/gif\' || file.ext === \'.gif\';\n    const filePath = file.tmpWorkingDirectory ? path.join(file.tmpWorkingDirectory, hash) : hash;\n    let newInfo;\n    if (!file.filepath) {\n        const transform = sharp__default.default({\n            animated: !isGif\n        })';
+  if (uploadContent.includes(animTarget)) {
+    uploadContent = uploadContent.replace(animTarget, animRepl);
+  }
+
+  const animFileTarget = 'newInfo = await sharp__default.default(file.filepath, {\n            animated: true\n        }).resize(options).toFile(filePath);';
+  const animFileRepl = 'newInfo = await sharp__default.default(file.filepath, {\n            animated: !isGif\n        }).resize(options).toFile(filePath);';
+  if (uploadContent.includes(animFileTarget)) {
+    uploadContent = uploadContent.replace(animFileTarget, animFileRepl);
+    console.log('[patch-page-builder] Patched fast GIF thumbnail in', uploadServiceFile);
+  }
+
+  fs.writeFileSync(uploadServiceFile, uploadContent, 'utf8');
 }
