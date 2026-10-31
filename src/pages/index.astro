@@ -23,12 +23,18 @@ const pbRender = await buildTemplateRender(landingPage, globalData, {
 });
 const effectiveGlobal = pbRender ? pbRender.globalData : globalData;
 const rootTitle = pbRender?.data?.root?.props?.title;
+const hasHeaderBlock =
+  pbRender?.data?.content?.some((b: any) => b.type === 'HeaderNavigation') ?? false;
+const hasFooterBlock =
+  pbRender?.data?.content?.some((b: any) => b.type === 'FooterBlock') ?? false;
 ---
 
 <BaseLayout
   globalData={effectiveGlobal}
   title={rootTitle || landingPage.title || effectiveGlobal.title}
   description={landingPage.description || effectiveGlobal.description}
+  hideHeader={hasHeaderBlock}
+  hideFooter={hasFooterBlock}
 >
   {
     pbRender ? (

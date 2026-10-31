@@ -213,16 +213,36 @@ export function createCareerAndContactBlocks(strapiImageUrl = 'http://localhost:
     defaultProps: {
       sectionId: 'documents',
       heading: 'CV Dossiers & Strapi Headless CMS',
-      description: '',
-      dossierCards: [],
+      description:
+        "Download Matteo's original topographic PDF CVs and 13-page portfolio book, or launch the Strapi v5 Admin Panel to manage page blocks, projects, career milestones, and 3D topographic scenes visually.",
+      dossierCards: [
+        {
+          title: 'UN & Policy CV',
+          subtitle: 'Styled Topographic PDF',
+          href: '/documents/Matteo_Casling_CV.pdf',
+          iconType: 'pdf',
+        },
+        {
+          title: 'Motion & Tech CV',
+          subtitle: 'Video / 3D / Code PDF',
+          href: '/documents/Matteo_Casling_CV_Tech_Motion.pdf',
+          iconType: 'film',
+        },
+        {
+          title: 'Un-Portfolio Book',
+          subtitle: '13-Page Editorial PDF',
+          href: '/documents/Matteo_Casling_Portfolio_Book.pdf',
+          iconType: 'browser',
+        },
+      ],
       contactHeading: 'Direct Contact',
-      email: '',
-      phone: '',
-      location: '',
+      email: 'matteocasling@gmail.com',
+      phone: '+39 327 662 4932',
+      location: 'New York, NY / Rome, Italy',
       cmsLabel: 'Strapi v5 Admin',
-      cmsUrl: 'http://localhost:1337/admin',
-      primaryCta: { label: '', href: '', isExternal: 'false' },
-      secondaryCta: { label: '', href: '', isExternal: 'true' },
+      cmsUrl: 'https://cms.matteocasling.com/admin',
+      primaryCta: { label: 'Send Email', href: 'mailto:matteocasling@gmail.com', isExternal: 'false' },
+      secondaryCta: { label: 'Open Strapi CMS', href: 'https://cms.matteocasling.com/admin', isExternal: 'true' },
     },
     render: (rawProps) => {
       const data = pbProps(rawProps);

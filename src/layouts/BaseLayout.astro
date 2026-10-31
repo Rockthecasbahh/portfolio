@@ -11,12 +11,16 @@ interface Props {
   title?: string;
   description?: string;
   globalData?: GlobalPageData;
+  hideHeader?: boolean;
+  hideFooter?: boolean;
 }
 
 const resolvedGlobal = Astro.props.globalData || (await getGlobalPageData());
 const pageTitle = Astro.props.title || resolvedGlobal.title;
 const pageDescription = Astro.props.description || resolvedGlobal.description;
 const showContours = resolvedGlobal.studio3d?.showTopographicContours !== false;
+const hideHeader = Astro.props.hideHeader === true;
+const hideFooter = Astro.props.hideFooter === true;
 ---
 
 <!doctype html>
@@ -35,15 +39,15 @@ const showContours = resolvedGlobal.studio3d?.showTopographicContours !== false;
     <!-- Interactive 3D Stepped Topographic Relief, Cinema Camera & Video Light Rig (Three.js + GSAP) -->
     <StudioMotionRig3D client:load settings={resolvedGlobal.studio3d} />
 
-    <!-- Global Navigation Header (Managed in Strapi Global Single Type) -->
-    <Header header={resolvedGlobal.header} />
+    <!-- Global Navigation Header (Rendered when not embedded directly as a page component) -->
+    {!hideHeader && <Header header={resolvedGlobal.header} />}
 
     <!-- Page Dynamic Zone Blocks -->
     <main id="top" class="relative z-10">
       <slot />
     </main>
 
-    <!-- Global Footer (Managed in Strapi Global Single Type) -->
-    <Footer footer={resolvedGlobal.footer} />
+    <!-- Global Footer (Rendered when not embedded directly as a page component) -->
+    {!hideFooter && <Footer footer={resolvedGlobal.footer} />}
   </body>
 </html>

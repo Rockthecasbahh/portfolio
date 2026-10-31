@@ -4,6 +4,7 @@ import StudioMotionRig3D from '../components/StudioMotionRig3D';
 import { createIdentityAndPortfolioBlocks } from './blocks/IdentityAndPortfolioBlocks';
 import { createCareerAndContactBlocks } from './blocks/CareerAndContactBlocks';
 import { createContentAndLayoutBlocks } from './blocks/ContentAndLayoutBlocks';
+import { createNavigationBlocks } from './blocks/NavigationBlocks';
 
 export interface PageBuilderConfigOptions {
   /** Base URL used to resolve Strapi `/uploads/...` media (e.g. http://localhost:1337). */
@@ -41,12 +42,18 @@ export function createPageBuilderConfig({
   strapiImageUrl = 'http://localhost:1337',
   isEditor = false,
 }: PageBuilderConfigOptions = {}): Config {
+  const navigation = createNavigationBlocks();
   const identity = createIdentityAndPortfolioBlocks(strapiImageUrl);
   const career = createCareerAndContactBlocks(strapiImageUrl);
   const content = createContentAndLayoutBlocks(strapiImageUrl);
 
   return {
     categories: {
+      navigation: {
+        title: 'Header & Navigation',
+        components: ['HeaderNavigation', 'FooterBlock'],
+        defaultExpanded: true,
+      },
       identity: {
         title: 'Identity & Hero',
         components: ['HeroStratum', 'LogoWall', 'EducationSkillsStratum'],
@@ -71,6 +78,7 @@ export function createPageBuilderConfig({
       },
     },
     components: {
+      ...navigation,
       ...identity,
       ...career,
       ...content,

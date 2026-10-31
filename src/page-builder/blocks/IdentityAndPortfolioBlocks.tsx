@@ -294,11 +294,78 @@ export function createIdentityAndPortfolioBlocks(strapiImageUrl = 'http://localh
     },
     defaultProps: {
       sectionId: 'education-skills',
-      metrics: [],
+      metrics: [
+        {
+          value: '41.5M',
+          label: 'People Protected - FAO Desert Locust Campaign',
+          agency: 'FAO · 3 Languages (EN / FR / AR)',
+          theme: 'paper',
+        },
+        {
+          value: '3.0M+',
+          label: 'Global Views - World Water Day Scrollytelling',
+          agency: 'Joint FAO/IAEA Centre',
+          theme: 'cobalt',
+        },
+        {
+          value: '+45%',
+          label: 'Lift in Monthly User Engagement on FINS Digital Platform',
+          agency: 'UN DESA',
+          theme: 'paper',
+        },
+        {
+          value: '2 Decades',
+          label: 'Independent Evaluation Milestone Celebration System',
+          agency: 'IFAD IOE',
+          theme: 'cobalt',
+        },
+      ],
       educationHeading: 'Education',
-      educationItems: [],
+      educationItems: [
+        {
+          degree: 'MA Marketing, Buying Behaviour and Digital Communication',
+          school: 'John Cabot University',
+          years: '2019 - 2020',
+        },
+        {
+          degree: 'Bachelor of Arts in Communications',
+          school: 'John Cabot University',
+          years: '2014 - 2017',
+        },
+        {
+          degree: 'Diploma Scuola Superiore - Graphic Design',
+          school: 'Liceo Artistico Via di Ripetta, Rome',
+          years: '2008 - 2013',
+        },
+      ],
       skillsHeading: 'Skills & 3D Pipeline',
-      softwareMeters: [],
+      softwareMeters: [
+        {
+          name: 'ADOBE CREATIVE CLOUD',
+          subtitle: 'Premiere Pro · After Effects · Photoshop · InDesign · Illustrator · Audition',
+          segmentsFilled: 8,
+        },
+        {
+          name: 'BLENDER 3D & MOTION',
+          subtitle: '3D Modeling · Cycles/EEVEE · Procedural Shaders · GLTF Pipelines',
+          segmentsFilled: 7,
+        },
+        {
+          name: 'UNREAL ENGINE 5',
+          subtitle: 'Real-Time Environments · Virtual Production · Sequencer',
+          segmentsFilled: 6,
+        },
+        {
+          name: 'WEB & CMS ARCHITECTURE',
+          subtitle: 'Drupal 10 · WordPress · HTML5 · CSS3 · JavaScript · Astro',
+          segmentsFilled: 7,
+        },
+        {
+          name: 'CODE & AUTOMATION',
+          subtitle: 'Python · Remotion · GSAP 3D · Analytics & Telemetry',
+          segmentsFilled: 6,
+        },
+      ],
     },
     render: (rawProps) => {
       const data = pbProps(rawProps);
