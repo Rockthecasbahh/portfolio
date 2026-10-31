@@ -1,4 +1,4 @@
-FROM node:20-bookworm-slim AS build
+FROM node:22-bookworm-slim AS build
 
 WORKDIR /opt/app
 
@@ -16,7 +16,7 @@ ENV NODE_ENV=production
 RUN npm run build
 
 # Runtime Stage
-FROM node:20-bookworm-slim
+FROM node:22-bookworm-slim
 
 WORKDIR /opt/app
 
@@ -32,12 +32,11 @@ COPY package.json package-lock.json ./
 RUN npm ci --omit=dev
 
 COPY --from=build /opt/app/dist ./dist
-COPY --from=build /opt/app/config ./config
+COPY --from=build /opt/app/dist/config ./config
+COPY --from=build /opt/app/dist/src ./src
 COPY --from=build /opt/app/database ./database
 COPY --from=build /opt/app/public ./public
 COPY --from=build /opt/app/scripts ./scripts
-COPY --from=build /opt/app/src ./src
-COPY --from=build /opt/app/types ./types
 COPY --from=build /opt/app/tsconfig.json ./tsconfig.json
 
 # Default storage directories for persistence
