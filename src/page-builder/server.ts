@@ -7,11 +7,15 @@ import type { GlobalPageData, LandingPageData } from '../utils/types';
 
 /** URL the visitor's browser uses to reach Strapi (uploads, admin). */
 export const PUBLIC_STRAPI_URL: string =
-  import.meta.env.PUBLIC_STRAPI_URL || process.env.PUBLIC_STRAPI_URL || 'http://localhost:1337';
+  import.meta.env.PUBLIC_STRAPI_URL ||
+  process.env.PUBLIC_STRAPI_URL ||
+  (import.meta.env.PROD ? 'https://cms.matteocasling.com' : 'http://localhost:1337');
 
 /** Page Builder API key from https://pagebuilder.wc8.io (server-side only, never sent to the browser). */
 export const PAGE_BUILDER_API_KEY: string =
-  import.meta.env.STRAPI_PAGE_BUILDER_API_KEY || process.env.STRAPI_PAGE_BUILDER_API_KEY || '';
+  import.meta.env.STRAPI_PAGE_BUILDER_API_KEY ||
+  process.env.STRAPI_PAGE_BUILDER_API_KEY ||
+  'b88aa5ad445af0080f9b4adfcb7b19c6';
 
 /** Optional Strapi API token (read access) so the editor can resolve draft content. */
 export const STRAPI_API_TOKEN: string =
@@ -22,7 +26,7 @@ export const STRAPI_ADMIN_ORIGIN: string = (() => {
   try {
     return new URL(PUBLIC_STRAPI_URL).origin;
   } catch {
-    return 'http://localhost:1337';
+    return 'https://cms.matteocasling.com';
   }
 })();
 

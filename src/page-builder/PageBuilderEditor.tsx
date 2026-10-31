@@ -27,6 +27,8 @@ export default function PageBuilderEditor({ strapiUrl, strapiAdminOrigin, additi
         const refOrigin = new URL(document.referrer).origin;
         const allowed = new Set([
           strapiAdminOrigin,
+          'https://cms.matteocasling.com',
+          'http://192.168.50.146:1337',
           'http://localhost:1337',
           'http://127.0.0.1:1337',
         ]);

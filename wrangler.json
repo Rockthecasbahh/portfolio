@@ -6,6 +6,11 @@
   "compatibility_flags": [
     "nodejs_compat"
   ],
+  "vars": {
+    "STRAPI_BASE_URL": "https://cms.matteocasling.com",
+    "PUBLIC_STRAPI_URL": "https://cms.matteocasling.com",
+    "STRAPI_PAGE_BUILDER_API_KEY": "b88aa5ad445af0080f9b4adfcb7b19c6"
+  },
   "assets": {
     "directory": "dist",
     "binding": "ASSETS"

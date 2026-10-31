@@ -22,6 +22,7 @@ services:
       - TRANSFER_TOKEN_SALT=${STRAPI_TRANSFER_TOKEN_SALT:-"transfer_931bfa8201de5c"}
       - JWT_SECRET=${STRAPI_JWT_SECRET:-"jwt_5719abde02c48831"}
       - STRAPI_PAGE_BUILDER_API_KEY=${STRAPI_PAGE_BUILDER_API_KEY:-"b88aa5ad445af0080f9b4adfcb7b19c6"}
+      - STRAPI_PAGE_BUILDER_EDITOR_URL=${STRAPI_PAGE_BUILDER_EDITOR_URL:-"https://matteocasling.com/editor"}
     volumes:
       # Persistent SQLite database storage on your OMV drive
       - strapi-data:/opt/app/.tmp

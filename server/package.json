@@ -10,7 +10,8 @@
     "start": "strapi start",
     "strapi": "strapi",
     "clean": "rm -rf dist .strapi",
-    "seed": "node scripts/seed.js"
+    "seed": "node scripts/seed.js",
+    "postinstall": "node scripts/patch-page-builder.js"
   },
   "dependencies": {
     "@strapi/plugin-cloud": "5.58.0",
