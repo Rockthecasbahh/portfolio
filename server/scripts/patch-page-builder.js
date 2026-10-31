@@ -47,3 +47,28 @@ for (const file of targets) {
 
   fs.writeFileSync(file, content);
 }
+
+// Patch Sharp pixel limit in @strapi/upload
+const uploadServiceFile = path.join(__dirname, '../node_modules/@strapi/upload/dist/server/services/image-manipulation.js');
+if (fs.existsSync(uploadServiceFile)) {
+  let uploadContent = fs.readFileSync(uploadServiceFile, 'utf8');
+  const sharpNeedle = 'var sharp__default = /*#__PURE__*/_interopDefault(sharp);';
+  const sharpRepl = 'var _rawSharp = /*#__PURE__*/_interopDefault(sharp);\n' +
+    'var sharp__default = {\n' +
+    '  default: function(...args) {\n' +
+    '    if (args.length === 0) return _rawSharp.default({ limitInputPixels: false });\n' +
+    '    if (args.length === 1 && typeof args[0] === "object" && args[0] !== null && !(args[0] instanceof Buffer) && !(typeof args[0].pipe === "function") && !Array.isArray(args[0])) {\n' +
+    '      return _rawSharp.default({ limitInputPixels: false, ...args[0] });\n' +
+    '    }\n' +
+    '    const [input, opts = {}] = args;\n' +
+    '    return _rawSharp.default(input, { limitInputPixels: false, ...opts });\n' +
+    '  }\n' +
+    '};\n' +
+    'Object.assign(sharp__default.default, _rawSharp.default);';
+
+  if (uploadContent.includes(sharpNeedle)) {
+    uploadContent = uploadContent.replace(sharpNeedle, sharpRepl);
+    fs.writeFileSync(uploadServiceFile, uploadContent, 'utf8');
+    console.log('[patch-page-builder] Patched sharp limitInputPixels in', uploadServiceFile);
+  }
+}
