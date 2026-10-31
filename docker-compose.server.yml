@@ -1,14 +1,12 @@
 # Docker Compose Configuration for OpenMediaVault (OMV) / Home Server
 # Runs Strapi v5 Headless CMS with Cloudflare Tunnel (cloudflared)
 #
-# Requirements:
-# 1. Fill in your Strapi security secrets and Cloudflare TUNNEL_TOKEN in the environment or an accompanying .env file.
-# 2. Deploy via OMV Workbench (Services > Compose > Files) or docker compose -f docker-compose.server.yml up -d.
+# Builds directly from GitHub so you do NOT need to manually copy server files to OMV!
 
 services:
   strapi:
     build:
-      context: ./server
+      context: https://github.com/Rockthecasbahh/portfolio.git#main:server
       dockerfile: Dockerfile
     container_name: portfolio-strapi
     restart: unless-stopped
@@ -20,11 +18,11 @@ services:
       - NODE_ENV=production
       - DATABASE_CLIENT=sqlite
       - DATABASE_FILENAME=.tmp/data.db
-      - APP_KEYS=${STRAPI_APP_KEYS:-"devKey1,devKey2,devKey3,devKey4"}
-      - API_TOKEN_SALT=${STRAPI_API_TOKEN_SALT:-"devApiTokenSalt1234567890"}
-      - ADMIN_JWT_SECRET=${STRAPI_ADMIN_JWT_SECRET:-"devAdminJwtSecret1234567890"}
-      - TRANSFER_TOKEN_SALT=${STRAPI_TRANSFER_TOKEN_SALT:-"devTransferSalt1234567890"}
-      - JWT_SECRET=${STRAPI_JWT_SECRET:-"devJwtSecret1234567890"}
+      - APP_KEYS=${STRAPI_APP_KEYS:-"f82e3914a1c5d988b01e,e84f2913b2c4e977a12d"}
+      - API_TOKEN_SALT=${STRAPI_API_TOKEN_SALT:-"salt_e71a93bd8c42a0b1"}
+      - ADMIN_JWT_SECRET=${STRAPI_ADMIN_JWT_SECRET:-"admin_jwt_b38c2910f54e61aa"}
+      - TRANSFER_TOKEN_SALT=${STRAPI_TRANSFER_TOKEN_SALT:-"transfer_931bfa8201de5c"}
+      - JWT_SECRET=${STRAPI_JWT_SECRET:-"jwt_5719abde02c48831"}
       - STRAPI_PAGE_BUILDER_API_KEY=${STRAPI_PAGE_BUILDER_API_KEY:-"b88aa5ad445af0080f9b4adfcb7b19c6"}
     volumes:
       # Persistent SQLite database storage on your OMV drive
@@ -38,7 +36,7 @@ services:
     restart: unless-stopped
     command: tunnel --no-autoupdate run
     environment:
-      # Generate this token once in Cloudflare Zero Trust (Networks > Tunnels)
+      # Paste your Cloudflare Zero Trust Tunnel Token below:
       - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN:-""}
     depends_on:
       - strapi
