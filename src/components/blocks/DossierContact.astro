@@ -13,6 +13,26 @@ interface Props {
 }
 
 const { data } = Astro.props;
+const displayHeading =
+  (data.heading || '').replace('& Strapi Headless CMS', '& Direct Contact') ||
+  'CV Dossiers & Direct Contact';
+const displayDescription =
+  (data.description || '')
+    .replace(', or launch the Strapi v5 Admin Panel to manage page blocks, projects, career milestones, and 3D topographic scenes visually.', '.')
+    .replace('or launch the Strapi v5 Admin Panel to manage page blocks, projects, career milestones, and 3D topographic scenes visually.', '')
+    .trim() ||
+  "Download Matteo's original topographic PDF CVs and 13-page portfolio book, or connect directly for global communications strategy and digital production.";
+const linkedinUrl =
+  data.linkedinUrl || 'https://www.linkedin.com/in/matteo-louis-casling-7285a8150/';
+const linkedinLabel = data.linkedinLabel || 'in/matteo-louis-casling';
+const secondaryCtaHref =
+  data.secondaryCta?.href && !data.secondaryCta.href.includes('1337/admin')
+    ? data.secondaryCta.href
+    : linkedinUrl;
+const secondaryCtaLabel =
+  data.secondaryCta?.label && !data.secondaryCta.label.toLowerCase().includes('strapi')
+    ? data.secondaryCta.label
+    : 'LinkedIn Profile';
 ---
 
 <section id={data.sectionId || 'documents'} class="py-20">
@@ -21,11 +41,11 @@ const { data } = Astro.props;
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
         <div class="lg:col-span-7 space-y-6">
           <h2 class="font-display font-extrabold text-3xl md:text-4xl text-white">
-            {data.heading || 'CV Dossiers & Strapi Headless CMS'}
+            {displayHeading}
           </h2>
-          {data.description && (
+          {displayDescription && (
             <p class="text-base text-[#d9ebf4] leading-relaxed max-w-[60ch]">
-              {data.description}
+              {displayDescription}
             </p>
           )}
 
@@ -85,14 +105,14 @@ const { data } = Astro.props;
               </div>
             )}
             <div class="flex items-center justify-between py-2 border-b border-[#304774]/15">
-              <span class="text-[#52637a]">HEADLESS CMS</span>
+              <span class="text-[#52637a]">LINKEDIN</span>
               <a
-                href={data.cmsUrl || 'http://localhost:1337/admin'}
+                href={linkedinUrl}
                 target="_blank"
                 rel="noreferrer"
-                class="text-[#304774] font-bold hover:underline"
+                class="text-[#1c72b4] hover:underline font-bold truncate max-w-[240px]"
               >
-                {data.cmsLabel || 'Strapi v5 Admin'}
+                {linkedinLabel}
               </a>
             </div>
           </div>
@@ -109,15 +129,14 @@ const { data } = Astro.props;
                 <span>{data.primaryCta.label}</span>
               </a>
             )}
-            {data.secondaryCta && (
+            {secondaryCtaHref && (
               <a
-                href={data.secondaryCta.href}
-                target={data.secondaryCta.isExternal ? '_blank' : undefined}
-                rel={data.secondaryCta.isExternal ? 'noreferrer' : undefined}
+                href={secondaryCtaHref}
+                target="_blank"
+                rel="noreferrer"
                 class="px-4 py-3 rounded-full bg-white border border-[#304774]/25 text-[#172a3b] hover:bg-[#304774] hover:text-white font-mono-tech text-xs font-bold inline-flex items-center gap-2 transition-colors"
               >
-                <Sliders size={15} weight="bold" />
-                <span>{data.secondaryCta.label}</span>
+                <span>{secondaryCtaLabel}</span>
               </a>
             )}
           </div>

@@ -108,6 +108,7 @@ export default function PortfolioChapters({
   const [activeTrack, setActiveTrack] = useState<'all' | 'un-policy' | 'tech-motion'>(defaultTrackFilter);
   const [activeVideo, setActiveVideo] = useState<ProjectItem | null>(null);
   const [flippedImages, setFlippedImages] = useState<Record<string, boolean>>({});
+  const [selectedWebSlug, setSelectedWebSlug] = useState<string | null>(null);
 
   const chaptersList: ChapterMeta[] = CHAPTERS.map((base) => {
     const override = customChapters?.find((c) => c.chapterNumber === base.number);
@@ -198,6 +199,19 @@ export default function PortfolioChapters({
 
           const isCobalt = chapter.stratumStyle === 'cobalt';
           const isIce = chapter.stratumStyle === 'ice';
+          const isChapter04 = chapter.number === '04';
+
+          const activeWebSlug =
+            isChapter04
+              ? (selectedWebSlug === 'all' || chapterProjects.some((p) => p.slug === selectedWebSlug))
+                ? selectedWebSlug
+                : chapterProjects[0]?.slug
+              : null;
+
+          const displayedProjects =
+            isChapter04 && activeWebSlug && activeWebSlug !== 'all'
+              ? chapterProjects.filter((p) => p.slug === activeWebSlug)
+              : chapterProjects;
 
           return (
             <section
@@ -269,10 +283,61 @@ export default function PortfolioChapters({
                   </p>
                 </div>
 
+                {/* Digital Platform Tabs for Chapter 04 */}
+                {isChapter04 && chapterProjects.length > 1 && (
+                  <div className="mb-8 p-3 rounded-2xl bg-white/70 border border-[#304774]/15 flex flex-wrap items-center justify-between gap-3 shadow-sm">
+                    <div
+                      className="flex items-center gap-2 flex-wrap"
+                      role="tablist"
+                      aria-label="Digital Platforms"
+                    >
+                      <span className="font-mono-tech text-xs font-bold text-[#304774] px-2.5 uppercase tracking-wider flex items-center gap-1.5">
+                        <Globe size={16} weight="duotone" />
+                        <span>Platform Tabs:</span>
+                      </span>
+                      {chapterProjects.map((proj) => {
+                        const isSelected = activeWebSlug === proj.slug;
+                        return (
+                          <button
+                            key={proj.slug}
+                            type="button"
+                            role="tab"
+                            aria-selected={isSelected}
+                            onClick={() => setSelectedWebSlug(proj.slug)}
+                            className={`px-4 py-2 rounded-full font-mono-tech text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${
+                              isSelected
+                                ? 'bg-[#304774] text-white shadow-md scale-[1.01]'
+                                : 'bg-[#d9ebf4]/60 text-[#172a3b] hover:bg-[#d9ebf4] hover:text-[#1c72b4]'
+                            }`}
+                          >
+                            <span
+                              className={`w-2 h-2 rounded-full ${
+                                isSelected ? 'bg-[#c9a345]' : 'bg-[#304774]/30'
+                              }`}
+                            />
+                            <span>{proj.title}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedWebSlug('all')}
+                      className={`px-3.5 py-1.5 rounded-full font-mono-tech text-xs transition-colors cursor-pointer ${
+                        activeWebSlug === 'all'
+                          ? 'bg-[#304774] text-white font-bold'
+                          : 'text-[#304774] hover:bg-[#d9ebf4]/50 font-semibold'
+                      }`}
+                    >
+                      View Both / All ({chapterProjects.length})
+                    </button>
+                  </div>
+                )}
+
                 {/* Project Cards inside the Topographic Stratum */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                  {chapterProjects.map((project, index) => {
-                    const isFeaturedSpan = chapterProjects.length % 2 === 1 && index === 0;
+                  {displayedProjects.map((project, index) => {
+                    const isFeaturedSpan = displayedProjects.length % 2 === 1 && index === 0;
                     const showSecondary =
                       flippedImages[project.slug] && project.secondaryImage;
                     const activeImgSrc = showSecondary

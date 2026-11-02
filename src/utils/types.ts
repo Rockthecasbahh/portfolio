@@ -161,6 +161,8 @@ export interface DossierContactBlock extends BaseBlock {
   email?: string;
   phone?: string;
   location?: string;
+  linkedinLabel?: string;
+  linkedinUrl?: string;
   cmsLabel?: string;
   cmsUrl?: string;
   primaryCta?: SharedLink | null;

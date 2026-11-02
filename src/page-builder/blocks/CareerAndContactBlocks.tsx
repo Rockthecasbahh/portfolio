@@ -205,16 +205,18 @@ export function createCareerAndContactBlocks(strapiImageUrl = 'http://localhost:
       email: { type: 'text', label: 'Email' },
       phone: { type: 'text', label: 'Phone' },
       location: { type: 'text', label: 'Base Location' },
-      cmsLabel: { type: 'text', label: 'CMS Link Label' },
-      cmsUrl: { type: 'text', label: 'CMS Link URL' },
+      linkedinLabel: { type: 'text', label: 'LinkedIn Label' },
+      linkedinUrl: { type: 'text', label: 'LinkedIn URL' },
+      cmsLabel: { type: 'text', label: 'CMS Link Label (Optional)' },
+      cmsUrl: { type: 'text', label: 'CMS Link URL (Optional)' },
       primaryCta: { type: 'object', label: 'Primary CTA', objectFields: linkFields as any },
       secondaryCta: { type: 'object', label: 'Secondary CTA', objectFields: linkFields as any },
     },
     defaultProps: {
       sectionId: 'documents',
-      heading: 'CV Dossiers & Strapi Headless CMS',
+      heading: 'CV Dossiers & Direct Contact',
       description:
-        "Download Matteo's original topographic PDF CVs and 13-page portfolio book, or launch the Strapi v5 Admin Panel to manage page blocks, projects, career milestones, and 3D topographic scenes visually.",
+        "Download Matteo's original topographic PDF CVs and 13-page portfolio book, or connect directly for global communications strategy and digital production.",
       dossierCards: [
         {
           title: 'UN & Policy CV',
@@ -237,17 +239,37 @@ export function createCareerAndContactBlocks(strapiImageUrl = 'http://localhost:
       ],
       contactHeading: 'Direct Contact',
       email: 'matteocasling@gmail.com',
-      phone: '+39 327 662 4932',
-      location: 'New York, NY / Rome, Italy',
-      cmsLabel: 'Strapi v5 Admin',
-      cmsUrl: 'https://cms.matteocasling.com/admin',
+      phone: '+1 332 262 9369',
+      location: 'New York, USA · Vienna · Rome',
+      linkedinLabel: 'in/matteo-louis-casling',
+      linkedinUrl: 'https://www.linkedin.com/in/matteo-louis-casling-7285a8150/',
+      cmsLabel: '',
+      cmsUrl: '',
       primaryCta: { label: 'Send Email', href: 'mailto:matteocasling@gmail.com', isExternal: 'false' },
-      secondaryCta: { label: 'Open Strapi CMS', href: 'https://cms.matteocasling.com/admin', isExternal: 'true' },
+      secondaryCta: {
+        label: 'LinkedIn Profile',
+        href: 'https://www.linkedin.com/in/matteo-louis-casling-7285a8150/',
+        isExternal: 'true',
+      },
     },
     render: (rawProps) => {
       const data = pbProps(rawProps);
       const pExt = isTrue(data.primaryCta?.isExternal);
       const sExt = isTrue(data.secondaryCta?.isExternal);
+      const displayHeading =
+        (data.heading || '').replace('& Strapi Headless CMS', '& Direct Contact') ||
+        'CV Dossiers & Direct Contact';
+      const linkedinUrl =
+        data.linkedinUrl || 'https://www.linkedin.com/in/matteo-louis-casling-7285a8150/';
+      const linkedinLabel = data.linkedinLabel || 'in/matteo-louis-casling';
+      const secondaryCtaHref =
+        data.secondaryCta?.href && !data.secondaryCta.href.includes('1337/admin')
+          ? data.secondaryCta.href
+          : linkedinUrl;
+      const secondaryCtaLabel =
+        data.secondaryCta?.label && !data.secondaryCta.label.toLowerCase().includes('strapi')
+          ? data.secondaryCta.label
+          : 'LinkedIn Profile';
 
       return (
         <section id={data.sectionId || 'documents'} className="py-20">
@@ -256,7 +278,7 @@ export function createCareerAndContactBlocks(strapiImageUrl = 'http://localhost:
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
                 <div className="lg:col-span-7 space-y-6">
                   <h2 className="font-display font-extrabold text-3xl md:text-4xl text-white">
-                    {data.heading || 'CV Dossiers & Strapi Headless CMS'}
+                    {displayHeading}
                   </h2>
                   {data.description && (
                     <p className="text-base text-[#d9ebf4] leading-relaxed max-w-[60ch]">
@@ -320,14 +342,14 @@ export function createCareerAndContactBlocks(strapiImageUrl = 'http://localhost:
                       </div>
                     )}
                     <div className="flex items-center justify-between py-2 border-b border-[#304774]/15">
-                      <span className="text-[#52637a]">HEADLESS CMS</span>
+                      <span className="text-[#52637a]">LINKEDIN</span>
                       <a
-                        href={data.cmsUrl || 'http://localhost:1337/admin'}
+                        href={linkedinUrl}
                         target="_blank"
                         rel="noreferrer"
-                        className="text-[#304774] font-bold hover:underline"
+                        className="text-[#1c72b4] hover:underline font-bold truncate max-w-[240px]"
                       >
-                        {data.cmsLabel || 'Strapi v5 Admin'}
+                        {linkedinLabel}
                       </a>
                     </div>
                   </div>
@@ -343,15 +365,14 @@ export function createCareerAndContactBlocks(strapiImageUrl = 'http://localhost:
                         <span>{data.primaryCta.label}</span>
                       </a>
                     )}
-                    {data.secondaryCta?.label && (
+                    {secondaryCtaLabel && (
                       <a
-                        href={data.secondaryCta.href}
-                        target={sExt ? '_blank' : undefined}
-                        rel={sExt ? 'noreferrer' : undefined}
+                        href={secondaryCtaHref}
+                        target="_blank"
+                        rel="noreferrer"
                         className="px-4 py-3 rounded-full bg-white border border-[#304774]/25 text-[#172a3b] hover:bg-[#304774] hover:text-white font-mono-tech text-xs font-bold inline-flex items-center gap-2 transition-colors"
                       >
-                        <Sliders size={15} weight="bold" />
-                        <span>{data.secondaryCta.label}</span>
+                        <span>{secondaryCtaLabel}</span>
                       </a>
                     )}
                   </div>

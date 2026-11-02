@@ -1,0 +1,28 @@
+{
+  "title": "FAO Transboundary Knowledge Portal",
+  "chapterNumber": "04",
+  "category": "web",
+  "madeFor": "FAO",
+  "year": "2023",
+  "location": "Rome, Italy",
+  "track": "tech-motion",
+  "featuredInReel": false,
+  "sortOrder": 10,
+  "shortDescription": "Conceptualized, designed, and launched the FAO Transboundary Plant Pests and Diseases digital knowledge portal, structuring geospatial surveillance telemetry, emergency response guidelines, and technical publications.",
+  "mandateChallenge": "Consolidate dispersed regional pest monitoring protocols, early warning bulletins, and emergency response frameworks into a single authoritative digital hub for ministries of agriculture and field specialists.",
+  "executionCraft": "Architected modern responsive portal layouts with structured content types, interactive knowledge taxonomy, video tutorials, and download repositories optimized for low-bandwidth field access.",
+  "impactMetric": "Official FAO Global Knowledge Repository · Surveillance & SOPs",
+  "thumbnail": "/assets/projects/undesa-fins-drupal10-platform/fao-locust-upsurge-story.png",
+  "secondaryImage": "/assets/projects/fao-transboundary-spread.png",
+  "videoYoutubeId": "",
+  "externalUrl": "https://www.fao.org/transboundary-plant-pests-diseases/en",
+  "externalLabel": "Visit Live FAO Portal",
+  "tools": [
+    "WordPress",
+    "Web Architecture",
+    "HTML5 / CSS3",
+    "JavaScript",
+    "Information Architecture",
+    "Geospatial Telemetry"
+  ]
+}

@@ -309,9 +309,9 @@ function buildFallbackLandingPage(): LandingPageData {
     {
       __component: 'blocks.dossier-contact',
       sectionId: 'documents',
-      heading: 'CV Dossiers & Strapi Headless CMS',
+      heading: 'CV Dossiers & Direct Contact',
       description:
-        "Download Matteo's original topographic PDF CVs and 13-page portfolio book, or launch the Strapi v5 Admin Panel to manage page blocks, projects, career milestones, and 3D topographic scenes visually.",
+        "Download Matteo's original topographic PDF CVs and 13-page portfolio book, or connect directly for global communications strategy and digital production.",
       dossierCards: [
         {
           title: 'UN & Policy CV',
@@ -336,8 +336,8 @@ function buildFallbackLandingPage(): LandingPageData {
       email: profile.email,
       phone: profile.phone,
       location: profile.location,
-      cmsLabel: 'Strapi v5 Admin',
-      cmsUrl: 'http://localhost:1337/admin',
+      linkedinLabel: 'in/matteo-louis-casling',
+      linkedinUrl: 'https://www.linkedin.com/in/matteo-louis-casling-7285a8150/',
       primaryCta: {
         label: 'Send Email',
         href: `mailto:${profile.email}`,
@@ -346,8 +346,8 @@ function buildFallbackLandingPage(): LandingPageData {
         type: 'PRIMARY',
       },
       secondaryCta: {
-        label: 'Open Strapi CMS',
-        href: 'http://localhost:1337/admin',
+        label: 'LinkedIn Profile',
+        href: 'https://www.linkedin.com/in/matteo-louis-casling-7285a8150/',
         isExternal: true,
         isButtonLink: true,
         type: 'SECONDARY',
@@ -482,9 +482,9 @@ function buildFallbackLandingPage(): LandingPageData {
         props: {
           id: 'DossierContact-home-1',
           sectionId: 'documents',
-          heading: 'CV Dossiers & Strapi Headless CMS',
+          heading: 'CV Dossiers & Direct Contact',
           description:
-            "Download Matteo's original topographic PDF CVs and 13-page portfolio book, or launch the Strapi v5 Admin Panel to manage page blocks, projects, career milestones, and 3D topographic scenes visually.",
+            "Download Matteo's original topographic PDF CVs and 13-page portfolio book, or connect directly for global communications strategy and digital production.",
           dossierCards: [
             {
               title: 'UN & Policy CV',
@@ -509,16 +509,16 @@ function buildFallbackLandingPage(): LandingPageData {
           email: profile.email,
           phone: profile.phone,
           location: profile.location,
-          cmsLabel: 'Strapi v5 Admin',
-          cmsUrl: 'http://localhost:1337/admin',
+          linkedinLabel: 'in/matteo-louis-casling',
+          linkedinUrl: 'https://www.linkedin.com/in/matteo-louis-casling-7285a8150/',
           primaryCta: {
             label: 'Send Email',
             href: `mailto:${profile.email}`,
             isExternal: 'false',
           },
           secondaryCta: {
-            label: 'Open Strapi CMS',
-            href: 'http://localhost:1337/admin',
+            label: 'LinkedIn Profile',
+            href: 'https://www.linkedin.com/in/matteo-louis-casling-7285a8150/',
             isExternal: 'true',
           },
         },

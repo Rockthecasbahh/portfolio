@@ -39,13 +39,19 @@
       "type": "string",
       "default": "New York, NY / Rome, Italy"
     },
-    "cmsLabel": {
+    "linkedinLabel": {
       "type": "string",
-      "default": "Strapi v5 Admin"
+      "default": "in/matteo-louis-casling"
+    },
+    "linkedinUrl": {
+      "type": "string",
+      "default": "https://www.linkedin.com/in/matteo-louis-casling-7285a8150/"
+    },
+    "cmsLabel": {
+      "type": "string"
     },
     "cmsUrl": {
-      "type": "string",
-      "default": "http://localhost:1337/admin"
+      "type": "string"
     },
     "primaryCta": {
       "type": "component",
