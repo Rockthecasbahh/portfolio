@@ -12,6 +12,7 @@ import HorizontalShowreel from '../../components/HorizontalShowreel';
 import PortfolioChapters from '../../components/PortfolioChapters';
 import { resolvePbMediaUrl, normalizePbProject, pbProps } from '../helpers';
 import type { ProjectItem } from '../../lib/cms';
+import { getReadableLogoUrl } from '../../utils/loaders';
 
 export function createIdentityAndPortfolioBlocks(strapiImageUrl = 'http://localhost:1337') {
   const HeroStratum: ComponentConfig<any> = {
@@ -218,7 +219,11 @@ export function createIdentityAndPortfolioBlocks(strapiImageUrl = 'http://localh
           <div className="max-w-[1440px] mx-auto px-4 sm:px-8">
             <div className="rounded-[32px] bg-white/90 backdrop-blur-md border border-[#d9ebf4] shadow-sm px-6 md:px-12 py-6 flex flex-wrap items-center justify-between gap-8">
               {(data.logos || []).map((logo: any, idx: number) => {
-                const src = resolvePbMediaUrl(logo?.imageUrl, strapiImageUrl);
+                const src = getReadableLogoUrl(
+                  resolvePbMediaUrl(logo?.imageUrl, strapiImageUrl),
+                  logo?.alt,
+                  logo?.name
+                );
                 if (!src) return null;
                 return (
                   <div

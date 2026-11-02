@@ -9,6 +9,7 @@ import {
 } from '@phosphor-icons/react';
 import { normalizePbExperience, pbProps } from '../helpers';
 import type { ExperienceItem } from '../../lib/cms';
+import { getReadableLogoUrl } from '../../utils/loaders';
 
 const linkFields = {
   label: { type: 'text', label: 'Label' },
@@ -80,10 +81,11 @@ export function createCareerAndContactBlocks(strapiImageUrl = 'http://localhost:
                 const band = idx % 3 === 0 ? 'paper' : idx % 3 === 1 ? 'cobalt' : 'ice';
                 const isCobalt = band === 'cobalt';
                 const isIce = band === 'ice';
-                const logo =
-                  exp.logoPath === '/assets/logos/iaea-fao-white.png'
-                    ? '/assets/logos/iaea-fao-navy.png'
-                    : (exp.logoPath || '').replace('-white.png', '.png');
+                const logo = getReadableLogoUrl(
+                  exp.logoPath,
+                  exp.organizationShort,
+                  exp.organization
+                );
 
                 return (
                   <article

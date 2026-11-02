@@ -1,6 +1,6 @@
 ---
 import type { ExperienceCascadeBlock, ExperienceItem } from '../../utils/types';
-import { normalizeStrapiExperience } from '../../utils/loaders';
+import { normalizeStrapiExperience, getReadableLogoUrl } from '../../utils/loaders';
 
 interface Props {
   data: ExperienceCascadeBlock;
@@ -56,11 +56,7 @@ const expList =
                 >
                   {exp.logoPath && (
                     <img
-                      src={
-                        exp.logoPath === '/assets/logos/iaea-fao-white.png'
-                          ? '/assets/logos/iaea-fao-navy.png'
-                          : exp.logoPath.replace('-white.png', '.png')
-                      }
+                      src={getReadableLogoUrl(exp.logoPath, exp.organizationShort, exp.organization)}
                       alt={exp.organizationShort}
                       loading="lazy"
                       class="max-h-10 w-auto object-contain"

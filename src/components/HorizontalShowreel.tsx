@@ -192,7 +192,7 @@ export default function HorizontalShowreel({
                         onClick={() => setActiveVideoProject(project)}
                         className="font-mono-tech text-xs font-bold text-[#1c72b4] hover:text-[#304774] inline-flex items-center gap-1 cursor-pointer"
                       >
-                        <span>Play Film</span>
+                        <span>Play Video</span>
                         <Play size={13} weight="fill" />
                       </button>
                     ) : (

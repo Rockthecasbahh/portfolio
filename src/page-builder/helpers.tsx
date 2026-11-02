@@ -1,6 +1,7 @@
 import React from 'react';
 import Handlebars from 'handlebars';
 import type { ProjectItem, ExperienceItem } from '../lib/cms';
+import { getReadableLogoUrl } from '../utils/loaders';
 
 export function resolvePbMediaUrl(
   src: string | null | undefined,
@@ -66,10 +67,7 @@ export function normalizePbExperience(
     ? resolvePbMediaUrl(raw.logoImage.url, strapiImageUrl)
     : resolvePbMediaUrl(raw?.logoPath, strapiImageUrl);
 
-  const cleanLogo =
-    rawLogo === '/assets/logos/iaea-fao-white.png'
-      ? '/assets/logos/iaea-fao-navy.png'
-      : rawLogo.replace('-white.png', '.png');
+  const cleanLogo = getReadableLogoUrl(rawLogo, raw?.organizationShort, raw?.organization);
 
   const bulletList: string[] = Array.isArray(raw?.highlights)
     ? raw.highlights

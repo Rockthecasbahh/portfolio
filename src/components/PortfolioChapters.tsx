@@ -5,7 +5,6 @@ import {
   SlidersHorizontal,
   X,
   CheckCircle,
-  Images,
   VideoCamera,
   Cube,
   BookOpenText,
@@ -107,7 +106,6 @@ export default function PortfolioChapters({
 }: Props) {
   const [activeTrack, setActiveTrack] = useState<'all' | 'un-policy' | 'tech-motion'>(defaultTrackFilter);
   const [activeVideo, setActiveVideo] = useState<ProjectItem | null>(null);
-  const [flippedImages, setFlippedImages] = useState<Record<string, boolean>>({});
   const [selectedWebSlug, setSelectedWebSlug] = useState<string | null>(null);
 
   const chaptersList: ChapterMeta[] = CHAPTERS.map((base) => {
@@ -121,10 +119,6 @@ export default function PortfolioChapters({
     if (activeTrack === 'all') return true;
     return p.track === 'both' || p.track === activeTrack;
   });
-
-  const toggleSecondaryImage = (slug: string) => {
-    setFlippedImages((prev) => ({ ...prev, [slug]: !prev[slug] }));
-  };
 
   return (
     <div id={sectionId} className="relative z-10 py-20">
@@ -338,11 +332,7 @@ export default function PortfolioChapters({
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                   {displayedProjects.map((project, index) => {
                     const isFeaturedSpan = displayedProjects.length % 2 === 1 && index === 0;
-                    const showSecondary =
-                      flippedImages[project.slug] && project.secondaryImage;
-                    const activeImgSrc = showSecondary
-                      ? project.secondaryImage
-                      : project.thumbnail;
+                    const activeImgSrc = project.thumbnail;
 
                     return (
                       <article
@@ -368,8 +358,8 @@ export default function PortfolioChapters({
                             />
                           </div>
 
-                          <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
-                            {project.impactMetric && (
+                          {project.impactMetric && (
+                            <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
                               <div className="inline-flex items-center gap-1.5 font-mono-tech text-xs text-[#1c72b4] font-bold">
                                 <CheckCircle
                                   size={16}
@@ -378,23 +368,8 @@ export default function PortfolioChapters({
                                 />
                                 <span>{project.impactMetric}</span>
                               </div>
-                            )}
-
-                            {project.secondaryImage && (
-                              <button
-                                type="button"
-                                onClick={() => toggleSecondaryImage(project.slug)}
-                                className="rounded-full bg-[#d9ebf4]/75 hover:bg-[#304774] text-[#172a3b] hover:text-white px-3.5 py-1 font-mono-tech text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
-                              >
-                                <Images size={14} weight="duotone" />
-                                <span>
-                                  {showSecondary
-                                    ? 'Primary Cover'
-                                    : 'Inspect 3D / Spread Asset'}
-                                </span>
-                              </button>
-                            )}
-                          </div>
+                            </div>
+                          )}
                         </div>
 
                         <div
@@ -471,7 +446,7 @@ export default function PortfolioChapters({
                                   className="px-4 py-2.5 rounded-full bg-[#304774] text-white hover:bg-[#172a3b] font-mono-tech text-xs font-bold inline-flex items-center gap-2 transition-colors cursor-pointer active:scale-95"
                                 >
                                   <Play size={15} weight="fill" />
-                                  <span>Play Film</span>
+                                  <span>Play Video</span>
                                 </button>
                               )}
                               {project.externalUrl && (

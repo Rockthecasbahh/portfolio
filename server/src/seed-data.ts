@@ -575,8 +575,10 @@ export async function ensurePortfolioSeeded(strapi: any, force = false) {
         }
 
         const cleanLogoPath =
-          exp.logoPath === '/assets/logos/iaea-fao-white.png'
+          exp.logoPath?.includes('iaea')
             ? '/assets/logos/iaea-fao-navy.png'
+            : exp.logoPath?.includes('ifad')
+            ? '/assets/logos/ifad.png'
             : (exp.logoPath || '').replace('-white.png', '.png');
 
         const created = await strapi.documents('api::experience.experience').create({

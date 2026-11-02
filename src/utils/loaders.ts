@@ -137,12 +137,34 @@ export function normalizeStrapiProject(raw: any): ProjectItem {
   };
 }
 
+export function getReadableLogoUrl(
+  logoPath?: string | null,
+  orgShort?: string,
+  orgName?: string
+): string {
+  if (!logoPath && !orgShort && !orgName) return '';
+  const path = (logoPath || '').toLowerCase();
+  const org = `${orgShort || ''} ${orgName || ''}`.toLowerCase();
+
+  // IAEA logo: always high-contrast navy logo
+  if (path.includes('iaea') || org.includes('iaea')) {
+    return '/assets/logos/iaea-fao-navy.png';
+  }
+
+  // IFAD logo: always high-contrast dark logo
+  if (path.includes('ifad') || org.includes('ifad')) {
+    return '/assets/logos/ifad.png';
+  }
+
+  if (!logoPath) return '';
+
+  // Strip white suffix variants if present (e.g. -white.png, _white_xxxx.png, -white-xxxx.png)
+  return logoPath.replace(/[-_]white(?:[-_a-z0-9]+)?\.png$/i, '.png');
+}
+
 export function normalizeStrapiExperience(raw: any): ExperienceItem {
   const rawLogo = getStrapiMediaUrl(raw?.logoImage, raw?.logoPath);
-  const cleanLogo =
-    rawLogo === '/assets/logos/iaea-fao-white.png'
-      ? '/assets/logos/iaea-fao-navy.png'
-      : rawLogo.replace('-white.png', '.png');
+  const cleanLogo = getReadableLogoUrl(rawLogo, raw?.organizationShort, raw?.organization);
 
   const bulletList: string[] = Array.isArray(raw?.highlights)
     ? raw.highlights
