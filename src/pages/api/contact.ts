@@ -1,6 +1,4 @@
 import type { APIRoute } from 'astro';
-import fs from 'node:fs';
-import path from 'node:path';
 
 export const prerender = false;
 
@@ -51,20 +49,26 @@ export const POST: APIRoute = async ({ request }) => {
       message,
     };
 
-    // Persist privately on the backend filesystem (never exposed publicly)
-    try {
-      if (typeof fs?.mkdirSync === 'function' && typeof process?.cwd === 'function') {
-        const storageDir = path.resolve(process.cwd(), 'server', '.tmp');
-        fs.mkdirSync(storageDir, { recursive: true });
-        const submissionsFile = path.join(storageDir, 'contact-submissions.json');
-        const existing = fs.existsSync(submissionsFile)
-          ? JSON.parse(fs.readFileSync(submissionsFile, 'utf-8'))
-          : [];
-        const updated = Array.isArray(existing) ? [submissionRecord, ...existing] : [submissionRecord];
-        fs.writeFileSync(submissionsFile, JSON.stringify(updated, null, 2), 'utf-8');
+    // Optional local storage fallback when running in a Node server environment
+    if (typeof process !== 'undefined' && process.versions?.node && !('WebSocketPair' in globalThis)) {
+      try {
+        const fsMod = 'node:fs';
+        const pathMod = 'node:path';
+        const nodeFs: any = await import(/* @vite-ignore */ fsMod).catch(() => null);
+        const nodePath: any = await import(/* @vite-ignore */ pathMod).catch(() => null);
+        if (nodeFs && nodePath && typeof process.cwd === 'function') {
+          const storageDir = nodePath.resolve(process.cwd(), 'server', '.tmp');
+          nodeFs.mkdirSync(storageDir, { recursive: true });
+          const submissionsFile = nodePath.join(storageDir, 'contact-submissions.json');
+          const existing = nodeFs.existsSync(submissionsFile)
+            ? JSON.parse(nodeFs.readFileSync(submissionsFile, 'utf-8'))
+            : [];
+          const updated = Array.isArray(existing) ? [submissionRecord, ...existing] : [submissionRecord];
+          nodeFs.writeFileSync(submissionsFile, JSON.stringify(updated, null, 2), 'utf-8');
+        }
+      } catch {
+        // Non-fatal
       }
-    } catch {
-      // Non-fatal if filesystem is read-only in a serverless environment
     }
 
     return new Response(
