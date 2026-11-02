@@ -10,6 +10,7 @@
     "dev": "concurrently -n \"STRAPI,ASTRO\" -c \"cyan,magenta\" \"npm --prefix server run develop\" \"astro dev --port 4321\"",
     "start": "npm run dev",
     "build": "astro build",
+    "deploy": "astro build && wrangler deploy",
     "preview": "astro preview",
     "seed": "npm --prefix server run seed",
     "setup": "npm install && npm --prefix server install"
