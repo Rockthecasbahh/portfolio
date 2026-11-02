@@ -6,25 +6,6 @@
   "compatibility_flags": [
     "nodejs_compat"
   ],
-  "workers_dev": true,
-  "preview_urls": true,
-  "routes": [
-    {
-      "pattern": "matteocasling.com",
-      "zone_name": "matteocasling.com",
-      "custom_domain": true
-    },
-    {
-      "pattern": "www.matteocasling.com",
-      "zone_name": "matteocasling.com",
-      "custom_domain": true
-    }
-  ],
-  "vars": {
-    "STRAPI_BASE_URL": "https://cms.matteocasling.com",
-    "PUBLIC_STRAPI_URL": "https://cms.matteocasling.com",
-    "STRAPI_PAGE_BUILDER_API_KEY": "b88aa5ad445af0080f9b4adfcb7b19c6"
-  },
   "assets": {
     "directory": "dist",
     "binding": "ASSETS"
