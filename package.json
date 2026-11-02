@@ -9,10 +9,13 @@
     "server": "npm --prefix server run develop",
     "dev": "concurrently -n \"STRAPI,ASTRO\" -c \"cyan,magenta\" \"npm --prefix server run develop\" \"astro dev --port 4321\"",
     "start": "npm run dev",
-    "build": "DEPLOY_TARGET=cloudflare astro build",
+    "build": "astro build",
     "preview": "astro preview",
     "seed": "npm --prefix server run seed",
     "setup": "npm install && npm --prefix server install"
+  },
+  "engines": {
+    "node": ">=20.0.0"
   },
   "dependencies": {
     "@astrojs/node": "^9.1.2",
