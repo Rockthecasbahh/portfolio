@@ -4,14 +4,11 @@ import node from '@astrojs/node';
 import cloudflare from '@astrojs/cloudflare';
 import tailwindcss from '@tailwindcss/vite';
 
-const isCloudflare =
-  process.env.CF_PAGES === '1' ||
-  process.env.DEPLOY_TARGET === 'cloudflare' ||
-  process.env.CI === 'true';
+const isNode = process.env.DEPLOY_TARGET === 'node';
 
 export default defineConfig({
   output: 'server',
-  adapter: isCloudflare ? cloudflare() : node({ mode: 'standalone' }),
+  adapter: isNode ? node({ mode: 'standalone' }) : cloudflare(),
   integrations: [react()],
   vite: {
     plugins: [tailwindcss()],
