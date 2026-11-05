@@ -15,9 +15,6 @@
     "seed": "npm --prefix server run seed",
     "setup": "npm install && npm --prefix server install"
   },
-  "engines": {
-    "node": ">=20.0.0"
-  },
   "dependencies": {
     "@astrojs/node": "^9.1.2",
     "@astrojs/react": "^4.2.1",
