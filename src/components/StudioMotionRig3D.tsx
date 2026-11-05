@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
+import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import type { Studio3DSettings } from '../lib/cms';
@@ -13,21 +14,23 @@ interface Props {
 /**
  * Generates an organic closed 2D topographic contour shape using Fourier harmonics
  * matching the cartographic elevation style of Matteo's CV.
+ * Radial bounds are strictly controlled so the outer topographic contour (R <= 2.18)
+ * never touches the planetary orbital ring (R = 3.22).
  */
 function createTopographicShape(
   baseRadius: number,
   seedPhase: number,
-  elongationX = 1.25,
-  elongationY = 0.88
+  elongationX = 1.04,
+  elongationY = 0.92
 ): THREE.Shape {
   const shape = new THREE.Shape();
   const segments = 96;
 
   for (let i = 0; i <= segments; i++) {
     const theta = (i / segments) * Math.PI * 2;
-    const wave1 = Math.sin(theta * 2 + seedPhase) * 0.18;
-    const wave2 = Math.cos(theta * 3 - seedPhase * 1.3) * 0.11;
-    const wave3 = Math.sin(theta * 5 + seedPhase * 0.7) * 0.05;
+    const wave1 = Math.sin(theta * 2 + seedPhase) * 0.09;
+    const wave2 = Math.cos(theta * 3 - seedPhase * 1.3) * 0.05;
+    const wave3 = Math.sin(theta * 5 + seedPhase * 0.7) * 0.02;
     const r = baseRadius * (1 + wave1 + wave2 + wave3);
 
     const x = Math.cos(theta) * r * elongationX;
@@ -43,6 +46,668 @@ function createTopographicShape(
   return shape;
 }
 
+/**
+ * Builds a real HDR Studio Environment using PMREMGenerator (from MengTo/Skills 3d-metal-material).
+ * High-radiance softbox window cards in a dark studio give metallic and glass surfaces authentic
+ * structured specular reflections and crisp bevel highlights.
+ */
+function buildStudioEnvironment(renderer: THREE.WebGLRenderer): THREE.Texture {
+  const studio = new THREE.Scene();
+  studio.background = new THREE.Color(0.035, 0.05, 0.08);
+  const disposables: { geo: THREE.BufferGeometry; mat: THREE.Material }[] = [];
+
+  const addLightCard = (
+    w: number,
+    h: number,
+    pos: [number, number, number],
+    radiance: [number, number, number]
+  ) => {
+    const geo = new THREE.PlaneGeometry(w, h);
+    const mat = new THREE.MeshBasicMaterial({
+      color: new THREE.Color(radiance[0], radiance[1], radiance[2]),
+      side: THREE.DoubleSide,
+      toneMapped: false,
+    });
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.position.set(pos[0], pos[1], pos[2]);
+    mesh.lookAt(0, 0, 0);
+    studio.add(mesh);
+    disposables.push({ geo, mat });
+  };
+
+  // 4x3 Mullioned Studio Window Softbox Array (Key Highlight Reflection)
+  const windowFrame = new THREE.Group();
+  windowFrame.position.set(-5.0, 4.4, 5.2);
+  windowFrame.lookAt(0, 0, 0);
+  for (let row = 0; row < 3; row++) {
+    for (let col = 0; col < 4; col++) {
+      const geo = new THREE.PlaneGeometry(1.06, 1.18);
+      const mat = new THREE.MeshBasicMaterial({
+        color: new THREE.Color(3.6, 3.5, 3.25),
+        side: THREE.DoubleSide,
+        toneMapped: false,
+      });
+      const pane = new THREE.Mesh(geo, mat);
+      pane.position.set((col - 1.5) * 1.28, (row - 1) * 1.44, 0);
+      windowFrame.add(pane);
+      disposables.push({ geo, mat });
+    }
+  }
+  studio.add(windowFrame);
+
+  // Cool Glacier-Ice Side Fill Card (#d9ebf4)
+  addLightCard(3.6, 5.8, [6.2, 1.8, 2.6], [0.85, 1.05, 1.35]);
+  // Warm Coral Back Rim Card (#f29f8b)
+  addLightCard(2.8, 4.8, [2.8, 2.4, -5.5], [1.75, 1.02, 0.85]);
+  // Deep Cobalt Lower Bounce Card (#304774)
+  addLightCard(8.5, 8.5, [0, -4.2, 0], [0.2, 0.32, 0.52]);
+  // Overhead Soft Strip
+  addLightCard(7.5, 2.5, [0, 6.2, 0], [0.95, 1.02, 1.15]);
+
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  const envTarget = pmrem.fromScene(studio, 0.006, 0.1, 40);
+  pmrem.dispose();
+  disposables.forEach(({ geo, mat }) => {
+    geo.dispose();
+    mat.dispose();
+  });
+
+  return envTarget.texture;
+}
+
+/**
+ * Helper to create a finely knurled cylindrical lens ring (for Sony G-Master zoom, focus & iris rings).
+ */
+function createKnurledLensRing(
+  radius: number,
+  width: number,
+  ridgeCount: number,
+  ringMat: THREE.Material,
+  ridgeMat: THREE.Material
+): THREE.Group {
+  const group = new THREE.Group();
+  const baseCyl = new THREE.Mesh(
+    new THREE.CylinderGeometry(radius, radius, width, 48),
+    ringMat
+  );
+  baseCyl.rotation.x = Math.PI / 2;
+  group.add(baseCyl);
+
+  const ridgeGeo = new THREE.BoxGeometry(0.006, 0.006, width * 0.92);
+  for (let i = 0; i < ridgeCount; i++) {
+    const a = (i / ridgeCount) * Math.PI * 2;
+    const ridge = new THREE.Mesh(ridgeGeo, ridgeMat);
+    ridge.position.set(Math.cos(a) * (radius + 0.002), Math.sin(a) * (radius + 0.002), 0);
+    ridge.rotation.z = a;
+    group.add(ridge);
+  }
+  return group;
+}
+
+/**
+ * Builds an anatomically accurate, studio-detailed Sony FX6 (ILME-FX6) Full-Frame Cinema Camera
+ * with Sony FE 24-70mm f/2.8 GM II Lens, Petal Lens Hood, Smart Top Handle, Dual XLR Audio Unit,
+ * Shotgun Microphone with Foam Windscreen, 3.5" LCD Viewfinder, Rotatable Smart Grip,
+ * Left-Side Electronic Variable ND Filter Wheel, 6 Silver Assignable Buttons, and BP-U60 Battery.
+ */
+function buildSonyFX6Camera(materials: {
+  fx6BodyMat: THREE.Material;
+  anodizedBlackMat: THREE.Material;
+  brushedCobaltMat: THREE.Material;
+  machinedSilverMat: THREE.Material;
+  coralCinemaMat: THREE.Material;
+  opticalGlassMat: THREE.Material;
+  matteFoamMat: THREE.Material;
+  lcdScreenMat: THREE.Material;
+}): THREE.Group {
+  const {
+    fx6BodyMat,
+    anodizedBlackMat,
+    brushedCobaltMat,
+    machinedSilverMat,
+    coralCinemaMat,
+    opticalGlassMat,
+    matteFoamMat,
+    lcdScreenMat,
+  } = materials;
+
+  // Center the assembly near (0,0,0) so its bounding radius is compact (~0.56 units)
+  const fx6Root = new THREE.Group();
+  const innerRig = new THREE.Group();
+  innerRig.position.set(0, -0.04, -0.14);
+  innerRig.scale.setScalar(0.84);
+  fx6Root.add(innerRig);
+
+  // ==========================================================================
+  // 1. SONY FX6 MAGNESIUM BODY CHASSIS (114mm x 116mm x 153mm compact cube-box)
+  // ==========================================================================
+  const mainChassis = new THREE.Mesh(
+    new RoundedBoxGeometry(0.48, 0.49, 0.62, 6, 0.038),
+    fx6BodyMat
+  );
+  innerRig.add(mainChassis);
+
+  // Front Stepped Sensor Block & Cooling Intake Louvers
+  const frontBlock = new THREE.Mesh(
+    new RoundedBoxGeometry(0.44, 0.44, 0.08, 4, 0.022),
+    anodizedBlackMat
+  );
+  frontBlock.position.set(0, -0.01, 0.31);
+  innerRig.add(frontBlock);
+
+  // Right-side diagonal heatsink cooling vents (Signature FX6 thermal Exhaust/Intake channel)
+  for (let v = 0; v < 7; v++) {
+    const fin = new THREE.Mesh(
+      new RoundedBoxGeometry(0.02, 0.014, 0.24, 2, 0.003),
+      anodizedBlackMat
+    );
+    fin.position.set(-0.242, 0.14 - v * 0.038, 0.08);
+    innerRig.add(fin);
+  }
+
+  // Top-front SONY brow badge & Cinema Line FX6 side badge
+  const sonyBrowBadge = new THREE.Mesh(
+    new RoundedBoxGeometry(0.14, 0.028, 0.012, 2, 0.003),
+    machinedSilverMat
+  );
+  sonyBrowBadge.position.set(0, 0.195, 0.348);
+  innerRig.add(sonyBrowBadge);
+
+  const fx6SideBadge = new THREE.Mesh(
+    new RoundedBoxGeometry(0.01, 0.045, 0.095, 2, 0.003),
+    coralCinemaMat
+  );
+  fx6SideBadge.position.set(0.242, 0.16, 0.18);
+  innerRig.add(fx6SideBadge);
+
+  const sensorPin = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.014, 0.014, 0.01, 16),
+    machinedSilverMat
+  );
+  sensorPin.position.set(0.18, 0.248, 0.14);
+  innerRig.add(sensorPin);
+
+  // ==========================================================================
+  // 2. LEFT-SIDE OPERATOR PANEL (+X side: Electronic Variable ND Wheel & 6 Buttons)
+  // ==========================================================================
+  const ndHousing = new THREE.Mesh(
+    new RoundedBoxGeometry(0.035, 0.16, 0.14, 4, 0.012),
+    anodizedBlackMat
+  );
+  ndHousing.position.set(0.245, 0.02, 0.18);
+  innerRig.add(ndHousing);
+
+  const ndWheel = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.048, 0.048, 0.022, 32),
+    machinedSilverMat
+  );
+  ndWheel.rotation.z = Math.PI / 2;
+  ndWheel.position.set(0.258, 0.02, 0.21);
+  innerRig.add(ndWheel);
+
+  const sideRecBezel = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.028, 0.028, 0.018, 24),
+    machinedSilverMat
+  );
+  sideRecBezel.rotation.z = Math.PI / 2;
+  sideRecBezel.position.set(0.246, -0.11, 0.22);
+  innerRig.add(sideRecBezel);
+
+  const sideRecBtn = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.02, 0.02, 0.024, 24),
+    coralCinemaMat
+  );
+  sideRecBtn.rotation.z = Math.PI / 2;
+  sideRecBtn.position.set(0.248, -0.11, 0.22);
+  innerRig.add(sideRecBtn);
+
+  // Row of 6 Signature FX6 Round Silver Assignable Function Buttons
+  for (let b = 0; b < 6; b++) {
+    const btnGuard = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.019, 0.019, 0.014, 20),
+      anodizedBlackMat
+    );
+    btnGuard.rotation.z = Math.PI / 2;
+    btnGuard.position.set(0.244, -0.16, 0.12 - b * 0.056);
+    innerRig.add(btnGuard);
+
+    const btnCap = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.014, 0.014, 0.02, 20),
+      machinedSilverMat
+    );
+    btnCap.rotation.z = Math.PI / 2;
+    btnCap.position.set(0.246, -0.16, 0.12 - b * 0.056);
+    innerRig.add(btnCap);
+  }
+
+  for (let ch = 0; ch < 2; ch++) {
+    const pot = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.018, 0.018, 0.022, 20),
+      machinedSilverMat
+    );
+    pot.rotation.z = Math.PI / 2;
+    pot.position.set(0.248, 0.05 - ch * 0.05, 0.02);
+    innerRig.add(pot);
+  }
+
+  const mediaCardDoor = new THREE.Mesh(
+    new RoundedBoxGeometry(0.02, 0.22, 0.16, 3, 0.006),
+    brushedCobaltMat
+  );
+  mediaCardDoor.position.set(0.242, 0.01, -0.16);
+  innerRig.add(mediaCardDoor);
+
+  // ==========================================================================
+  // 3. REAR BATTERY CAVITY (Sony BP-U60 Battery) & SDI / HDMI / TC Connectors
+  // ==========================================================================
+  const batteryPack = new THREE.Mesh(
+    new RoundedBoxGeometry(0.22, 0.34, 0.18, 4, 0.02),
+    anodizedBlackMat
+  );
+  batteryPack.position.set(-0.04, 0.01, -0.36);
+  innerRig.add(batteryPack);
+
+  for (let l = 0; l < 4; l++) {
+    const led = new THREE.Mesh(
+      new THREE.BoxGeometry(0.032, 0.012, 0.008),
+      lcdScreenMat
+    );
+    led.position.set(-0.04, -0.06 + l * 0.028, -0.452);
+    innerRig.add(led);
+  }
+
+  for (let bnc = 0; bnc < 2; bnc++) {
+    const bncCyl = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.022, 0.022, 0.06, 20),
+      machinedSilverMat
+    );
+    bncCyl.rotation.x = Math.PI / 2;
+    bncCyl.position.set(0.14, -0.06 + bnc * 0.09, -0.33);
+    innerRig.add(bncCyl);
+  }
+
+  // ==========================================================================
+  // 4. SONY E-MOUNT LOCKING LEVER RING + FE 24-70mm f/2.8 GM II LENS & PETAL HOOD
+  // ==========================================================================
+  const lensGroup = new THREE.Group();
+  lensGroup.position.set(0, -0.01, 0.35);
+
+  const eMountFlange = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.175, 0.185, 0.045, 48),
+    machinedSilverMat
+  );
+  eMountFlange.rotation.x = Math.PI / 2;
+  eMountFlange.position.set(0, 0, 0.02);
+  lensGroup.add(eMountFlange);
+
+  const lockLever = new THREE.Mesh(
+    new RoundedBoxGeometry(0.08, 0.028, 0.025, 2, 0.005),
+    machinedSilverMat
+  );
+  lockLever.position.set(0.19, 0.06, 0.02);
+  lockLever.rotation.z = 0.35;
+  lensGroup.add(lockLever);
+
+  const rearBarrel = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.182, 0.175, 0.11, 48),
+    anodizedBlackMat
+  );
+  rearBarrel.rotation.x = Math.PI / 2;
+  rearBarrel.position.set(0, 0, 0.09);
+  lensGroup.add(rearBarrel);
+
+  const irisRing = createKnurledLensRing(
+    0.186,
+    0.065,
+    60,
+    anodizedBlackMat,
+    fx6BodyMat
+  );
+  irisRing.position.set(0, 0, 0.16);
+  lensGroup.add(irisRing);
+
+  const midBarrel = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.192, 0.186, 0.09, 48),
+    fx6BodyMat
+  );
+  midBarrel.rotation.x = Math.PI / 2;
+  midBarrel.position.set(0, 0, 0.23);
+  lensGroup.add(midBarrel);
+
+  const gMasterBadge = new THREE.Mesh(
+    new RoundedBoxGeometry(0.012, 0.042, 0.042, 2, 0.004),
+    coralCinemaMat
+  );
+  gMasterBadge.position.set(0.19, 0.03, 0.23);
+  lensGroup.add(gMasterBadge);
+
+  const zoomRing = createKnurledLensRing(
+    0.198,
+    0.14,
+    72,
+    anodizedBlackMat,
+    brushedCobaltMat
+  );
+  zoomRing.position.set(0, 0, 0.34);
+  lensGroup.add(zoomRing);
+
+  const silverAccentRing = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.199, 0.199, 0.016, 48),
+    machinedSilverMat
+  );
+  silverAccentRing.rotation.x = Math.PI / 2;
+  silverAccentRing.position.set(0, 0, 0.42);
+  lensGroup.add(silverAccentRing);
+
+  const focusRing = createKnurledLensRing(
+    0.202,
+    0.12,
+    72,
+    anodizedBlackMat,
+    fx6BodyMat
+  );
+  focusRing.position.set(0, 0, 0.49);
+  lensGroup.add(focusRing);
+
+  // Sculpted Petal-Shaped Lens Hood (ALC-SH168 style bayonet hood)
+  const hoodBase = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.226, 0.204, 0.08, 48, 1, false),
+    anodizedBlackMat
+  );
+  hoodBase.rotation.x = Math.PI / 2;
+  hoodBase.position.set(0, 0, 0.59);
+  lensGroup.add(hoodBase);
+
+  const createHoodPetal = (
+    arcAngle: number,
+    centerAngle: number,
+    length: number
+  ) => {
+    const petalGeo = new THREE.CylinderGeometry(
+      0.242,
+      0.226,
+      length,
+      28,
+      1,
+      true,
+      centerAngle - arcAngle / 2,
+      arcAngle
+    );
+    petalGeo.rotateX(Math.PI / 2);
+    const petalMat = anodizedBlackMat.clone();
+    petalMat.side = THREE.DoubleSide;
+    const petal = new THREE.Mesh(petalGeo, petalMat);
+    petal.position.set(0, 0, 0.63 + length / 2);
+    return petal;
+  };
+  lensGroup.add(createHoodPetal(Math.PI * 0.42, 0, 0.095));
+  lensGroup.add(createHoodPetal(Math.PI * 0.42, Math.PI, 0.095));
+  lensGroup.add(createHoodPetal(Math.PI * 0.32, Math.PI * 0.5, 0.055));
+  lensGroup.add(createHoodPetal(Math.PI * 0.32, Math.PI * 1.5, 0.055));
+
+  // Deep Multi-Element Optical Glass Assembly + 11-Blade Aperture Iris Stop
+  const innerBaffle = new THREE.Mesh(
+    new THREE.CircleGeometry(0.192, 36),
+    matteFoamMat
+  );
+  innerBaffle.position.set(0, 0, 0.595);
+  lensGroup.add(innerBaffle);
+
+  const irisStopRing = new THREE.Mesh(
+    new THREE.RingGeometry(0.072, 0.175, 11),
+    brushedCobaltMat
+  );
+  irisStopRing.position.set(0, 0, 0.602);
+  lensGroup.add(irisStopRing);
+
+  const innerLensGeo = new THREE.SphereGeometry(
+    0.11,
+    32,
+    20,
+    0,
+    Math.PI * 2,
+    0,
+    Math.PI * 0.38
+  );
+  innerLensGeo.rotateX(Math.PI / 2);
+  innerLensGeo.scale(1, 1, 0.5);
+  const innerLens = new THREE.Mesh(innerLensGeo, opticalGlassMat);
+  innerLens.position.set(0, 0, 0.57);
+  lensGroup.add(innerLens);
+
+  const frontGlassGeo = new THREE.SphereGeometry(
+    0.188,
+    40,
+    28,
+    0,
+    Math.PI * 2,
+    0,
+    Math.PI * 0.44
+  );
+  frontGlassGeo.rotateX(Math.PI / 2);
+  frontGlassGeo.scale(1, 1, 0.55);
+  const frontGlass = new THREE.Mesh(frontGlassGeo, opticalGlassMat);
+  frontGlass.position.set(0, 0, 0.585);
+  lensGroup.add(frontGlass);
+
+  const filterRim = new THREE.Mesh(
+    new THREE.TorusGeometry(0.196, 0.009, 16, 48),
+    machinedSilverMat
+  );
+  filterRim.position.set(0, 0, 0.625);
+  lensGroup.add(filterRim);
+
+  innerRig.add(lensGroup);
+
+  // ==========================================================================
+  // 5. SONY FX6 SMART TOP HANDLE + XLR AUDIO BOX + SHOTGUN MIC + 3.5" LCD MONITOR
+  // ==========================================================================
+  const topHandleGroup = new THREE.Group();
+
+  const frontRiser = new THREE.Mesh(
+    new RoundedBoxGeometry(0.095, 0.16, 0.11, 4, 0.015),
+    anodizedBlackMat
+  );
+  frontRiser.position.set(0, 0.31, 0.18);
+  topHandleGroup.add(frontRiser);
+
+  const rearRiser = new THREE.Mesh(
+    new RoundedBoxGeometry(0.08, 0.14, 0.09, 4, 0.015),
+    anodizedBlackMat
+  );
+  rearRiser.position.set(0, 0.3, -0.18);
+  topHandleGroup.add(rearRiser);
+
+  const topGripBar = new THREE.Mesh(
+    new RoundedBoxGeometry(0.082, 0.062, 0.64, 5, 0.022),
+    fx6BodyMat
+  );
+  topGripBar.position.set(0, 0.4, -0.02);
+  topHandleGroup.add(topGripBar);
+
+  const rearTailHook = new THREE.Mesh(
+    new RoundedBoxGeometry(0.08, 0.09, 0.07, 4, 0.018),
+    fx6BodyMat
+  );
+  rearTailHook.position.set(0, 0.43, -0.32);
+  topHandleGroup.add(rearTailHook);
+
+  const topRecBtn = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.018, 0.018, 0.016, 20),
+    coralCinemaMat
+  );
+  topRecBtn.position.set(0, 0.435, 0.18);
+  topHandleGroup.add(topRecBtn);
+
+  // Integrated Dual-XLR Audio Box on Right Side of Top Handle (-X side)
+  const xlrBox = new THREE.Mesh(
+    new RoundedBoxGeometry(0.14, 0.11, 0.24, 4, 0.016),
+    anodizedBlackMat
+  );
+  xlrBox.position.set(-0.1, 0.38, 0.12);
+  topHandleGroup.add(xlrBox);
+
+  for (let x = 0; x < 2; x++) {
+    const xlrSocket = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.032, 0.032, 0.03, 24),
+      machinedSilverMat
+    );
+    xlrSocket.rotation.z = Math.PI / 2;
+    xlrSocket.position.set(-0.172, 0.38, 0.17 - x * 0.095);
+    topHandleGroup.add(xlrSocket);
+
+    const xlrCore = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.024, 0.024, 0.034, 20),
+      matteFoamMat
+    );
+    xlrCore.rotation.z = Math.PI / 2;
+    xlrCore.position.set(-0.172, 0.38, 0.17 - x * 0.095);
+    topHandleGroup.add(xlrCore);
+  }
+
+  // Shock-Isolated Shotgun Microphone Holder Clamp & Sony ECM Shotgun Mic (-X side)
+  const micClamp = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.042, 0.042, 0.09, 24),
+    anodizedBlackMat
+  );
+  micClamp.rotation.x = Math.PI / 2;
+  micClamp.position.set(-0.22, 0.42, 0.16);
+  topHandleGroup.add(micClamp);
+
+  const shotgunTube = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.024, 0.024, 0.34, 24),
+    fx6BodyMat
+  );
+  shotgunTube.rotation.x = Math.PI / 2;
+  shotgunTube.position.set(-0.22, 0.42, 0.22);
+  topHandleGroup.add(shotgunTube);
+
+  const windscreenGeo = new THREE.CapsuleGeometry(0.042, 0.26, 16, 28);
+  windscreenGeo.rotateX(Math.PI / 2);
+  const windscreen = new THREE.Mesh(windscreenGeo, matteFoamMat);
+  windscreen.position.set(-0.22, 0.42, 0.48);
+  topHandleGroup.add(windscreen);
+
+  // Front-Left 15mm Viewfinder Rod & 3.5-inch FX6 LCD Monitor (+X side)
+  const vfRod = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.012, 0.012, 0.24, 16),
+    machinedSilverMat
+  );
+  vfRod.rotation.z = Math.PI / 2;
+  vfRod.position.set(0.14, 0.4, 0.25);
+  topHandleGroup.add(vfRod);
+
+  const lcdGroup = new THREE.Group();
+  lcdGroup.position.set(0.26, 0.42, 0.3);
+  lcdGroup.rotation.y = -0.28;
+  lcdGroup.rotation.x = 0.18;
+
+  const lcdChassis = new THREE.Mesh(
+    new RoundedBoxGeometry(0.28, 0.18, 0.025, 4, 0.01),
+    anodizedBlackMat
+  );
+  lcdGroup.add(lcdChassis);
+
+  const lcdHood = new THREE.Mesh(
+    new RoundedBoxGeometry(0.29, 0.19, 0.04, 3, 0.008),
+    fx6BodyMat
+  );
+  lcdHood.position.set(0, 0, 0.012);
+  lcdGroup.add(lcdHood);
+
+  const lcdPanel = new THREE.Mesh(
+    new THREE.PlaneGeometry(0.25, 0.15),
+    lcdScreenMat
+  );
+  lcdPanel.position.set(0, 0, 0.033);
+  lcdGroup.add(lcdPanel);
+
+  const recTallyPill = new THREE.Mesh(
+    new THREE.PlaneGeometry(0.055, 0.018),
+    coralCinemaMat
+  );
+  recTallyPill.position.set(-0.08, 0.052, 0.035);
+  lcdGroup.add(recTallyPill);
+
+  const horizonLine = new THREE.Mesh(
+    new THREE.PlaneGeometry(0.18, 0.004),
+    machinedSilverMat
+  );
+  horizonLine.position.set(0, 0, 0.035);
+  lcdGroup.add(horizonLine);
+
+  topHandleGroup.add(lcdGroup);
+  innerRig.add(topHandleGroup);
+
+  // ==========================================================================
+  // 6. SONY FX6 ROTATABLE ERGONOMIC SMART GRIP (Right-Hand Side Rosette Grip)
+  // ==========================================================================
+  const smartGripGroup = new THREE.Group();
+  smartGripGroup.position.set(-0.28, -0.06, 0.08);
+
+  const rosetteJoint = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.055, 0.055, 0.08, 28),
+    anodizedBlackMat
+  );
+  rosetteJoint.rotation.z = Math.PI / 2;
+  smartGripGroup.add(rosetteJoint);
+
+  const gripBody = new THREE.Mesh(
+    new THREE.CapsuleGeometry(0.052, 0.19, 16, 24),
+    fx6BodyMat
+  );
+  gripBody.position.set(-0.06, -0.04, 0.11);
+  gripBody.rotation.x = 0.55;
+  gripBody.rotation.z = -0.12;
+  smartGripGroup.add(gripBody);
+
+  const gripHead = new THREE.Mesh(
+    new RoundedBoxGeometry(0.095, 0.085, 0.12, 4, 0.022),
+    anodizedBlackMat
+  );
+  gripHead.position.set(-0.05, 0.05, 0.08);
+  smartGripGroup.add(gripHead);
+
+  const gripRecBtn = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.018, 0.018, 0.016, 20),
+    coralCinemaMat
+  );
+  gripRecBtn.position.set(-0.05, 0.096, 0.1);
+  smartGripGroup.add(gripRecBtn);
+
+  const strapTorus = new THREE.Mesh(
+    new THREE.TorusGeometry(0.115, 0.014, 12, 36, Math.PI * 1.05),
+    brushedCobaltMat
+  );
+  strapTorus.position.set(-0.08, -0.03, 0.1);
+  strapTorus.rotation.y = Math.PI / 2;
+  strapTorus.rotation.x = 0.55;
+  smartGripGroup.add(strapTorus);
+
+  innerRig.add(smartGripGroup);
+
+  // ==========================================================================
+  // 7. CINEMA QUICK-RELEASE BASEPLATE & DUAL 15MM TITANIUM RODS
+  // ==========================================================================
+  const qrBaseplate = new THREE.Mesh(
+    new RoundedBoxGeometry(0.46, 0.05, 0.54, 4, 0.012),
+    brushedCobaltMat
+  );
+  qrBaseplate.position.set(0, -0.27, 0.04);
+  innerRig.add(qrBaseplate);
+
+  const rodGeo = new THREE.CylinderGeometry(0.018, 0.018, 0.96, 24);
+  rodGeo.rotateX(Math.PI / 2);
+  const rodL = new THREE.Mesh(rodGeo, machinedSilverMat);
+  rodL.position.set(-0.15, -0.28, 0.18);
+  const rodR = new THREE.Mesh(rodGeo, machinedSilverMat);
+  rodR.position.set(0.15, -0.28, 0.18);
+  innerRig.add(rodL);
+  innerRig.add(rodR);
+
+  return fx6Root;
+}
+
 export default function StudioMotionRig3D({ settings }: Props) {
   const mountRef = useRef<HTMLDivElement>(null);
 
@@ -56,13 +721,11 @@ export default function StudioMotionRig3D({ settings }: Props) {
     // 1. Scene, Camera, Renderer (Strictly adhering to CV palette: Navy, Cobalt, Ice, Coral, Paper)
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(
-      36,
+      34,
       container.clientWidth / container.clientHeight,
       0.1,
       100
     );
-    camera.position.set(0, 2.3, 9.2);
-    camera.lookAt(0, 0, 0);
 
     const renderer = new THREE.WebGLRenderer({
       antialias: true,
@@ -72,58 +735,119 @@ export default function StudioMotionRig3D({ settings }: Props) {
     renderer.setSize(container.clientWidth, container.clientHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.1;
+    renderer.toneMappingExposure = 1.14;
     container.innerHTML = '';
     container.appendChild(renderer.domElement);
 
-    // 2. Studio Lighting (Zero gold - Pure white, ice blue, deep cobalt & warm coral)
-    const ambientLight = new THREE.AmbientLight('#ffffff', 2.3);
+    // Real HDR Studio Reflection Environment (MengTo/Skills 3d-metal-material)
+    const studioEnv = buildStudioEnvironment(renderer);
+    scene.environment = studioEnv;
+
+    // 2. Studio Lighting
+    const ambientLight = new THREE.AmbientLight('#ffffff', 1.9);
     scene.add(ambientLight);
 
-    const sunKeyLight = new THREE.DirectionalLight('#fffaf0', 2.8);
-    sunKeyLight.position.set(6, 10, 7);
+    const sunKeyLight = new THREE.DirectionalLight('#fffaf5', 2.8);
+    sunKeyLight.position.set(6, 10, 8);
     scene.add(sunKeyLight);
 
     const iceRimLight = new THREE.DirectionalLight('#d9ebf4', 2.2);
-    iceRimLight.position.set(-7, 4, -5);
+    iceRimLight.position.set(-8, 5, -6);
     scene.add(iceRimLight);
 
-    const cobaltFillLight = new THREE.PointLight('#304774', 3.4, 20);
-    cobaltFillLight.position.set(-4, -5, 5);
+    const cobaltFillLight = new THREE.PointLight('#304774', 3.2, 22);
+    cobaltFillLight.position.set(-4, -5, 6);
     scene.add(cobaltFillLight);
 
-    const coralAccentLight = new THREE.PointLight('#f29f8b', 2.4, 16);
-    coralAccentLight.position.set(4, 3, 4);
-    scene.add(coralAccentLight);
+    const focalStageLight = new THREE.PointLight('#ffffff', 3.2, 16);
+    focalStageLight.position.set(1.0, 1.8, 6.0);
+    scene.add(focalStageLight);
 
-    // 3. Master 3D Topographic Assembly
+    // 3. Master 3D Topographic Assembly & Responsive Viewport Framing (Mobile + Tablet + Desktop)
     const worldRoot = new THREE.Group();
-    const baseOffsetX = settings.sceneOffsetX ?? 2.55;
-    const baseOffsetY = settings.sceneOffsetY ?? -0.1;
-    const updateResponsivePlacement = () => {
-      const w = window.innerWidth;
-      worldRoot.position.x = w >= 1280 ? baseOffsetX : w >= 1024 ? 2.1 : 0;
-      worldRoot.position.y = w >= 1024 ? baseOffsetY : -0.5;
-      const scale = w >= 1280 ? 0.92 : w >= 768 ? 0.76 : 0.58;
-      worldRoot.scale.setScalar(scale);
-    };
-    updateResponsivePlacement();
-    worldRoot.rotation.x = 0.52;
-    worldRoot.rotation.z = -0.18;
     scene.add(worldRoot);
 
+    const TILT_X = 0.26;
+
+    const layoutState = {
+      frontFocusAngle: -0.06,
+      orbitRadiusX: 3.12,
+      orbitRadiusZ: 3.02,
+      isMobile: false,
+    };
+
+    const updateResponsivePlacement = () => {
+      if (!container) return;
+      const w = container.clientWidth || window.innerWidth;
+      const h = container.clientHeight || window.innerHeight || 1;
+      const aspect = w / h;
+
+      if (w < 768 || aspect < 0.85) {
+        // Mobile Portrait / Narrow Viewport:
+        // Centered horizontally & vertically so the spinning orbital ring and focused model sit right in the middle of the screen
+        layoutState.isMobile = true;
+        layoutState.frontFocusAngle = 0;
+        layoutState.orbitRadiusX = 2.95;
+        layoutState.orbitRadiusZ = 2.95;
+
+        const mobileScale = w < 420 ? 0.56 : 0.62;
+        worldRoot.position.set(0, 0.46, 0);
+        worldRoot.scale.setScalar(mobileScale);
+
+        camera.fov = 38;
+        const camZ = Math.min(13.8, Math.max(10.2, 5.4 / Math.max(0.38, aspect)));
+        camera.position.set(0, 1.9, camZ);
+        camera.lookAt(0, 0.35, 0);
+      } else if (w < 1280) {
+        // Tablet / Compact Laptop:
+        layoutState.isMobile = false;
+        layoutState.frontFocusAngle = -0.04;
+        layoutState.orbitRadiusX = 3.06;
+        layoutState.orbitRadiusZ = 2.98;
+
+        worldRoot.position.set(0.32, 0.46, 0);
+        worldRoot.scale.setScalar(0.74);
+
+        camera.fov = 35;
+        camera.position.set(0, 1.88, 10.1);
+        camera.lookAt(0, 0.35, 0);
+      } else {
+        // Desktop Widescreen:
+        // Positioned centrally with a gentle right bias so the focused front model sits near the center of the screen
+        layoutState.isMobile = false;
+        layoutState.frontFocusAngle = -0.06;
+        layoutState.orbitRadiusX = 3.12;
+        layoutState.orbitRadiusZ = 3.02;
+
+        const baseOffsetX = Math.min(settings.sceneOffsetX ?? 0.65, 0.72);
+        const baseOffsetY = (settings.sceneOffsetY ?? 0) + 0.48;
+        worldRoot.position.set(baseOffsetX, baseOffsetY, 0);
+        worldRoot.scale.setScalar(0.84);
+
+        camera.fov = 34;
+        camera.position.set(0, 1.85, 9.8);
+        camera.lookAt(0, 0.35, 0);
+      }
+      camera.updateProjectionMatrix();
+    };
+
+    updateResponsivePlacement();
+    worldRoot.rotation.x = TILT_X;
+    worldRoot.rotation.z = -0.06;
+
     // 4. Stepped Topographic Elevation Strata matching the CV Palette (NO GOLD)
+    // Strictly bounded within R <= 2.15 so the outer planetary orbit (R >= 2.95) never touches it!
     const strataGroup = new THREE.Group();
     worldRoot.add(strataGroup);
 
     const strataConfigs = [
-      { radius: 2.65, phase: 0.2, color: '#172a3b', edgeColor: '#304774', roughness: 0.45 },
-      { radius: 2.32, phase: 0.85, color: '#304774', edgeColor: '#d9ebf4', roughness: 0.35 },
-      { radius: 1.98, phase: 1.5, color: '#d9ebf4', edgeColor: '#304774', roughness: 0.25 },
-      { radius: 1.66, phase: 2.2, color: '#ffffff', edgeColor: '#304774', roughness: 0.2 },
-      { radius: 1.34, phase: 2.9, color: '#304774', edgeColor: '#d9ebf4', roughness: 0.32 },
-      { radius: 1.02, phase: 3.6, color: '#d9ebf4', edgeColor: '#f29f8b', roughness: 0.22 },
-      { radius: 0.68, phase: 4.3, color: '#fbd5cd', edgeColor: '#f29f8b', roughness: 0.2 },
+      { radius: 1.82, phase: 0.2, color: '#172a3b', edgeColor: '#304774', roughness: 0.42 },
+      { radius: 1.6, phase: 0.85, color: '#304774', edgeColor: '#d9ebf4', roughness: 0.34 },
+      { radius: 1.38, phase: 1.5, color: '#d9ebf4', edgeColor: '#304774', roughness: 0.24 },
+      { radius: 1.16, phase: 2.2, color: '#ffffff', edgeColor: '#304774', roughness: 0.2 },
+      { radius: 0.94, phase: 2.9, color: '#304774', edgeColor: '#d9ebf4', roughness: 0.3 },
+      { radius: 0.72, phase: 3.6, color: '#d9ebf4', edgeColor: '#f29f8b', roughness: 0.22 },
+      { radius: 0.5, phase: 4.3, color: '#fbd5cd', edgeColor: '#f29f8b', roughness: 0.18 },
     ];
 
     interface StratumLayer {
@@ -138,34 +862,37 @@ export default function StudioMotionRig3D({ settings }: Props) {
 
     strataConfigs.forEach((cfg, idx) => {
       const shape = createTopographicShape(cfg.radius, cfg.phase);
+      // Total slab thickness = 0.10 + 2 * 0.022 = 0.144 units; step = 0.25 units -> permanent air gap!
       const geo = new THREE.ExtrudeGeometry(shape, {
-        depth: 0.14,
+        depth: 0.1,
         bevelEnabled: true,
-        bevelThickness: 0.035,
-        bevelSize: 0.035,
-        bevelSegments: 3,
-        curveSegments: 48,
+        bevelThickness: 0.022,
+        bevelSize: 0.022,
+        bevelSegments: 4,
+        curveSegments: 56,
       });
       geo.rotateX(-Math.PI / 2);
 
       const mat = new THREE.MeshStandardMaterial({
         color: new THREE.Color(cfg.color),
         roughness: cfg.roughness,
-        metalness: 0.08,
+        metalness: 0.12,
+        envMap: studioEnv,
+        envMapIntensity: 0.55,
       });
 
       const mesh = new THREE.Mesh(geo, mat);
 
-      const edgesGeo = new THREE.EdgesGeometry(geo, 22);
+      const edgesGeo = new THREE.EdgesGeometry(geo, 24);
       const edgesMat = new THREE.LineBasicMaterial({
         color: new THREE.Color(cfg.edgeColor),
         transparent: true,
-        opacity: 0.55,
+        opacity: 0.48,
       });
       const edgesLine = new THREE.LineSegments(edgesGeo, edgesMat);
 
       const layerGroup = new THREE.Group();
-      const baseY = (idx - 3) * 0.22;
+      const baseY = (idx - 3) * 0.25;
       layerGroup.position.y = baseY;
       layerGroup.add(mesh);
       layerGroup.add(edgesLine);
@@ -180,263 +907,664 @@ export default function StudioMotionRig3D({ settings }: Props) {
       });
     });
 
-    // 5. 3D Objects: Non-Gold Palette Materials
+    // 5. Studio-Grade PBR Materials
     const objectsGroup = new THREE.Group();
     worldRoot.add(objectsGroup);
 
-    const navyMat = new THREE.MeshStandardMaterial({
-      color: new THREE.Color('#172a3b'),
-      metalness: 0.75,
+    const fx6BodyMat = new THREE.MeshPhysicalMaterial({
+      color: new THREE.Color('#1d2b3a'),
+      metalness: 0.78,
       roughness: 0.32,
-    });
-    const cobaltMetalMat = new THREE.MeshStandardMaterial({
-      color: new THREE.Color('#304774'),
-      metalness: 0.65,
-      roughness: 0.28,
-    });
-    const iceMetalMat = new THREE.MeshStandardMaterial({
-      color: new THREE.Color('#d9ebf4'),
-      metalness: 0.45,
-      roughness: 0.25,
-    });
-    const coralGlossMat = new THREE.MeshPhysicalMaterial({
-      color: new THREE.Color('#f29f8b'),
-      metalness: 0.1,
-      roughness: 0.18,
-      clearcoat: 0.9,
-    });
-    const glassMat = new THREE.MeshPhysicalMaterial({
-      color: new THREE.Color('#d9ebf4'),
-      transmission: 0.8,
-      roughness: 0.08,
-      ior: 1.5,
-      clearcoat: 1,
-    });
-    const lightDiffuserMat = new THREE.MeshBasicMaterial({
-      color: new THREE.Color('#ffffff'),
+      clearcoat: 0.28,
+      clearcoatRoughness: 0.35,
+      envMap: studioEnv,
+      envMapIntensity: 1.1,
     });
 
-    // 3D Object A: Summit 3D Motion Knot (Cobalt & Coral, No Gold)
+    const anodizedBlackMat = new THREE.MeshPhysicalMaterial({
+      color: new THREE.Color('#111c27'),
+      metalness: 0.86,
+      roughness: 0.24,
+      anisotropy: 0.65,
+      clearcoat: 0.3,
+      envMap: studioEnv,
+      envMapIntensity: 1.15,
+    });
+
+    const matteFoamMat = new THREE.MeshStandardMaterial({
+      color: new THREE.Color('#0c151f'),
+      metalness: 0.08,
+      roughness: 0.92,
+      envMap: studioEnv,
+      envMapIntensity: 0.2,
+    });
+
+    const brushedCobaltMat = new THREE.MeshPhysicalMaterial({
+      color: new THREE.Color('#304774'),
+      metalness: 0.88,
+      roughness: 0.22,
+      anisotropy: 0.75,
+      clearcoat: 0.25,
+      envMap: studioEnv,
+      envMapIntensity: 1.15,
+    });
+
+    const machinedSilverMat = new THREE.MeshPhysicalMaterial({
+      color: new THREE.Color('#d9ebf4'),
+      metalness: 0.95,
+      roughness: 0.13,
+      anisotropy: 0.65,
+      envMap: studioEnv,
+      envMapIntensity: 1.3,
+    });
+
+    const coralCinemaMat = new THREE.MeshPhysicalMaterial({
+      color: new THREE.Color('#f29f8b'),
+      metalness: 0.38,
+      roughness: 0.16,
+      clearcoat: 0.92,
+      clearcoatRoughness: 0.1,
+      envMap: studioEnv,
+      envMapIntensity: 1.15,
+    });
+
+    const opticalGlassMat = new THREE.MeshPhysicalMaterial({
+      color: new THREE.Color('#d9ebf4'),
+      transmission: 0.9,
+      opacity: 1,
+      transparent: true,
+      roughness: 0.03,
+      ior: 1.65,
+      thickness: 0.38,
+      specularIntensity: 1.0,
+      specularColor: new THREE.Color('#f29f8b'),
+      clearcoat: 1.0,
+      envMap: studioEnv,
+      envMapIntensity: 1.75,
+    });
+
+    const frostedGlassMat = new THREE.MeshPhysicalMaterial({
+      color: new THREE.Color('#d9ebf4'),
+      transmission: 0.64,
+      opacity: 1,
+      transparent: true,
+      roughness: 0.2,
+      ior: 1.48,
+      thickness: 0.22,
+      clearcoat: 0.85,
+      envMap: studioEnv,
+      envMapIntensity: 1.25,
+    });
+
+    const lcdScreenMat = new THREE.MeshStandardMaterial({
+      color: new THREE.Color('#d9ebf4'),
+      emissive: new THREE.Color('#4aa8ff'),
+      emissiveIntensity: 0.95,
+      roughness: 0.18,
+    });
+
+    // ============================================================================
+    // SUMMIT CROWN: Kinetic 3D Motion Sculpture (Elevated above Topographic Peak)
+    // ============================================================================
     const summitObject = new THREE.Group();
-    summitObject.position.set(0, 1.35, 0);
-    const knotGeo = new THREE.TorusKnotGeometry(0.34, 0.085, 96, 16);
-    const knotMesh = new THREE.Mesh(knotGeo, cobaltMetalMat);
+    summitObject.position.set(0, 1.58, 0);
+    const knotGeo = new THREE.TorusKnotGeometry(0.24, 0.062, 128, 24);
+    const knotMesh = new THREE.Mesh(knotGeo, brushedCobaltMat);
     summitObject.add(knotMesh);
 
-    const haloRingGeo = new THREE.TorusGeometry(0.62, 0.018, 16, 80);
-    const haloRing = new THREE.Mesh(haloRingGeo, coralGlossMat);
+    const haloRingGeo = new THREE.TorusGeometry(0.44, 0.014, 20, 96);
+    const haloRing = new THREE.Mesh(haloRingGeo, coralCinemaMat);
     haloRing.rotation.x = Math.PI / 2;
     summitObject.add(haloRing);
     objectsGroup.add(summitObject);
 
-    // 3D Object B: Modular 3D Cinema Camera + Studio Video Light on the Side
-    const cameraRigGroup = new THREE.Group();
-    cameraRigGroup.position.set(-2.25, 0.45, 0.9);
+    // ============================================================================
+    // ORBITAL ELEMENT 0: SONY FX6 FULL-FRAME CINEMA CAMERA
+    // ============================================================================
+    const fx6StationGroup = new THREE.Group();
+    const fx6CameraMeshGroup = buildSonyFX6Camera({
+      fx6BodyMat,
+      anodizedBlackMat,
+      brushedCobaltMat,
+      machinedSilverMat,
+      coralCinemaMat,
+      opticalGlassMat,
+      matteFoamMat,
+      lcdScreenMat,
+    });
+    fx6StationGroup.add(fx6CameraMeshGroup);
+    objectsGroup.add(fx6StationGroup);
 
-    // --- CINEMA CAMERA ---
-    const cameraBodyGroup = new THREE.Group();
+    // ============================================================================
+    // ORBITAL ELEMENT 1: COMMUNICATIONS STRATEGIES (Parabolic Dish & Signal Nodes)
+    // ============================================================================
+    const commsStationGroup = new THREE.Group();
 
-    // 1. Camera Main Chassis (RED / ARRI Cinema Box Body)
-    const bodyGeo = new THREE.BoxGeometry(0.58, 0.44, 0.68);
-    const bodyMesh = new THREE.Mesh(bodyGeo, navyMat);
-    cameraBodyGroup.add(bodyMesh);
+    const dishAssembly = new THREE.Group();
+    dishAssembly.rotation.y = -0.35;
+    dishAssembly.rotation.x = -0.18;
 
-    // 2. Side Cheeseplates & Control Screen
-    const screenGeo = new THREE.BoxGeometry(0.04, 0.24, 0.36);
-    const screenMesh = new THREE.Mesh(screenGeo, iceMetalMat);
-    screenMesh.position.set(-0.3, 0.02, 0.05);
-    cameraBodyGroup.add(screenMesh);
-
-    // 3. Top Handle Rig
-    const handleBarGeo = new THREE.BoxGeometry(0.1, 0.06, 0.52);
-    const handleBarMesh = new THREE.Mesh(handleBarGeo, cobaltMetalMat);
-    handleBarMesh.position.set(0, 0.34, -0.05);
-    cameraBodyGroup.add(handleBarMesh);
-
-    const handlePost1 = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.14, 0.08), cobaltMetalMat);
-    handlePost1.position.set(0, 0.25, 0.14);
-    cameraBodyGroup.add(handlePost1);
-
-    const handlePost2 = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.14, 0.08), cobaltMetalMat);
-    handlePost2.position.set(0, 0.25, -0.22);
-    cameraBodyGroup.add(handlePost2);
-
-    // 4. Cinema Prime Lens Barrel
-    const lensBarrelGeo = new THREE.CylinderGeometry(0.24, 0.27, 0.42, 32);
-    lensBarrelGeo.rotateX(Math.PI / 2);
-    const lensBarrelMesh = new THREE.Mesh(lensBarrelGeo, cobaltMetalMat);
-    lensBarrelMesh.position.set(0, 0, 0.52);
-    cameraBodyGroup.add(lensBarrelMesh);
-
-    // Lens Focus Gear Rings
-    const gearRingGeo = new THREE.TorusGeometry(0.26, 0.022, 16, 40);
-    const gearRing1 = new THREE.Mesh(gearRingGeo, coralGlossMat);
-    gearRing1.position.set(0, 0, 0.46);
-    cameraBodyGroup.add(gearRing1);
-
-    const gearRing2 = new THREE.Mesh(gearRingGeo, iceMetalMat);
-    gearRing2.position.set(0, 0, 0.6);
-    cameraBodyGroup.add(gearRing2);
-
-    // Front Optical Glass Element
-    const frontGlassGeo = new THREE.SphereGeometry(0.2, 24, 24);
-    frontGlassGeo.scale(1, 1, 0.35);
-    const frontGlassMesh = new THREE.Mesh(frontGlassGeo, glassMat);
-    frontGlassMesh.position.set(0, 0, 0.72);
-    cameraBodyGroup.add(frontGlassMesh);
-
-    // Cinema Matte Box Hood
-    const matteBoxGeo = new THREE.BoxGeometry(0.56, 0.44, 0.14);
-    const matteBoxMesh = new THREE.Mesh(matteBoxGeo, navyMat);
-    matteBoxMesh.position.set(0, 0, 0.78);
-    cameraBodyGroup.add(matteBoxMesh);
-
-    // Matte Box Top French Flag
-    const frenchFlagGeo = new THREE.BoxGeometry(0.54, 0.02, 0.18);
-    const frenchFlagMesh = new THREE.Mesh(frenchFlagGeo, cobaltMetalMat);
-    frenchFlagMesh.position.set(0, 0.24, 0.82);
-    frenchFlagMesh.rotation.x = -0.25;
-    cameraBodyGroup.add(frenchFlagMesh);
-
-    // 5. Rear V-Mount Battery Pack
-    const vBatteryGeo = new THREE.BoxGeometry(0.42, 0.34, 0.18);
-    const vBatteryMesh = new THREE.Mesh(vBatteryGeo, cobaltMetalMat);
-    vBatteryMesh.position.set(0, -0.02, -0.42);
-    cameraBodyGroup.add(vBatteryMesh);
-
-    // 6. 15mm Baseplate Support Rods
-    const rodGeo = new THREE.CylinderGeometry(0.022, 0.022, 1.05, 16);
-    rodGeo.rotateX(Math.PI / 2);
-    const rodLeft = new THREE.Mesh(rodGeo, iceMetalMat);
-    rodLeft.position.set(-0.16, -0.26, 0.22);
-    const rodRight = new THREE.Mesh(rodGeo, iceMetalMat);
-    rodRight.position.set(0.16, -0.26, 0.22);
-    cameraBodyGroup.add(rodLeft);
-    cameraBodyGroup.add(rodRight);
-
-    cameraRigGroup.add(cameraBodyGroup);
-
-    // --- STUDIO VIDEO LIGHT (Positioned on the side of the camera) ---
-    const videoLightGroup = new THREE.Group();
-    videoLightGroup.position.set(-0.88, 0.22, 0.18);
-    videoLightGroup.rotation.y = 0.48; // Angled inward toward the subject & camera
-    videoLightGroup.rotation.x = 0.15;
-
-    // 1. Light Panel Enclosure
-    const lightHousingGeo = new THREE.BoxGeometry(0.52, 0.42, 0.16);
-    const lightHousingMesh = new THREE.Mesh(lightHousingGeo, navyMat);
-    videoLightGroup.add(lightHousingMesh);
-
-    // 2. Rear Heat Sink Cooling Fins
-    for (let f = 0; f < 4; f++) {
-      const finGeo = new THREE.BoxGeometry(0.46, 0.02, 0.08);
-      const finMesh = new THREE.Mesh(finGeo, cobaltMetalMat);
-      finMesh.position.set(0, (f - 1.5) * 0.09, -0.11);
-      videoLightGroup.add(finMesh);
+    const dishPoints: THREE.Vector2[] = [];
+    for (let i = 0; i <= 24; i++) {
+      const r = (i / 24) * 0.42;
+      const z = r * r * 0.92;
+      dishPoints.push(new THREE.Vector2(r, z));
     }
+    dishPoints.push(new THREE.Vector2(0.435, 0.18));
+    dishPoints.push(new THREE.Vector2(0.41, 0.15));
+    const dishLatheGeo = new THREE.LatheGeometry(dishPoints, 56);
+    dishLatheGeo.rotateX(Math.PI / 2);
+    const dishMesh = new THREE.Mesh(dishLatheGeo, machinedSilverMat);
+    dishAssembly.add(dishMesh);
 
-    // 3. Frosted Diffuser Emissive Face
-    const diffuserGeo = new THREE.PlaneGeometry(0.46, 0.36);
-    const diffuserMesh = new THREE.Mesh(diffuserGeo, lightDiffuserMat);
-    diffuserMesh.position.set(0, 0, 0.085);
-    videoLightGroup.add(diffuserMesh);
-
-    // Actual PointLight emanating from the video light panel face
-    const panelBeamLight = new THREE.PointLight(
-      settings.videoLightColor || '#d9ebf4',
-      settings.videoLightIntensity ?? 3.0,
-      9
-    );
-    panelBeamLight.position.set(0, 0, 0.2);
-    videoLightGroup.add(panelBeamLight);
-
-    // 4. Four Articulated Barn Doors (Top, Bottom, Left, Right)
-    const topBarnDoorGeo = new THREE.BoxGeometry(0.48, 0.18, 0.015);
-    const topBarnDoor = new THREE.Mesh(topBarnDoorGeo, cobaltMetalMat);
-    topBarnDoor.position.set(0, 0.27, 0.14);
-    topBarnDoor.rotation.x = -0.58;
-    videoLightGroup.add(topBarnDoor);
-
-    const btmBarnDoor = new THREE.Mesh(topBarnDoorGeo, cobaltMetalMat);
-    btmBarnDoor.position.set(0, -0.27, 0.14);
-    btmBarnDoor.rotation.x = 0.58;
-    videoLightGroup.add(btmBarnDoor);
-
-    const sideBarnDoorGeo = new THREE.BoxGeometry(0.18, 0.38, 0.015);
-    const leftBarnDoor = new THREE.Mesh(sideBarnDoorGeo, cobaltMetalMat);
-    leftBarnDoor.position.set(-0.31, 0, 0.14);
-    leftBarnDoor.rotation.y = 0.58;
-    videoLightGroup.add(leftBarnDoor);
-
-    const rightBarnDoor = new THREE.Mesh(sideBarnDoorGeo, cobaltMetalMat);
-    rightBarnDoor.position.set(0.31, 0, 0.14);
-    rightBarnDoor.rotation.y = -0.58;
-    videoLightGroup.add(rightBarnDoor);
-
-    // 5. Yoke Bracket & Light Stand Mount
-    const yokePostGeo = new THREE.CylinderGeometry(0.024, 0.024, 0.6, 16);
-    const yokePost = new THREE.Mesh(yokePostGeo, cobaltMetalMat);
-    yokePost.position.set(0, -0.38, 0);
-    videoLightGroup.add(yokePost);
-
-    const yokeKnobGeo = new THREE.CylinderGeometry(0.045, 0.045, 0.04, 16);
-    yokeKnobGeo.rotateZ(Math.PI / 2);
-    const yokeKnob = new THREE.Mesh(yokeKnobGeo, coralGlossMat);
-    yokeKnob.position.set(-0.3, 0, 0);
-    videoLightGroup.add(yokeKnob);
-
-    cameraRigGroup.scale.setScalar(settings.cameraRigScale ?? 1.15);
-    cameraRigGroup.add(videoLightGroup);
-    objectsGroup.add(cameraRigGroup);
-
-    // 3D Object C: Global UN Geodesic Node & Latitude Rings
-    const globeObject = new THREE.Group();
-    globeObject.position.set(2.25, -0.1, 1.1);
-    const geoSphere = new THREE.IcosahedronGeometry(0.38, 1);
-    const geoMesh = new THREE.Mesh(geoSphere, coralGlossMat);
-    const geoWire = new THREE.LineSegments(
-      new THREE.EdgesGeometry(geoSphere),
-      new THREE.LineBasicMaterial({ color: '#172a3b', transparent: true, opacity: 0.45 })
-    );
-    globeObject.add(geoMesh);
-    globeObject.add(geoWire);
-
-    const orbitRingGeo = new THREE.TorusGeometry(0.58, 0.016, 12, 64);
-    const orbitRing = new THREE.Mesh(orbitRingGeo, iceMetalMat);
-    orbitRing.rotation.x = Math.PI / 3;
-    orbitRing.rotation.y = Math.PI / 6;
-    globeObject.add(orbitRing);
-    objectsGroup.add(globeObject);
-
-    // 6. Floating Topographic Elevation Markers (No Gold - Cobalt & Warm Coral)
-    const pinsGroup = new THREE.Group();
-    worldRoot.add(pinsGroup);
-    const pinMeshes: THREE.Mesh[] = [];
-    const pinGeo = new THREE.OctahedronGeometry(0.11, 0);
-
-    for (let i = 0; i < 8; i++) {
-      const angle = (i / 8) * Math.PI * 2;
-      const dist = 2.85 + (i % 2) * 0.45;
-      const pin = new THREE.Mesh(pinGeo, i % 2 === 0 ? coralGlossMat : cobaltMetalMat);
-      pin.position.set(
-        Math.cos(angle) * dist * 1.15,
-        (i - 3.5) * 0.24,
-        Math.sin(angle) * dist * 0.8
+    for (let rib = 0; rib < 8; rib++) {
+      const a = (rib / 8) * Math.PI * 2;
+      const ribMesh = new THREE.Mesh(
+        new RoundedBoxGeometry(0.015, 0.34, 0.028, 2, 0.004),
+        brushedCobaltMat
       );
-      pinsGroup.add(pin);
-      pinMeshes.push(pin);
+      ribMesh.position.set(Math.cos(a) * 0.19, Math.sin(a) * 0.19, 0.035);
+      ribMesh.rotation.z = a + Math.PI / 2;
+      dishAssembly.add(ribMesh);
     }
 
-    // 7. GSAP ScrollTrigger Choreography
+    const dishHub = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.11, 0.14, 0.12, 28),
+      fx6BodyMat
+    );
+    dishHub.rotation.x = Math.PI / 2;
+    dishHub.position.set(0, 0, -0.06);
+    dishAssembly.add(dishHub);
+
+    for (let s = 0; s < 4; s++) {
+      const a = (s / 4) * Math.PI * 2 + Math.PI / 4;
+      const strut = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.008, 0.008, 0.36, 12),
+        brushedCobaltMat
+      );
+      strut.position.set(Math.cos(a) * 0.15, Math.sin(a) * 0.15, 0.17);
+      strut.lookAt(0, 0, 0.34);
+      strut.rotateX(Math.PI / 2);
+      dishAssembly.add(strut);
+    }
+
+    const feedHorn = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.042, 0.06, 0.08, 24),
+      coralCinemaMat
+    );
+    feedHorn.rotation.x = Math.PI / 2;
+    feedHorn.position.set(0, 0, 0.33);
+    dishAssembly.add(feedHorn);
+
+    const signalWaveRings: THREE.Mesh[] = [];
+    for (let w = 0; w < 3; w++) {
+      const waveRingGeo = new THREE.TorusGeometry(0.14 + w * 0.095, 0.01, 16, 64);
+      const waveRing = new THREE.Mesh(
+        waveRingGeo,
+        w % 2 === 0 ? coralCinemaMat : lcdScreenMat
+      );
+      waveRing.position.set(0, 0, 0.42 + w * 0.12);
+      dishAssembly.add(waveRing);
+      signalWaveRings.push(waveRing);
+    }
+
+    const dishPedestal = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.045, 0.17, 0.32, 28),
+      fx6BodyMat
+    );
+    dishPedestal.position.set(0, -0.3, -0.04);
+    commsStationGroup.add(dishPedestal);
+    commsStationGroup.add(dishAssembly);
+
+    const strategyNodesGroup = new THREE.Group();
+    strategyNodesGroup.position.set(-0.38, 0.2, 0.28);
+    const nodeOffsets: [number, number, number][] = [
+      [0, 0, 0],
+      [-0.26, 0.18, 0.12],
+      [-0.14, -0.2, 0.18],
+      [0.2, 0.22, -0.1],
+      [0.22, -0.15, 0.14],
+    ];
+    nodeOffsets.forEach((pos, idx) => {
+      const nodeSphere = new THREE.Mesh(
+        new THREE.SphereGeometry(idx === 0 ? 0.068 : 0.048, 24, 24),
+        idx === 0 ? coralCinemaMat : idx % 2 === 0 ? machinedSilverMat : brushedCobaltMat
+      );
+      nodeSphere.position.set(pos[0], pos[1], pos[2]);
+      strategyNodesGroup.add(nodeSphere);
+
+      if (idx > 0) {
+        const curve = new THREE.LineCurve3(
+          new THREE.Vector3(0, 0, 0),
+          new THREE.Vector3(pos[0], pos[1], pos[2])
+        );
+        const linkTube = new THREE.Mesh(
+          new THREE.TubeGeometry(curve, 8, 0.009, 12, false),
+          machinedSilverMat
+        );
+        strategyNodesGroup.add(linkTube);
+      }
+    });
+    commsStationGroup.add(strategyNodesGroup);
+    objectsGroup.add(commsStationGroup);
+
+    // ============================================================================
+    // ORBITAL ELEMENT 2: DIGITAL MARKETING (3D Growth Graph & Optical Magnifier Glass)
+    // ============================================================================
+    const marketingStationGroup = new THREE.Group();
+
+    const analyticsDeck = new THREE.Mesh(
+      new RoundedBoxGeometry(0.84, 0.05, 0.5, 4, 0.015),
+      fx6BodyMat
+    );
+    analyticsDeck.position.set(0, -0.22, -0.06);
+    marketingStationGroup.add(analyticsDeck);
+
+    const barHeights = [0.16, 0.25, 0.22, 0.36, 0.5];
+    const analyticsBars: THREE.Mesh[] = [];
+    barHeights.forEach((h, idx) => {
+      const colGeo = new RoundedBoxGeometry(0.1, h, 0.1, 4, 0.016);
+      const colMat =
+        idx === 4
+          ? coralCinemaMat
+          : idx % 2 === 1
+            ? brushedCobaltMat
+            : frostedGlassMat;
+      const colMesh = new THREE.Mesh(colGeo, colMat);
+      const xPos = (idx - 2) * 0.145;
+      colMesh.position.set(xPos, -0.195 + h / 2, -0.09);
+      marketingStationGroup.add(colMesh);
+      analyticsBars.push(colMesh);
+    });
+
+    const trendCurve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(-0.31, -0.06, 0.04),
+      new THREE.Vector3(-0.15, 0.06, 0.06),
+      new THREE.Vector3(0.0, 0.04, 0.06),
+      new THREE.Vector3(0.15, 0.21, 0.06),
+      new THREE.Vector3(0.31, 0.38, 0.04),
+    ]);
+    const trendTubeGeo = new THREE.TubeGeometry(trendCurve, 40, 0.021, 16, false);
+    const trendTubeMesh = new THREE.Mesh(trendTubeGeo, coralCinemaMat);
+    marketingStationGroup.add(trendTubeMesh);
+
+    const arrowHeadGeo = new THREE.ConeGeometry(0.052, 0.12, 24);
+    const arrowHeadMesh = new THREE.Mesh(arrowHeadGeo, coralCinemaMat);
+    arrowHeadMesh.position.set(0.34, 0.42, 0.04);
+    arrowHeadMesh.rotation.z = -0.68;
+    marketingStationGroup.add(arrowHeadMesh);
+
+    // Precision 3D Magnifying Glass (replaces the old cone/funnel mesh)
+    // Positioned in front of the growth graph so its optical lens zooms the graph & topographic background behind it!
+    const LENS_RADIUS = 0.215;
+    const magnifierRenderTarget = new THREE.WebGLRenderTarget(512, 512, {
+      minFilter: THREE.LinearFilter,
+      magFilter: THREE.LinearFilter,
+      format: THREE.RGBAFormat,
+    });
+    const lensZoomCamera = new THREE.PerspectiveCamera(10, 1, 0.1, 100);
+    const lensFrameCamera = new THREE.PerspectiveCamera(10, 1, 0.1, 100);
+    const lensFrameProjViewMatrix = new THREE.Matrix4();
+
+    const magnifierZoomMat = new THREE.ShaderMaterial({
+      uniforms: {
+        tZoomMap: { value: magnifierRenderTarget.texture },
+        uFrameProjViewMatrix: { value: lensFrameProjViewMatrix },
+        uZoomStrength: { value: 1.0 },
+      },
+      vertexShader: `
+        uniform mat4 uFrameProjViewMatrix;
+        varying vec2 vFrameNdc;
+        varying vec2 vLocalUv;
+        varying vec3 vNormal;
+        varying vec3 vViewDir;
+        void main() {
+          vLocalUv = uv * 2.0 - 1.0;
+          vec4 worldPos = modelMatrix * vec4(position, 1.0);
+          vec4 frameClip = uFrameProjViewMatrix * worldPos;
+          vFrameNdc = frameClip.xy / max(0.0001, frameClip.w);
+          vec4 mvPos = viewMatrix * worldPos;
+          vNormal = normalize(normalMatrix * normal);
+          vViewDir = normalize(-mvPos.xyz);
+          gl_Position = projectionMatrix * mvPos;
+        }
+      `,
+      fragmentShader: `
+        uniform sampler2D tZoomMap;
+        uniform float uZoomStrength;
+        varying vec2 vFrameNdc;
+        varying vec2 vLocalUv;
+        varying vec3 vNormal;
+        varying vec3 vViewDir;
+        void main() {
+          float r2 = dot(vLocalUv, vLocalUv);
+          // Convex optical barrel curvature inside the lens
+          vec2 distortedNdc = vFrameNdc * (1.0 - 0.16 * r2);
+          vec2 sampleUv = clamp(distortedNdc * 0.5 + 0.5, 0.02, 0.98);
+
+          // Subtle optical chromatic dispersion near rim
+          vec2 caOffset = vLocalUv * 0.0045 * r2 * uZoomStrength;
+          float colR = texture2D(tZoomMap, clamp(sampleUv + caOffset, 0.02, 0.98)).r;
+          vec4 colG = texture2D(tZoomMap, sampleUv);
+          float colB = texture2D(tZoomMap, clamp(sampleUv - caOffset, 0.02, 0.98)).b;
+          vec3 zoomedBg = vec3(colR, colG.g, colB);
+
+          // Crisp glass reflection & Fresnel rim highlight
+          float fresnel = pow(1.0 - abs(dot(vNormal, vViewDir)), 2.4);
+          float specularBand = smoothstep(0.52, 0.58, vLocalUv.x + vLocalUv.y * 0.65)
+                             * (1.0 - smoothstep(0.66, 0.74, vLocalUv.x + vLocalUv.y * 0.65))
+                             * (1.0 - smoothstep(0.75, 0.98, r2));
+          float innerReticle = smoothstep(0.74, 0.76, sqrt(r2)) * (1.0 - smoothstep(0.76, 0.78, sqrt(r2)));
+
+          vec3 glassTint = vec3(0.86, 0.94, 0.98);
+          vec3 finalColor = mix(zoomedBg, glassTint, fresnel * 0.34);
+          finalColor += vec3(1.0) * (specularBand * 0.24 + innerReticle * 0.18);
+
+          gl_FragColor = vec4(finalColor, 0.98);
+        }
+      `,
+      transparent: true,
+      depthWrite: true,
+    });
+
+    const magnifierGroup = new THREE.Group();
+    magnifierGroup.position.set(-0.04, 0.08, 0.24);
+
+    // 1. Machined Silver Outer Rim & Cylindrical Lens Barrel
+    const magOuterRim = new THREE.Mesh(
+      new THREE.TorusGeometry(LENS_RADIUS, 0.022, 28, 72),
+      machinedSilverMat
+    );
+    magnifierGroup.add(magOuterRim);
+
+    const magBarrelSleeve = new THREE.Mesh(
+      new THREE.CylinderGeometry(LENS_RADIUS + 0.016, LENS_RADIUS + 0.016, 0.044, 64, 1, true),
+      fx6BodyMat
+    );
+    magBarrelSleeve.rotation.x = Math.PI / 2;
+    magnifierGroup.add(magBarrelSleeve);
+
+    // 2. Inner Brushed Cobalt Retaining Bezel
+    const magInnerBezel = new THREE.Mesh(
+      new THREE.TorusGeometry(LENS_RADIUS - 0.018, 0.009, 20, 64),
+      brushedCobaltMat
+    );
+    magInnerBezel.position.z = 0.012;
+    magnifierGroup.add(magInnerBezel);
+
+    // 3. Bi-Convex Optical Magnifier Lens (samples the live zoomed background)
+    const magnifierLensGeo = new THREE.SphereGeometry(LENS_RADIUS - 0.012, 48, 32);
+    magnifierLensGeo.scale(1, 1, 0.16);
+    const magnifierLensMesh = new THREE.Mesh(magnifierLensGeo, magnifierZoomMat);
+    magnifierGroup.add(magnifierLensMesh);
+
+    // 4. Angled Ergonomic Handle & Silver Ferrule Collar
+    const handlePivot = new THREE.Group();
+    handlePivot.rotation.z = 0.72; // Classic 41° lower-right magnifier handle angle
+    magnifierGroup.add(handlePivot);
+
+    const ferruleCollar = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.022, 0.027, 0.075, 24),
+      machinedSilverMat
+    );
+    ferruleCollar.position.set(0, -(LENS_RADIUS + 0.045), 0);
+    handlePivot.add(ferruleCollar);
+
+    const coralAccentRing = new THREE.Mesh(
+      new THREE.TorusGeometry(0.027, 0.006, 16, 32),
+      coralCinemaMat
+    );
+    coralAccentRing.rotation.x = Math.PI / 2;
+    coralAccentRing.position.set(0, -(LENS_RADIUS + 0.082), 0);
+    handlePivot.add(coralAccentRing);
+
+    const magHandleShaft = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.026, 0.033, 0.32, 28),
+      fx6BodyMat
+    );
+    magHandleShaft.position.set(0, -(LENS_RADIUS + 0.24), 0);
+    handlePivot.add(magHandleShaft);
+
+    for (let g = 0; g < 4; g++) {
+      const gripRing = new THREE.Mesh(
+        new THREE.TorusGeometry(0.03, 0.0035, 12, 32),
+        machinedSilverMat
+      );
+      gripRing.rotation.x = Math.PI / 2;
+      gripRing.position.set(0, -(LENS_RADIUS + 0.15 + g * 0.055), 0);
+      handlePivot.add(gripRing);
+    }
+
+    const handlePommel = new THREE.Mesh(
+      new THREE.SphereGeometry(0.033, 24, 24),
+      machinedSilverMat
+    );
+    handlePommel.position.set(0, -(LENS_RADIUS + 0.4), 0);
+    handlePivot.add(handlePommel);
+
+    marketingStationGroup.add(magnifierGroup);
+    objectsGroup.add(marketingStationGroup);
+
+    // ============================================================================
+    // ORBITAL ELEMENT 3: MEDIA ENGAGEMENT (Broadcast Microphone & 20-Bar 3D EQ Ring)
+    // ============================================================================
+    const mediaStationGroup = new THREE.Group();
+
+    const micAssembly = new THREE.Group();
+    micAssembly.rotation.z = -0.1;
+
+    const micBody = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.105, 0.095, 0.38, 36),
+      fx6BodyMat
+    );
+    micAssembly.add(micBody);
+
+    const innerCapsule = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.062, 0.062, 0.17, 24),
+      coralCinemaMat
+    );
+    innerCapsule.position.set(0, 0.25, 0);
+    micAssembly.add(innerCapsule);
+
+    const capsuleGrilleGeo = new THREE.SphereGeometry(0.106, 32, 24);
+    capsuleGrilleGeo.scale(1, 1.45, 1);
+    const capsuleGrille = new THREE.Mesh(capsuleGrilleGeo, machinedSilverMat);
+    capsuleGrille.position.set(0, 0.24, 0);
+    micAssembly.add(capsuleGrille);
+
+    const capsuleWire = new THREE.LineSegments(
+      new THREE.EdgesGeometry(capsuleGrilleGeo, 12),
+      new THREE.LineBasicMaterial({ color: '#304774', transparent: true, opacity: 0.45 })
+    );
+    capsuleWire.position.set(0, 0.24, 0);
+    micAssembly.add(capsuleWire);
+
+    const micBand = new THREE.Mesh(
+      new THREE.TorusGeometry(0.108, 0.014, 16, 48),
+      coralCinemaMat
+    );
+    micBand.rotation.x = Math.PI / 2;
+    micBand.position.set(0, 0.18, 0);
+    micAssembly.add(micBand);
+
+    const shockUpperRing = new THREE.Mesh(
+      new THREE.TorusGeometry(0.175, 0.012, 16, 48),
+      brushedCobaltMat
+    );
+    shockUpperRing.rotation.x = Math.PI / 2;
+    shockUpperRing.position.set(0, 0.05, 0);
+    micAssembly.add(shockUpperRing);
+
+    const shockLowerRing = new THREE.Mesh(
+      new THREE.TorusGeometry(0.175, 0.012, 16, 48),
+      brushedCobaltMat
+    );
+    shockLowerRing.rotation.x = Math.PI / 2;
+    shockLowerRing.position.set(0, -0.12, 0);
+    micAssembly.add(shockLowerRing);
+
+    for (let strutIdx = 0; strutIdx < 4; strutIdx++) {
+      const a = (strutIdx / 4) * Math.PI * 2 + Math.PI / 4;
+      const post = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.01, 0.01, 0.22, 12),
+        machinedSilverMat
+      );
+      post.position.set(Math.cos(a) * 0.175, -0.035, Math.sin(a) * 0.175);
+      micAssembly.add(post);
+    }
+
+    const eqRingGroup = new THREE.Group();
+    eqRingGroup.position.set(0, 0.04, 0);
+    const eqBars: THREE.Mesh[] = [];
+    const barCount = 20;
+    for (let b = 0; b < barCount; b++) {
+      const angle = (b / barCount) * Math.PI * 2;
+      const r = 0.39;
+      const barGeo = new RoundedBoxGeometry(0.028, 0.16, 0.028, 3, 0.007);
+      const barMat =
+        b % 3 === 0 ? coralCinemaMat : b % 2 === 0 ? brushedCobaltMat : machinedSilverMat;
+      const barMesh = new THREE.Mesh(barGeo, barMat);
+      barMesh.position.set(Math.cos(angle) * r, 0, Math.sin(angle) * r);
+      barMesh.rotation.y = -angle;
+      eqRingGroup.add(barMesh);
+      eqBars.push(barMesh);
+    }
+    micAssembly.add(eqRingGroup);
+    mediaStationGroup.add(micAssembly);
+    objectsGroup.add(mediaStationGroup);
+
+    // ============================================================================
+    // PLANETARY CAROUSEL ORBIT SYSTEM (4 Elements Spaced 90° Apart Around Strata)
+    // Guaranteed Zero Collisions:
+    // - Topographic core max radius = 2.15
+    // - Planetary orbit radius = 2.95..3.18
+    // - Chord distance between adjacent 90° stations = 4.35 units (> 3.5x object size!)
+    // ============================================================================
+    const TWO_PI = Math.PI * 2;
+    const STEP_ANGLE = TWO_PI / 4; // 90 degrees (1.5708 rad) per station
+
+    interface OrbitalStation {
+      index: number;
+      group: THREE.Group;
+      baseAngle: number;
+      baseScale: number;
+      heroYawOffset: number;
+      heroPitchOffset: number;
+    }
+
+    const baseCameraScale = settings.cameraRigScale ?? 1.0;
+
+    const orbitalStations: OrbitalStation[] = [
+      {
+        index: 0, // Sony FX6 Cinema Camera (First Object in Focus: Hero, Showreel & Videos)
+        group: fx6StationGroup,
+        baseAngle: 0 * STEP_ANGLE,
+        baseScale: 0.92 * baseCameraScale,
+        heroYawOffset: -0.52, // Shows 3/4 front lens + shotgun mic + LCD + left-side ND controls
+        heroPitchOffset: 0.08,
+      },
+      {
+        index: 1, // Communications Strategies (Animation/3D & Brochures)
+        group: commsStationGroup,
+        baseAngle: 1 * STEP_ANGLE,
+        baseScale: 0.92,
+        heroYawOffset: 0.25,
+        heroPitchOffset: 0.06,
+      },
+      {
+        index: 2, // Digital Marketing (Websites & Portals)
+        group: marketingStationGroup,
+        baseAngle: 2 * STEP_ANGLE,
+        baseScale: 0.94,
+        heroYawOffset: -0.22,
+        heroPitchOffset: 0.1,
+      },
+      {
+        index: 3, // Media Engagement (Podcasts, Stories, Experience & Contact)
+        group: mediaStationGroup,
+        baseAngle: 3 * STEP_ANGLE,
+        baseScale: 0.94,
+        heroYawOffset: -0.18,
+        heroPitchOffset: 0.08,
+      },
+    ];
+
     const scrollState = {
       progress: 0,
-      explodeAmount: 0,
-      rotYTarget: 0,
-      rotZTarget: -0.18,
-      shiftXTarget: 0,
+      explodeAmount: 0.2,
+      targetOrbitAngle: 0, // Starts at 0 so Sony FX6 (Station 0) is immediately in focus at the top!
+      currentOrbitAngle: 0,
     };
 
-    const intensity = settings.scrollMorphIntensity || 1.0;
+    const updateTargetOrbitFromScroll = () => {
+      const vh = window.innerHeight || 1;
+      const scrollY = Math.max(0, window.scrollY || window.pageYOffset || 0);
+      const maxScroll = Math.max(1, document.documentElement.scrollHeight - vh);
+      const globalProgress = THREE.MathUtils.clamp(scrollY / maxScroll, 0, 1);
+
+      const intensity = settings.scrollMorphIntensity || 1.0;
+      scrollState.progress = globalProgress * intensity;
+      scrollState.explodeAmount = 0.16 + Math.sin(globalProgress * Math.PI) * 0.34;
+
+      // Measure the scrollY where each station's section group is centered in the viewport
+      const getGroupScrollCenter = (selectors: string[], fallbackRatio: number) => {
+        let minTop = Infinity;
+        let maxBottom = -Infinity;
+        for (const sel of selectors) {
+          const el = document.querySelector(sel);
+          if (!el) continue;
+          const rect = el.getBoundingClientRect();
+          const elTop = rect.top + scrollY;
+          const elBottom = rect.bottom + scrollY;
+          if (elTop < minTop) minTop = elTop;
+          if (elBottom > maxBottom) maxBottom = elBottom;
+        }
+        if (minTop < Infinity && maxBottom > minTop) {
+          const centerDocY = (minTop + maxBottom) * 0.5;
+          return THREE.MathUtils.clamp(centerDocY - vh * 0.5, 0, maxScroll);
+        }
+        return fallbackRatio * maxScroll;
+      };
+
+      // Strictly increasing scrollY milestones from top (0) to bottom (maxScroll)
+      // Station 0 (Sony FX6) starts at scrollY = 0 (angle = 0) so it never reverses direction on initial scroll!
+      const s0 = 0;
+      const rawS1 = getGroupScrollCenter(['#chapter-02', '#chapter-03'], 0.32);
+      const rawS2 = getGroupScrollCenter(['#chapter-04'], 0.58);
+      const rawS3 = getGroupScrollCenter(['#chapter-05', '#experience'], 0.82);
+      const s4 = maxScroll;
+
+      const s1 = THREE.MathUtils.clamp(rawS1, maxScroll * 0.2, maxScroll * 0.45);
+      const s2 = THREE.MathUtils.clamp(Math.max(s1 + maxScroll * 0.16, rawS2), maxScroll * 0.45, maxScroll * 0.72);
+      const s3 = THREE.MathUtils.clamp(Math.max(s2 + maxScroll * 0.16, rawS3), maxScroll * 0.7, maxScroll * 0.92);
+
+      const milestones = [
+        { s: s0, angle: 0 * STEP_ANGLE },        // Sony FX6 Cinema Camera (Hero, Showreel & Video)
+        { s: s1, angle: -1 * STEP_ANGLE },       // Communications Strategies (Animation/3D & Brochures)
+        { s: s2, angle: -2 * STEP_ANGLE },       // Digital Marketing (Websites & Portals)
+        { s: s3, angle: -3 * STEP_ANGLE },       // Media Engagement (Podcasts, Stories & Experience)
+        { s: s4, angle: -3.65 * STEP_ANGLE },    // Continuous completion through Documents & Contact
+      ];
+
+      let milestoneAngle = 0;
+      for (let i = 0; i < milestones.length - 1; i++) {
+        const curr = milestones[i];
+        const next = milestones[i + 1];
+        if (scrollY >= curr.s && scrollY <= next.s) {
+          const span = Math.max(1, next.s - curr.s);
+          const t = (scrollY - curr.s) / span;
+          milestoneAngle = THREE.MathUtils.lerp(curr.angle, next.angle, t);
+          break;
+        }
+      }
+      if (scrollY >= s4) {
+        milestoneAngle = milestones[milestones.length - 1].angle;
+      }
+
+      // Blend section-aligned milestone angle with pure uniform scroll progression for silky, consistent speed all the way around
+      const uniformAngle = -globalProgress * 3.65 * STEP_ANGLE;
+      scrollState.targetOrbitAngle = THREE.MathUtils.lerp(milestoneAngle, uniformAngle, 0.35);
+    };
 
     const ctx = gsap.context(() => {
       if (prefersReducedMotion) return;
@@ -444,17 +1572,16 @@ export default function StudioMotionRig3D({ settings }: Props) {
         trigger: document.body,
         start: 'top top',
         end: 'bottom bottom',
-        scrub: 0.85,
-        onUpdate: (self) => {
-          const p = self.progress;
-          scrollState.progress = p;
-          scrollState.rotYTarget = p * Math.PI * 2.2 * intensity;
-          scrollState.rotZTarget = -0.18 + Math.sin(p * Math.PI * 2) * 0.14;
-          scrollState.explodeAmount = Math.sin(p * Math.PI * 3) * 0.5 + 0.45;
-          scrollState.shiftXTarget = Math.cos(p * Math.PI * 2) * 0.45;
+        onUpdate: () => {
+          updateTargetOrbitFromScroll();
         },
       });
     });
+
+    window.addEventListener('scroll', updateTargetOrbitFromScroll, { passive: true });
+    updateTargetOrbitFromScroll();
+    // Initialize currentOrbitAngle to targetOrbitAngle immediately so there is zero jump on load
+    scrollState.currentOrbitAngle = scrollState.targetOrbitAngle;
 
     // 8. Pointer Parallax & Contact Form 3D Sync
     const pointer = { x: 0, y: 0, lerpedX: 0, lerpedY: 0 };
@@ -477,7 +1604,7 @@ export default function StudioMotionRig3D({ settings }: Props) {
     const onContactInteraction = (e: Event) => {
       const detail = (e as CustomEvent)?.detail || {};
       if (typeof detail.elevationProgress === 'number') {
-        contactBoost.targetSpread = detail.elevationProgress * 0.45;
+        contactBoost.targetSpread = detail.elevationProgress * 0.3;
       }
       if (typeof detail.lightPulse === 'number') {
         contactBoost.targetLightPulse = detail.lightPulse;
@@ -485,9 +1612,8 @@ export default function StudioMotionRig3D({ settings }: Props) {
       if (typeof detail.cameraYaw === 'number') {
         contactBoost.targetCameraYaw = detail.cameraYaw;
       }
-      if (detail.lightColor && panelBeamLight && diffuserMesh) {
-        panelBeamLight.color.set(detail.lightColor);
-        (diffuserMesh.material as THREE.MeshStandardMaterial).emissive.set(detail.lightColor);
+      if (detail.lightColor) {
+        focalStageLight.color.set(detail.lightColor);
       }
     };
     window.addEventListener('portfolio:contact-interaction', onContactInteraction);
@@ -496,13 +1622,73 @@ export default function StudioMotionRig3D({ settings }: Props) {
     const onResize = () => {
       if (!container) return;
       camera.aspect = container.clientWidth / container.clientHeight;
-      camera.updateProjectionMatrix();
       renderer.setSize(container.clientWidth, container.clientHeight);
       updateResponsivePlacement();
+      updateTargetOrbitFromScroll();
     };
     window.addEventListener('resize', onResize);
 
-    // 10. Animation Loop
+    const updateOrbitalStations = (t: number, effectiveOrbitAngle: number, snap: boolean) => {
+      const rx = layoutState.orbitRadiusX;
+      const rz = layoutState.orbitRadiusZ;
+      const tiltCompensation = Math.tan(TILT_X);
+
+      orbitalStations.forEach((st) => {
+        // Angle on the orbit where layoutState.frontFocusAngle is the front-most focal spot
+        const theta = st.baseAngle + effectiveOrbitAngle + layoutState.frontFocusAngle;
+        const deltaAngle = theta - layoutState.frontFocusAngle;
+
+        // Alignment with front focal spot: +1 when right in front of the viewer, -1 when behind the topographic model
+        const frontAlignment = Math.cos(deltaAngle);
+        const focusWeight = Math.pow(Math.max(0, (frontAlignment + 0.25) / 1.25), 2.0);
+        // Smooth zoom peak when the model spins into the front focus zone
+        const zoomBoost = Math.pow(Math.max(0, frontAlignment), 2.8);
+
+        const x = Math.sin(theta) * rx;
+        // Slight forward dolly (+Z toward camera) when focused so it zooms closer without touching the core
+        const z = Math.cos(theta) * rz + zoomBoost * 0.42;
+
+        // Counteract worldRoot's forward X-tilt (z * tan(TILT_X)) so the entire 360° orbit stays
+        // vertically centered on screen instead of dropping to the bottom!
+        const bob = prefersReducedMotion ? 0 : Math.sin(t * 1.3 + st.index * 1.25) * 0.032;
+        const y = z * tiltCompensation + 0.22 + zoomBoost * 0.1 + bob;
+
+        st.group.position.set(x, y, z);
+
+        // Scale up with a smooth zoom-in when spinning into the front focal zone, scale down when orbiting behind
+        const targetScale = st.baseScale * (0.7 + focusWeight * 0.42 + zoomBoost * 0.42);
+        const currentScale = snap
+          ? targetScale
+          : st.group.scale.x + (targetScale - st.group.scale.x) * 0.12;
+        st.group.scale.setScalar(currentScale);
+
+        // Continuous, monotonic orientation around the orbit (never snaps or reverses direction)
+        const continuousTurn = Math.sin(deltaAngle) * 0.28;
+        const targetRotY =
+          st.heroYawOffset +
+          continuousTurn +
+          pointer.lerpedX * 0.18 * focusWeight +
+          (prefersReducedMotion ? 0 : Math.sin(t * 0.65 + st.index) * 0.04) +
+          contactBoost.cameraYaw * focusWeight;
+
+        const targetRotX =
+          THREE.MathUtils.lerp(0.03, st.heroPitchOffset, focusWeight) +
+          pointer.lerpedY * 0.1 * focusWeight;
+
+        if (snap) {
+          st.group.rotation.y = targetRotY;
+          st.group.rotation.x = targetRotX;
+        } else {
+          st.group.rotation.y += (targetRotY - st.group.rotation.y) * 0.12;
+          st.group.rotation.x += (targetRotX - st.group.rotation.x) * 0.12;
+        }
+      });
+    };
+
+    // Pre-position all 4 stations at their exact initial state before the first frame
+    updateOrbitalStations(0, scrollState.currentOrbitAngle, true);
+
+    // 10. Animation Loop — Planetary Spin Around Topographic Core
     let reqId = 0;
     const clock = new THREE.Clock();
 
@@ -518,51 +1704,120 @@ export default function StudioMotionRig3D({ settings }: Props) {
       contactBoost.targetLightPulse *= 0.94;
       contactBoost.cameraYaw += (contactBoost.targetCameraYaw - contactBoost.cameraYaw) * 0.08;
 
-      const totalSpread = 1 + scrollState.explodeAmount * 1.15 + contactBoost.spread;
+      // Smoothly damp the master orbital spin angle toward the scroll-targeted angle
+      scrollState.currentOrbitAngle +=
+        (scrollState.targetOrbitAngle - scrollState.currentOrbitAngle) * 0.085;
+
+      // Pure monotonic orbital angle (no oscillating idleSpin that fights scroll direction)
+      const effectiveOrbitAngle = scrollState.currentOrbitAngle + pointer.lerpedX * 0.06;
+
+      // Strictly clamp totalSpread >= 1.15 so topographic slabs NEVER touch vertically
+      const totalSpread = Math.max(
+        1.15,
+        1.15 + scrollState.explodeAmount * 0.62 + contactBoost.spread
+      );
 
       // Animate each 3D topographic elevation slab
       strataLayers.forEach((layer) => {
         const waveOffset = prefersReducedMotion
           ? 0
-          : Math.sin(t * 1.4 + layer.index * 0.55) * (0.04 + contactBoost.lightPulse * 0.05);
+          : Math.sin(t * 1.3 + layer.index * 0.35) * 0.018;
         const targetY = layer.baseY * totalSpread + waveOffset;
-        layer.group.position.y += (targetY - layer.group.position.y) * 0.08;
+        layer.group.position.y += (targetY - layer.group.position.y) * 0.09;
+        // Topographic strata counter-rotate gently as the outer elements spin around them
         layer.group.rotation.y =
-          scrollState.rotYTarget * (0.25 + layer.index * 0.06) +
-          pointer.lerpedX * 0.22 +
-          contactBoost.cameraYaw * 0.35;
+          -effectiveOrbitAngle * (0.14 + layer.index * 0.025) +
+          contactBoost.cameraYaw * 0.2;
       });
 
-      // Float the summit sculpture
-      summitObject.position.y = 1.15 * totalSpread + Math.sin(t * 1.8) * 0.08;
-      knotMesh.rotation.x = t * 0.45 + scrollState.rotYTarget;
-      knotMesh.rotation.y = t * 0.6;
-      haloRing.rotation.z = -t * 0.5;
+      // Summit Sculpture above the top stratum
+      const topSlabY = strataLayers[strataLayers.length - 1].group.position.y;
+      summitObject.position.y =
+        Math.max(topSlabY + 0.72, 1.35 * totalSpread) + Math.sin(t * 1.6) * 0.04;
+      knotMesh.rotation.x = t * 0.4 - effectiveOrbitAngle * 0.4;
+      knotMesh.rotation.y = t * 0.55;
+      haloRing.rotation.z = -t * 0.45;
 
-      // Float and orient the Cinema Camera & Studio Video Light Rig
-      cameraRigGroup.position.y = 0.35 * totalSpread + Math.cos(t * 1.5) * 0.07;
-      cameraRigGroup.rotation.y =
-        Math.sin(t * 0.8) * 0.35 + pointer.lerpedX * 0.35 + contactBoost.cameraYaw;
-      cameraRigGroup.rotation.x = pointer.lerpedY * 0.2;
+      // Sub-element animations
+      signalWaveRings.forEach((ring, idx) => {
+        const pulse = (t * 0.65 + idx * 0.33) % 1;
+        ring.position.z = 0.36 + pulse * 0.36;
+        ring.scale.setScalar(0.65 + pulse * 0.6);
+      });
+      strategyNodesGroup.rotation.y = t * 0.35;
 
-      // Gentle subtle breathing movement + form interaction pulse on the video light
-      videoLightGroup.rotation.y = 0.48 + Math.sin(t * 1.2) * 0.06 + contactBoost.lightPulse * 0.18;
-      panelBeamLight.intensity =
-        (settings.videoLightIntensity ?? 2.8) + contactBoost.lightPulse * 2.4;
-
-      // Float the globe node
-      globeObject.position.y = -0.15 * totalSpread + Math.sin(t * 1.3 + 1) * 0.07;
-      globeObject.rotation.y = t * 0.38 + scrollState.rotYTarget * 0.5;
-      orbitRing.rotation.z = t * 0.65;
-
-      pinMeshes.forEach((pin, idx) => {
-        pin.rotation.y = t * 0.7 + idx;
-        pin.position.y =
-          (idx - 3.5) * 0.24 * totalSpread + Math.sin(t * 2 + idx) * 0.05;
+      eqRingGroup.rotation.y = t * 0.45;
+      eqBars.forEach((bar, bIdx) => {
+        bar.scale.y = 0.5 + 0.72 * Math.abs(Math.sin(t * 3.4 + bIdx * 0.55));
       });
 
-      worldRoot.rotation.z = scrollState.rotZTarget + pointer.lerpedX * 0.08;
-      worldRoot.rotation.x = 0.52 + pointer.lerpedY * 0.12;
+      // Sweep the Magnifying Glass across the growth bars & topographic background
+      magnifierGroup.position.x = Math.sin(t * 0.9) * 0.17;
+      magnifierGroup.position.y = 0.08 + Math.cos(t * 0.65) * 0.07;
+      magnifierGroup.rotation.z = Math.sin(t * 0.75) * 0.08;
+
+      analyticsBars.forEach((bar, idx) => {
+        bar.scale.y = 1 + Math.sin(t * 2.1 + idx * 0.6) * 0.09;
+      });
+
+      // Update the 4 Orbiting Elements around the Topographic Model
+      updateOrbitalStations(t, effectiveOrbitAngle, false);
+
+      worldRoot.rotation.x = TILT_X + pointer.lerpedY * 0.05;
+      worldRoot.rotation.z = -0.06 + pointer.lerpedX * 0.04;
+
+      // Optical Magnifier Lens Real-Time Background Zoom Pass:
+      // When the Digital Marketing / Magnifier station comes into view, capture the 3D background
+      // directly behind the lens with a 2.5x optical zoom!
+      scene.updateMatrixWorld(true);
+      const lensWorldPos = new THREE.Vector3();
+      magnifierLensMesh.getWorldPosition(lensWorldPos);
+
+      const station2Theta = orbitalStations[2].baseAngle + effectiveOrbitAngle + layoutState.frontFocusAngle;
+      const station2Align = Math.cos(station2Theta - layoutState.frontFocusAngle);
+      const station2Focus = Math.pow(Math.max(0, (station2Align + 0.35) / 1.35), 1.6);
+      const zoomFactor = 1.45 + station2Focus * 1.15; // Ramps up to 2.6x zoom when in focus!
+      magnifierZoomMat.uniforms.uZoomStrength.value = station2Focus;
+
+      const distToLens = Math.max(1.5, camera.position.distanceTo(lensWorldPos));
+      const worldLensRadius =
+        LENS_RADIUS * worldRoot.scale.x * marketingStationGroup.scale.x;
+      const halfConeTan = Math.max(0.008, worldLensRadius / distToLens);
+      const unzoomedFovDeg = THREE.MathUtils.radToDeg(2 * Math.atan(halfConeTan));
+      const zoomedFovDeg = THREE.MathUtils.radToDeg(
+        2 * Math.atan(halfConeTan / zoomFactor)
+      );
+
+      // 1. Frame camera (1x physical cone) maps the 3D lens disc vertices to [-1, 1] screen-aligned UVs
+      lensFrameCamera.position.copy(camera.position);
+      lensFrameCamera.up.copy(camera.up);
+      lensFrameCamera.fov = unzoomedFovDeg;
+      lensFrameCamera.aspect = 1.0;
+      lensFrameCamera.lookAt(lensWorldPos);
+      lensFrameCamera.updateProjectionMatrix();
+      lensFrameCamera.updateMatrixWorld();
+      lensFrameProjViewMatrix.multiplyMatrices(
+        lensFrameCamera.projectionMatrix,
+        lensFrameCamera.matrixWorldInverse
+      );
+
+      // 2. Zoom camera (2.6x tighter cone) renders the magnified background behind the lens
+      lensZoomCamera.position.copy(camera.position);
+      lensZoomCamera.up.copy(camera.up);
+      lensZoomCamera.fov = zoomedFovDeg;
+      lensZoomCamera.aspect = 1.0;
+      lensZoomCamera.lookAt(lensWorldPos);
+      lensZoomCamera.updateProjectionMatrix();
+      lensZoomCamera.updateMatrixWorld();
+
+      magnifierGroup.visible = false;
+      renderer.setRenderTarget(magnifierRenderTarget);
+      renderer.setClearColor(0xeef3f7, 1);
+      renderer.clear();
+      renderer.render(scene, lensZoomCamera);
+      renderer.setRenderTarget(null);
+      renderer.setClearColor(0x000000, 0);
+      magnifierGroup.visible = true;
 
       renderer.render(scene, camera);
     };
@@ -571,10 +1826,13 @@ export default function StudioMotionRig3D({ settings }: Props) {
 
     return () => {
       cancelAnimationFrame(reqId);
+      window.removeEventListener('scroll', updateTargetOrbitFromScroll);
       window.removeEventListener('pointermove', onPointerMove);
       window.removeEventListener('portfolio:contact-interaction', onContactInteraction);
       window.removeEventListener('resize', onResize);
       ctx.revert();
+      magnifierRenderTarget.dispose();
+      studioEnv.dispose();
       renderer.dispose();
     };
   }, [settings]);

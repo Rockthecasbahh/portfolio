@@ -15,6 +15,9 @@ export default function SmoothScrollAndContours() {
   const layer1Ref = useRef<SVGGElement>(null);
   const layer2Ref = useRef<SVGGElement>(null);
   const layer3Ref = useRef<SVGGElement>(null);
+  const mouse1Ref = useRef<SVGGElement>(null);
+  const mouse2Ref = useRef<SVGGElement>(null);
+  const mouse3Ref = useRef<SVGGElement>(null);
 
   useEffect(() => {
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -73,7 +76,46 @@ export default function SmoothScrollAndContours() {
       }
     });
 
+    // Subtle multi-depth mouse parallax across the 3 2D topographic contour layers
+    const xTo1 = mouse1Ref.current
+      ? gsap.quickTo(mouse1Ref.current, 'x', { duration: 1.1, ease: 'power3.out' })
+      : null;
+    const yTo1 = mouse1Ref.current
+      ? gsap.quickTo(mouse1Ref.current, 'y', { duration: 1.1, ease: 'power3.out' })
+      : null;
+
+    const xTo2 = mouse2Ref.current
+      ? gsap.quickTo(mouse2Ref.current, 'x', { duration: 1.35, ease: 'power3.out' })
+      : null;
+    const yTo2 = mouse2Ref.current
+      ? gsap.quickTo(mouse2Ref.current, 'y', { duration: 1.35, ease: 'power3.out' })
+      : null;
+
+    const xTo3 = mouse3Ref.current
+      ? gsap.quickTo(mouse3Ref.current, 'x', { duration: 1.6, ease: 'power3.out' })
+      : null;
+    const yTo3 = mouse3Ref.current
+      ? gsap.quickTo(mouse3Ref.current, 'y', { duration: 1.6, ease: 'power3.out' })
+      : null;
+
+    const onPointerMove = (e: PointerEvent) => {
+      const nx = (e.clientX / (window.innerWidth || 1) - 0.5) * 2; // -1..1
+      const ny = (e.clientY / (window.innerHeight || 1) - 0.5) * 2; // -1..1
+
+      xTo1?.(-nx * 10);
+      yTo1?.(-ny * 8);
+
+      xTo2?.(-nx * 18);
+      yTo2?.(-ny * 14);
+
+      xTo3?.(-nx * 28);
+      yTo3?.(-ny * 22);
+    };
+
+    window.addEventListener('pointermove', onPointerMove, { passive: true });
+
     return () => {
+      window.removeEventListener('pointermove', onPointerMove);
       ctx.revert();
       gsap.ticker.remove(raf);
       lenis.destroy();
@@ -88,31 +130,37 @@ export default function SmoothScrollAndContours() {
       <svg
         viewBox={TOPO_VIEWBOX}
         preserveAspectRatio="xMidYMin slice"
-        className="w-full h-[145dvh] fill-none"
+        className="w-full h-[145dvh] scale-[1.05] origin-center fill-none"
       >
         {/* Stratum Contour Layer 1: Exact CV Warm Rose-Taupe Contours */}
         <g ref={layer1Ref} stroke="#cbb6ba" strokeWidth="0.65" opacity="0.62">
-          {TOPO_LAYER_1.slice(0, -1).map((d, i) => (
-            <path key={`l1-${i}`} d={d} />
-          ))}
+          <g ref={mouse1Ref}>
+            {TOPO_LAYER_1.slice(0, -1).map((d, i) => (
+              <path key={`l1-${i}`} d={d} />
+            ))}
+          </g>
         </g>
 
         {/* Stratum Contour Layer 2: Glacier Slate Contours */}
         <g ref={layer2Ref} stroke="#8fabc2" strokeWidth="0.6" opacity="0.52">
-          {TOPO_LAYER_2.map((d, i) => (
-            <path key={`l2-${i}`} d={d} />
-          ))}
+          <g ref={mouse2Ref}>
+            {TOPO_LAYER_2.map((d, i) => (
+              <path key={`l2-${i}`} d={d} />
+            ))}
+          </g>
         </g>
 
         {/* Stratum Contour Layer 3: Deep Cobalt & Warm Coral Elevation Contours */}
         <g ref={layer3Ref} strokeWidth="0.55" opacity="0.45">
-          {TOPO_LAYER_3.map((d, i) => (
-            <path
-              key={`l3-${i}`}
-              d={d}
-              stroke={i % 4 === 0 ? '#f29f8b' : '#304774'}
-            />
-          ))}
+          <g ref={mouse3Ref}>
+            {TOPO_LAYER_3.map((d, i) => (
+              <path
+                key={`l3-${i}`}
+                d={d}
+                stroke={i % 4 === 0 ? '#f29f8b' : '#304774'}
+              />
+            ))}
+          </g>
         </g>
       </svg>
     </div>
