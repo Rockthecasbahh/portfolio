@@ -76,44 +76,60 @@ const artifactSrc = data.floatingArtifactImageUrl || '/assets/projects/locust-3d
 
           <!-- Right Column: Exact CV Coral-Apricot Portrait Circle + 3D Layer Preview -->
           <div class="lg:col-span-5 flex flex-col items-center lg:items-end justify-center">
-            <div class="relative">
-              <!-- Outer Topographic Elevation Ring -->
-              <div
-                aria-hidden="true"
-                class="w-60 h-60 sm:w-72 sm:h-72 rounded-full border-2 border-dashed border-[#304774]/35 absolute -inset-3 animate-[spin_45s_linear_infinite] pointer-events-none"
-              ></div>
+            <div class="relative pt-6 sm:pt-8">
+              <!-- Coral-Apricot Circle Frame with 3D Pop-Out Avatar -->
+              <div class="relative w-56 h-56 sm:w-64 sm:h-64">
+                <!-- Outer Topographic Elevation Ring -->
+                <div
+                  aria-hidden="true"
+                  class="w-60 h-60 sm:w-72 sm:h-72 rounded-full border-2 border-dashed border-[#304774]/35 absolute -inset-2 sm:-inset-4 animate-[spin_45s_linear_infinite] pointer-events-none"
+                ></div>
 
-              <!-- Warm Coral-Apricot Circle from Matteo's CV -->
-              <div class="relative w-56 h-56 sm:w-64 sm:h-64 rounded-full cv-portrait-halo border-4 border-white overflow-hidden flex items-end justify-center">
-                <img
-                  src={portraitSrc}
-                  alt={data.fullName}
-                  fetchpriority="high"
-                  class="w-full h-[108%] object-cover object-top drop-shadow-xl"
-                />
-              </div>
+                <!-- Background Circle & Clipped Lower Body / Suit -->
+                <div class="absolute inset-0 rounded-full cv-portrait-halo border-4 border-white overflow-hidden shadow-2xl flex items-end justify-center">
+                  <img
+                    src={portraitSrc}
+                    alt={data.fullName}
+                    fetchpriority="high"
+                    class="w-[122%] max-w-none h-auto object-cover object-top drop-shadow-xl translate-y-[2%]"
+                  />
+                </div>
 
-              <!-- Floating 3D Sculpture Artifact Thumbnail overlapping the Coral Circle -->
-              {data.floatingArtifactTitle && (
-                <a
-                  href={data.floatingArtifactHref || '#chapter-02'}
-                  class="mt-4 sm:mt-0 sm:absolute sm:-bottom-4 sm:-left-10 bg-white/95 backdrop-blur-md border border-[#304774]/20 rounded-2xl p-2.5 shadow-xl flex items-center gap-3 hover:border-[#304774] transition-colors"
+                <!-- Unclipped 3D Pop-Out Head (Breaks through top border) -->
+                <div
+                  class="absolute inset-0 flex items-end justify-center pointer-events-none"
+                  style="clip-path: inset(-60% -20% 50% -20%); -webkit-clip-path: inset(-60% -20% 50% -20%);"
                 >
                   <img
-                    src={artifactSrc}
-                    alt={data.floatingArtifactTitle}
-                    class="w-14 h-12 rounded-xl object-cover"
+                    src={portraitSrc}
+                    alt=""
+                    aria-hidden="true"
+                    class="w-[122%] max-w-none h-auto object-cover object-top drop-shadow-xl translate-y-[2%]"
                   />
-                  <div class="pr-2">
-                    <div class="font-display font-bold text-xs text-[#172a3b]">
-                      {data.floatingArtifactTitle}
+                </div>
+
+                <!-- Floating 3D Sculpture Artifact Thumbnail overlapping the Coral Circle -->
+                {data.floatingArtifactTitle && (
+                  <a
+                    href={data.floatingArtifactHref || '#chapter-02'}
+                    class="mt-4 sm:mt-0 sm:absolute sm:-bottom-4 sm:-left-10 bg-white/95 backdrop-blur-md border border-[#304774]/20 rounded-2xl p-2.5 shadow-xl flex items-center gap-3 hover:border-[#304774] transition-colors z-10"
+                  >
+                    <img
+                      src={artifactSrc}
+                      alt={data.floatingArtifactTitle}
+                      class="w-14 h-12 rounded-xl object-cover"
+                    />
+                    <div class="pr-2">
+                      <div class="font-display font-bold text-xs text-[#172a3b]">
+                        {data.floatingArtifactTitle}
+                      </div>
+                      <div class="font-mono-tech text-[11px] text-[#1c72b4]">
+                        {data.floatingArtifactSubtitle}
+                      </div>
                     </div>
-                    <div class="font-mono-tech text-[11px] text-[#1c72b4]">
-                      {data.floatingArtifactSubtitle}
-                    </div>
-                  </div>
-                </a>
-              )}
+                  </a>
+                )}
+              </div>
             </div>
           </div>
         </div>

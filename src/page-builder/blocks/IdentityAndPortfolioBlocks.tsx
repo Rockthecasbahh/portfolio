@@ -142,38 +142,55 @@ export function createIdentityAndPortfolioBlocks(strapiImageUrl = 'http://localh
                   </div>
 
                   <div className="lg:col-span-5 flex flex-col items-center lg:items-end justify-center">
-                    <div className="relative">
-                      <div
-                        aria-hidden="true"
-                        className="w-60 h-60 sm:w-72 sm:h-72 rounded-full border-2 border-dashed border-[#304774]/35 absolute -inset-3 animate-[spin_45s_linear_infinite] pointer-events-none"
-                      />
-                      <div className="relative w-56 h-56 sm:w-64 sm:h-64 rounded-full cv-portrait-halo border-4 border-white overflow-hidden flex items-end justify-center">
-                        <img
-                          src={portraitSrc}
-                          alt={data.fullName || 'Portrait'}
-                          className="w-full h-[108%] object-cover object-top drop-shadow-xl"
+                    <div className="relative pt-6 sm:pt-8">
+                      <div className="relative w-56 h-56 sm:w-64 sm:h-64">
+                        <div
+                          aria-hidden="true"
+                          className="w-60 h-60 sm:w-72 sm:h-72 rounded-full border-2 border-dashed border-[#304774]/35 absolute -inset-2 sm:-inset-4 animate-[spin_45s_linear_infinite] pointer-events-none"
                         />
-                      </div>
-                      {data.floatingArtifactTitle && (
-                        <a
-                          href={data.floatingArtifactHref || '#chapter-02'}
-                          className="mt-4 sm:mt-0 sm:absolute sm:-bottom-4 sm:-left-10 bg-white/95 backdrop-blur-md border border-[#304774]/20 rounded-2xl p-2.5 shadow-xl flex items-center gap-3 hover:border-[#304774] transition-colors"
+                        <div className="absolute inset-0 rounded-full cv-portrait-halo border-4 border-white overflow-hidden shadow-2xl flex items-end justify-center">
+                          <img
+                            src={portraitSrc}
+                            alt={data.fullName || 'Portrait'}
+                            className="w-[122%] max-w-none h-auto object-cover object-top drop-shadow-xl translate-y-[2%]"
+                          />
+                        </div>
+                        <div
+                          className="absolute inset-0 flex items-end justify-center pointer-events-none"
+                          style={{
+                            clipPath: 'inset(-60% -20% 50% -20%)',
+                            WebkitClipPath: 'inset(-60% -20% 50% -20%)',
+                          }}
                         >
                           <img
-                            src={artifactSrc}
-                            alt={data.floatingArtifactTitle}
-                            className="w-14 h-12 rounded-xl object-cover"
+                            src={portraitSrc}
+                            alt=""
+                            aria-hidden="true"
+                            className="w-[122%] max-w-none h-auto object-cover object-top drop-shadow-xl translate-y-[2%]"
                           />
-                          <div className="pr-2">
-                            <div className="font-display font-bold text-xs text-[#172a3b]">
-                              {data.floatingArtifactTitle}
+                        </div>
+
+                        {data.floatingArtifactTitle && (
+                          <a
+                            href={data.floatingArtifactHref || '#chapter-02'}
+                            className="mt-4 sm:mt-0 sm:absolute sm:-bottom-4 sm:-left-10 bg-white/95 backdrop-blur-md border border-[#304774]/20 rounded-2xl p-2.5 shadow-xl flex items-center gap-3 hover:border-[#304774] transition-colors z-10"
+                          >
+                            <img
+                              src={artifactSrc}
+                              alt={data.floatingArtifactTitle}
+                              className="w-14 h-12 rounded-xl object-cover"
+                            />
+                            <div className="pr-2">
+                              <div className="font-display font-bold text-xs text-[#172a3b]">
+                                {data.floatingArtifactTitle}
+                              </div>
+                              <div className="font-mono-tech text-[11px] text-[#1c72b4]">
+                                {data.floatingArtifactSubtitle}
+                              </div>
                             </div>
-                            <div className="font-mono-tech text-[11px] text-[#1c72b4]">
-                              {data.floatingArtifactSubtitle}
-                            </div>
-                          </div>
-                        </a>
-                      )}
+                          </a>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
