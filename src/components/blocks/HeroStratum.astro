@@ -86,25 +86,25 @@ const artifactSrc = data.floatingArtifactImageUrl || '/assets/projects/locust-3d
                 ></div>
 
                 <!-- Background Circle & Clipped Lower Body / Suit -->
-                <div class="absolute inset-0 rounded-full cv-portrait-halo border-4 border-white overflow-hidden shadow-2xl flex items-end justify-center">
+                <div class="absolute inset-0 rounded-full cv-portrait-halo border-4 border-white overflow-hidden shadow-2xl">
                   <img
                     src={portraitSrc}
                     alt={data.fullName}
                     fetchpriority="high"
-                    class="w-[122%] max-w-none h-auto object-cover object-top drop-shadow-xl translate-y-[2%]"
+                    class="absolute bottom-0 left-0 w-full h-[109%] object-cover object-top drop-shadow-xl"
                   />
                 </div>
 
                 <!-- Unclipped 3D Pop-Out Head (Breaks through top border) -->
                 <div
-                  class="absolute inset-0 flex items-end justify-center pointer-events-none"
-                  style="clip-path: inset(-60% -20% 50% -20%); -webkit-clip-path: inset(-60% -20% 50% -20%);"
+                  class="absolute inset-1 pointer-events-none"
+                  style="clip-path: inset(-50% -20% 45% -20%); -webkit-clip-path: inset(-50% -20% 45% -20%);"
                 >
                   <img
                     src={portraitSrc}
                     alt=""
                     aria-hidden="true"
-                    class="w-[122%] max-w-none h-auto object-cover object-top drop-shadow-xl translate-y-[2%]"
+                    class="absolute bottom-0 left-0 w-full h-[109%] object-cover object-top drop-shadow-xl"
                   />
                 </div>
 

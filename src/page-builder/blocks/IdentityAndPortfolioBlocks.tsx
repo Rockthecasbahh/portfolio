@@ -148,25 +148,25 @@ export function createIdentityAndPortfolioBlocks(strapiImageUrl = 'http://localh
                           aria-hidden="true"
                           className="w-60 h-60 sm:w-72 sm:h-72 rounded-full border-2 border-dashed border-[#304774]/35 absolute -inset-2 sm:-inset-4 animate-[spin_45s_linear_infinite] pointer-events-none"
                         />
-                        <div className="absolute inset-0 rounded-full cv-portrait-halo border-4 border-white overflow-hidden shadow-2xl flex items-end justify-center">
+                        <div className="absolute inset-0 rounded-full cv-portrait-halo border-4 border-white overflow-hidden shadow-2xl">
                           <img
                             src={portraitSrc}
                             alt={data.fullName || 'Portrait'}
-                            className="w-[122%] max-w-none h-auto object-cover object-top drop-shadow-xl translate-y-[2%]"
+                            className="absolute bottom-0 left-0 w-full h-[109%] object-cover object-top drop-shadow-xl"
                           />
                         </div>
                         <div
-                          className="absolute inset-0 flex items-end justify-center pointer-events-none"
+                          className="absolute inset-1 pointer-events-none"
                           style={{
-                            clipPath: 'inset(-60% -20% 50% -20%)',
-                            WebkitClipPath: 'inset(-60% -20% 50% -20%)',
+                            clipPath: 'inset(-50% -20% 45% -20%)',
+                            WebkitClipPath: 'inset(-50% -20% 45% -20%)',
                           }}
                         >
                           <img
                             src={portraitSrc}
                             alt=""
                             aria-hidden="true"
-                            className="w-[122%] max-w-none h-auto object-cover object-top drop-shadow-xl translate-y-[2%]"
+                            className="absolute bottom-0 left-0 w-full h-[109%] object-cover object-top drop-shadow-xl"
                           />
                         </div>
 
