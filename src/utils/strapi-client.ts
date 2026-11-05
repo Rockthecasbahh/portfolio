@@ -3,7 +3,7 @@ import { strapi } from '@strapi/client';
 export const STRAPI_BASE_URL =
   import.meta.env.STRAPI_BASE_URL ||
   process.env.STRAPI_BASE_URL ||
-  (import.meta.env.PROD ? 'https://cms.matteocasling.com' : 'http://127.0.0.1:1337');
+  (import.meta.env.DEV ? 'http://127.0.0.1:1337' : 'https://cms.matteocasling.com');
 
 export const strapiClient = strapi({
   baseURL: `${STRAPI_BASE_URL}/api`,

@@ -5,11 +5,11 @@ import { interpolateTemplateValue } from './helpers';
 import { STRAPI_BASE_URL } from '../utils/strapi-client';
 import type { GlobalPageData, LandingPageData } from '../utils/types';
 
-/** URL the visitor's browser uses to reach Strapi (uploads, admin). */
+/** URL the visitor's browser uses to reach Strapi (uploads, admin). Defaults to production CMS. */
 export const PUBLIC_STRAPI_URL: string =
   import.meta.env.PUBLIC_STRAPI_URL ||
   process.env.PUBLIC_STRAPI_URL ||
-  (import.meta.env.PROD ? 'https://cms.matteocasling.com' : 'http://localhost:1337');
+  (import.meta.env.DEV ? 'http://localhost:1337' : 'https://cms.matteocasling.com');
 
 /** Page Builder API key from https://pagebuilder.wc8.io (server-side only, never sent to the browser). */
 export const PAGE_BUILDER_API_KEY: string =

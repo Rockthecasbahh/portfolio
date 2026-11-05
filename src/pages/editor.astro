@@ -3,6 +3,8 @@ import PageBuilderEditor from '../page-builder/PageBuilderEditor';
 import { PUBLIC_STRAPI_URL, STRAPI_ADMIN_ORIGIN } from '../page-builder/server';
 import { getGlobalPageData, getAllProjects, getAllExperiences } from '../utils/loaders';
 
+export const prerender = false;
+
 const [globalData, projects, experiences] = await Promise.all([
   getGlobalPageData(),
   getAllProjects(),

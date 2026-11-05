@@ -15,30 +15,21 @@ interface Props {
  * The licence key and API token stay on the Astro server (see /api/page-builder/*).
  */
 export default function PageBuilderEditor({ strapiUrl, strapiAdminOrigin, additionalContent }: Props) {
-  const config = useMemo(
-    () => createPageBuilderConfig({ strapiImageUrl: strapiUrl, isEditor: true }),
-    [strapiUrl]
-  );
-
-  // Support opening Strapi Admin via either localhost:1337 or 127.0.0.1:1337
-  const resolvedParentOrigin = useMemo(() => {
-    if (typeof document !== 'undefined' && document.referrer) {
-      try {
-        const refOrigin = new URL(document.referrer).origin;
-        const allowed = new Set([
-          strapiAdminOrigin,
-          'https://cms.matteocasling.com',
-          'http://192.168.50.146:1337',
-          'http://localhost:1337',
-          'http://127.0.0.1:1337',
-        ]);
-        if (allowed.has(refOrigin)) return refOrigin;
-      } catch {
-        // ignore invalid referrer
+  // In the browser, always resolve to HTTPS Strapi if running on production domain to avoid Mixed Content
+  const effectiveStrapiUrl = useMemo(() => {
+    if (typeof window !== 'undefined') {
+      const host = window.location.hostname;
+      if (host === 'matteocasling.com' || host.endsWith('.matteocasling.com')) {
+        return 'https://cms.matteocasling.com';
       }
     }
-    return strapiAdminOrigin;
-  }, [strapiAdminOrigin]);
+    return strapiUrl || 'https://cms.matteocasling.com';
+  }, [strapiUrl]);
+
+  const config = useMemo(
+    () => createPageBuilderConfig({ strapiImageUrl: effectiveStrapiUrl, isEditor: true }),
+    [effectiveStrapiUrl]
+  );
 
   const validate = useCallback(async (token: string, origin: string) => {
     try {
@@ -81,9 +72,8 @@ export default function PageBuilderEditor({ strapiUrl, strapiAdminOrigin, additi
   return (
     <Editor
       config={config as any}
-      strapi={{ url: `${strapiUrl}/api`, imageUrl: strapiUrl }}
+      strapi={{ url: `${effectiveStrapiUrl}/api`, imageUrl: effectiveStrapiUrl }}
       additionalContent={additionalContent}
-      allowedParentOrigin={resolvedParentOrigin}
       validate={validate as any}
       resolve={resolve as any}
     />
