@@ -532,13 +532,6 @@ function buildSonyFX6Camera(materials: {
   rearTailHook.position.set(0, 0.43, -0.32);
   topHandleGroup.add(rearTailHook);
 
-  const topRecBtn = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.018, 0.018, 0.016, 20),
-    coralCinemaMat
-  );
-  topRecBtn.position.set(0, 0.435, 0.18);
-  topHandleGroup.add(topRecBtn);
-
   // Integrated Dual-XLR Audio Box on Right Side of Top Handle (-X side)
   const xlrBox = new THREE.Mesh(
     new RoundedBoxGeometry(0.14, 0.11, 0.24, 4, 0.016),
@@ -588,55 +581,135 @@ function buildSonyFX6Camera(materials: {
   windscreen.position.set(-0.22, 0.42, 0.48);
   topHandleGroup.add(windscreen);
 
-  // Front-Left 15mm Viewfinder Rod & 3.5-inch FX6 LCD Monitor (+X side)
-  const vfRod = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.012, 0.012, 0.24, 16),
+  // ==========================================================================
+  // 5B. ATOMOS NINJA V 5.2" 4K HDR MONITOR-RECORDER (True 151mm x 91.5mm Scale)
+  // ==========================================================================
+  // Relative to the Sony FX6 body (114mm x 116mm => 0.48 x 0.49 units), the 5.2" Atomos Ninja V
+  // (151mm x 91.5mm x 31.5mm) is 0.56 units wide x 0.34 units tall x 0.056 units deep.
+  const magicArmBase = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.026, 0.03, 0.04, 20),
     machinedSilverMat
   );
-  vfRod.rotation.z = Math.PI / 2;
-  vfRod.position.set(0.14, 0.4, 0.25);
-  topHandleGroup.add(vfRod);
+  magicArmBase.position.set(0.03, 0.445, 0.17);
+  topHandleGroup.add(magicArmBase);
 
-  const lcdGroup = new THREE.Group();
-  lcdGroup.position.set(0.26, 0.42, 0.3);
-  lcdGroup.rotation.y = -0.28;
-  lcdGroup.rotation.x = 0.18;
-
-  const lcdChassis = new THREE.Mesh(
-    new RoundedBoxGeometry(0.28, 0.18, 0.025, 4, 0.01),
+  const magicArmCurve = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(0.03, 0.45, 0.17),
+    new THREE.Vector3(0.18, 0.48, 0.21),
+    new THREE.Vector3(0.32, 0.46, 0.24),
+  ]);
+  const magicArmStrut = new THREE.Mesh(
+    new THREE.TubeGeometry(magicArmCurve, 16, 0.016, 12, false),
     anodizedBlackMat
   );
-  lcdGroup.add(lcdChassis);
+  topHandleGroup.add(magicArmStrut);
 
-  const lcdHood = new THREE.Mesh(
-    new RoundedBoxGeometry(0.29, 0.19, 0.04, 3, 0.008),
-    fx6BodyMat
-  );
-  lcdHood.position.set(0, 0, 0.012);
-  lcdGroup.add(lcdHood);
-
-  const lcdPanel = new THREE.Mesh(
-    new THREE.PlaneGeometry(0.25, 0.15),
-    lcdScreenMat
-  );
-  lcdPanel.position.set(0, 0, 0.033);
-  lcdGroup.add(lcdPanel);
-
-  const recTallyPill = new THREE.Mesh(
-    new THREE.PlaneGeometry(0.055, 0.018),
+  const magicArmKnob = new THREE.Mesh(
+    new RoundedBoxGeometry(0.045, 0.022, 0.028, 3, 0.005),
     coralCinemaMat
   );
-  recTallyPill.position.set(-0.08, 0.052, 0.035);
-  lcdGroup.add(recTallyPill);
+  magicArmKnob.position.set(0.18, 0.495, 0.21);
+  topHandleGroup.add(magicArmKnob);
 
-  const horizonLine = new THREE.Mesh(
-    new THREE.PlaneGeometry(0.18, 0.004),
+  // Atomos Ninja V Assembly angled toward the viewer on the side-front of the FX6
+  const ninjaVGroup = new THREE.Group();
+  ninjaVGroup.position.set(0.37, 0.45, 0.26);
+  ninjaVGroup.rotation.y = 0.48;  // Swiveled toward viewer to match heroYawOffset (-0.52)
+  ninjaVGroup.rotation.x = -0.15; // Tilted slightly up to face the camera squarely
+
+  // 1. Sleek Stealth-Grey Chamfered Aluminum Frame (151mm x 91.5mm = 0.56 x 0.34)
+  const ninjaOuterFrame = new THREE.Mesh(
+    new RoundedBoxGeometry(0.56, 0.34, 0.052, 5, 0.022),
+    fx6BodyMat
+  );
+  ninjaVGroup.add(ninjaOuterFrame);
+
+  // 2. Flush Edge-to-Edge Matte Black Glass Front Bezel (no bulky hood flaps)
+  const ninjaGlassBezel = new THREE.Mesh(
+    new RoundedBoxGeometry(0.538, 0.318, 0.012, 4, 0.014),
+    anodizedBlackMat
+  );
+  ninjaGlassBezel.position.set(0, 0, 0.023);
+  ninjaVGroup.add(ninjaGlassBezel);
+
+  // 3. Top & Bottom Atomos Brass/Silver 1/4"-20 Anti-Rotation Mount Bosses & Cooling Vents
+  const topMountBoss = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.02, 0.02, 0.008, 20),
     machinedSilverMat
   );
-  horizonLine.position.set(0, 0, 0.035);
-  lcdGroup.add(horizonLine);
+  topMountBoss.position.set(0, 0.172, 0);
+  ninjaVGroup.add(topMountBoss);
 
-  topHandleGroup.add(lcdGroup);
+  const bottomMountBoss = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.02, 0.02, 0.008, 20),
+    machinedSilverMat
+  );
+  bottomMountBoss.position.set(-0.05, -0.172, 0);
+  ninjaVGroup.add(bottomMountBoss);
+
+  for (let v = -3; v <= 3; v++) {
+    if (v === 0) continue;
+    const ventSlot = new THREE.Mesh(
+      new THREE.BoxGeometry(0.028, 0.006, 0.022),
+      anodizedBlackMat
+    );
+    ventSlot.position.set(v * 0.055, 0.171, -0.005);
+    ninjaVGroup.add(ventSlot);
+  }
+
+  // 4. Right-Side Power Button & Left-Side Dual HDMI 2.0 In/Out Connectors
+  const ninjaPowerBtn = new THREE.Mesh(
+    new RoundedBoxGeometry(0.008, 0.038, 0.018, 2, 0.003),
+    machinedSilverMat
+  );
+  ninjaPowerBtn.position.set(0.282, 0.08, 0);
+  ninjaVGroup.add(ninjaPowerBtn);
+
+  for (let h = 0; h < 2; h++) {
+    const hdmiPlug = new THREE.Mesh(
+      new RoundedBoxGeometry(0.032, 0.026, 0.018, 2, 0.004),
+      anodizedBlackMat
+    );
+    hdmiPlug.position.set(-0.29, 0.05 - h * 0.09, 0);
+    ninjaVGroup.add(hdmiPlug);
+  }
+
+  // Coiled HDMI 2.0 Cable from Ninja V HDMI-In to Sony FX6 HDMI-Out
+  const hdmiCableCurve = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(0.11, 0.42, 0.16),
+    new THREE.Vector3(0.04, 0.25, 0.02),
+    new THREE.Vector3(-0.08, 0.06, -0.18),
+  ]);
+  const hdmiCable = new THREE.Mesh(
+    new THREE.TubeGeometry(hdmiCableCurve, 20, 0.009, 10, false),
+    anodizedBlackMat
+  );
+  topHandleGroup.add(hdmiCable);
+
+  // 5. Rear AtomX SSDmini Drive Caddy + Sony NP-F750 Battery Pack on Back of Ninja V
+  const atomxSsd = new THREE.Mesh(
+    new RoundedBoxGeometry(0.21, 0.24, 0.028, 3, 0.008),
+    machinedSilverMat
+  );
+  atomxSsd.position.set(-0.12, 0, -0.036);
+  ninjaVGroup.add(atomxSsd);
+
+  const npfBattery = new THREE.Mesh(
+    new RoundedBoxGeometry(0.22, 0.25, 0.065, 4, 0.012),
+    anodizedBlackMat
+  );
+  npfBattery.position.set(0.11, 0, -0.054);
+  ninjaVGroup.add(npfBattery);
+
+  // 6. Active 5.2" 16:9 Touchscreen Display Panel (0.496 x 0.279)
+  const lcdPanel = new THREE.Mesh(
+    new THREE.PlaneGeometry(0.496, 0.279),
+    lcdScreenMat
+  );
+  lcdPanel.position.set(0, 0.004, 0.03);
+  ninjaVGroup.add(lcdPanel);
+
+  topHandleGroup.add(ninjaVGroup);
   innerRig.add(topHandleGroup);
 
   // ==========================================================================
@@ -1004,6 +1077,222 @@ export default function StudioMotionRig3D({ settings }: Props) {
     });
 
     // ============================================================================
+    // ATOMOS NINJA V 5.2" HDR MONITOR-RECORDER
+    // Plays clips ONLY from:
+    //  1) Nuclear & Related Techniques for Climate Action in Food and Agriculture (EDaApuJ4syo)
+    //  2) Inside FINS Initiative — Animated Segments (w0tVfjOWbm8)
+    // ============================================================================
+    interface PublishedVideoSnippet {
+      id: string;
+      title: string;
+      agency: string;
+      videoUrl: string;
+      posterUrl: string;
+      posterImg?: HTMLImageElement;
+    }
+
+    const publishedClips: PublishedVideoSnippet[] = [
+      {
+        id: 'EDaApuJ4syo-1',
+        title: 'Nuclear & Related Techniques for Climate Action',
+        agency: 'IAEA · FAO (COP28)',
+        videoUrl: '/assets/videos/nuclear-1.mp4?v=2',
+        posterUrl: '/assets/projects/iaea-nuclear-climate-video.png',
+      },
+      {
+        id: 'w0tVfjOWbm8-1',
+        title: 'Inside FINS Initiative — Tax-to-GDP Motion Graphics',
+        agency: 'UN DESA · FINS Animation',
+        videoUrl: '/assets/videos/fins-anim-1.mp4?v=2',
+        posterUrl: '/assets/projects/inside-fins-dominican-republic-undesa/sids-finance.webp',
+      },
+      {
+        id: 'EDaApuJ4syo-2',
+        title: 'Nuclear Techniques — Plant Breeding & Drone Telemetry',
+        agency: 'IAEA · FAO (COP28)',
+        videoUrl: '/assets/videos/nuclear-2.mp4?v=2',
+        posterUrl: '/assets/projects/iaea-nuclear-climate-video.png',
+      },
+      {
+        id: 'w0tVfjOWbm8-2',
+        title: 'Inside FINS Initiative — National Financing Frameworks',
+        agency: 'UN DESA · FINS Animation',
+        videoUrl: '/assets/videos/fins-anim-2.mp4?v=2',
+        posterUrl: '/assets/projects/inside-fins-dominican-republic-undesa/sids-finance.webp',
+      },
+      {
+        id: 'EDaApuJ4syo-3',
+        title: 'Nuclear Techniques — Global Food Security & Agronomy',
+        agency: 'IAEA · FAO (COP28)',
+        videoUrl: '/assets/videos/nuclear-3.mp4?v=2',
+        posterUrl: '/assets/projects/iaea-nuclear-climate-video.png',
+      },
+      {
+        id: 'w0tVfjOWbm8-3',
+        title: 'Inside FINS Initiative — Policy Coherence Animation',
+        agency: 'UN DESA · FINS Animation',
+        videoUrl: '/assets/videos/fins-anim-3.mp4?v=2',
+        posterUrl: '/assets/projects/inside-fins-dominican-republic-undesa/sids-finance.webp',
+      },
+    ];
+
+    // Preload poster images for seamless instant fallback between clip transitions
+    publishedClips.forEach((clip) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.src = clip.posterUrl;
+      clip.posterImg = img;
+    });
+
+    let isDisposed = false;
+
+    // Hidden HTML5 video player cycling through the Nuclear & FINS Animated clips
+    const fx6VideoEl = document.createElement('video');
+    fx6VideoEl.muted = true;
+    fx6VideoEl.playsInline = true;
+    fx6VideoEl.crossOrigin = 'anonymous';
+    fx6VideoEl.preload = 'auto';
+    fx6VideoEl.setAttribute('muted', '');
+    fx6VideoEl.setAttribute('playsinline', '');
+
+    let activeClipIdx = 0;
+    let lastClipSwitchTime = 0;
+
+    const playClipAtIndex = (idx: number) => {
+      if (isDisposed || publishedClips.length === 0) return;
+      activeClipIdx = ((idx % publishedClips.length) + publishedClips.length) % publishedClips.length;
+      const clip = publishedClips[activeClipIdx];
+      if (fx6VideoEl.src !== window.location.origin + clip.videoUrl) {
+        fx6VideoEl.src = clip.videoUrl;
+        fx6VideoEl.currentTime = 0;
+        fx6VideoEl.play().catch(() => {});
+      }
+    };
+
+    fx6VideoEl.addEventListener('ended', () => {
+      playClipAtIndex(activeClipIdx + 1);
+    });
+    playClipAtIndex(0);
+
+    // Offscreen 16:9 Canvas + THREE.CanvasTexture for the Atomos Ninja V 5.2" HDR Touchscreen
+    const fx6MonitorCanvas = document.createElement('canvas');
+    fx6MonitorCanvas.width = 512;
+    fx6MonitorCanvas.height = 288;
+    const fx6MonitorCtx = fx6MonitorCanvas.getContext('2d');
+
+    const fx6MonitorTexture = new THREE.CanvasTexture(fx6MonitorCanvas);
+    fx6MonitorTexture.colorSpace = THREE.SRGBColorSpace;
+    fx6MonitorTexture.minFilter = THREE.LinearFilter;
+    fx6MonitorTexture.magFilter = THREE.LinearFilter;
+
+    const fx6MonitorVideoMat = new THREE.MeshBasicMaterial({
+      map: fx6MonitorTexture,
+      toneMapped: false,
+    });
+
+    const updateFX6MonitorCanvas = (t: number) => {
+      if (!fx6MonitorCtx) return;
+      // Rotate to the next snippet every 7.5 seconds
+      if (t - lastClipSwitchTime > 7.5) {
+        lastClipSwitchTime = t;
+        playClipAtIndex(activeClipIdx + 1);
+      }
+
+      const clip = publishedClips[activeClipIdx] || publishedClips[0];
+      const W = fx6MonitorCanvas.width;
+      const H = fx6MonitorCanvas.height;
+
+      // 1. Draw live video frame (or animated Ken Burns poster frame while buffering)
+      if (fx6VideoEl.readyState >= 2 && !fx6VideoEl.paused && fx6VideoEl.videoWidth > 0) {
+        fx6MonitorCtx.drawImage(fx6VideoEl, 0, 0, W, H);
+      } else if (clip.posterImg && clip.posterImg.complete && clip.posterImg.naturalWidth > 0) {
+        const zoom = 1.06 + Math.sin(t * 0.8) * 0.04;
+        const sw = W * zoom;
+        const sh = H * zoom;
+        const sx = (W - sw) * 0.5 + Math.cos(t * 0.6) * 8;
+        const sy = (H - sh) * 0.5 + Math.sin(t * 0.5) * 5;
+        fx6MonitorCtx.drawImage(clip.posterImg, sx, sy, sw, sh);
+      } else {
+        fx6MonitorCtx.fillStyle = '#101d29';
+        fx6MonitorCtx.fillRect(0, 0, W, H);
+      }
+
+      // 2. Atomos AtomOS 11 Top & Bottom Dark Translucent Header/Footer Bars
+      fx6MonitorCtx.fillStyle = 'rgba(12, 16, 22, 0.84)';
+      fx6MonitorCtx.fillRect(0, 0, W, 30);
+      fx6MonitorCtx.fillRect(0, H - 36, W, 36);
+
+      // 3. Signature Atomos Ninja V Red Recording Tally Frame Outline
+      fx6MonitorCtx.strokeStyle = 'rgba(239, 68, 68, 0.88)';
+      fx6MonitorCtx.lineWidth = 3;
+      fx6MonitorCtx.strokeRect(1.5, 1.5, W - 3, H - 3);
+
+      // 4. AtomOS Top Bar: IN: HDMI 4K24 -> REC: ProRes HQ + Timecode + SSD Remaining
+      fx6MonitorCtx.fillStyle = '#ef4444';
+      fx6MonitorCtx.beginPath();
+      fx6MonitorCtx.roundRect(10, 5, 42, 20, 3);
+      fx6MonitorCtx.fill();
+
+      fx6MonitorCtx.fillStyle = '#ffffff';
+      fx6MonitorCtx.font = 'bold 11px monospace';
+      fx6MonitorCtx.fillText('REC', 18, 19);
+
+      fx6MonitorCtx.fillStyle = '#facc15';
+      fx6MonitorCtx.font = 'bold 10px monospace';
+      fx6MonitorCtx.fillText('IN 4K23.98p', 60, 19);
+
+      fx6MonitorCtx.fillStyle = '#38bdf8';
+      fx6MonitorCtx.fillText('ProRes 422 HQ', 142, 19);
+
+      const totalFrames = Math.floor(t * 24);
+      const ff = String(totalFrames % 24).padStart(2, '0');
+      const ss = String(Math.floor(totalFrames / 24) % 60).padStart(2, '0');
+      const mm = String((14 + Math.floor(totalFrames / 1440)) % 60).padStart(2, '0');
+      fx6MonitorCtx.fillStyle = '#f8fafc';
+      fx6MonitorCtx.font = 'bold 12px monospace';
+      fx6MonitorCtx.fillText(`01:${mm}:${ss}:${ff}`, 248, 19);
+
+      fx6MonitorCtx.fillStyle = '#a3e635';
+      fx6MonitorCtx.font = 'bold 10px monospace';
+      fx6MonitorCtx.fillText('SSD 02h14m · NINJA V', W - 138, 19);
+
+      // 5. Right-Edge AtomOS Stereo Audio Level Meter (CH1 / CH2)
+      for (let ch = 0; ch < 2; ch++) {
+        const mx = W - 18 + ch * 6;
+        const level = 0.45 + 0.45 * Math.abs(Math.sin(t * 6.2 + ch * 1.1));
+        const segments = 14;
+        for (let s = 0; s < segments; s++) {
+          const sy = H - 46 - s * 8;
+          const active = s / segments <= level;
+          fx6MonitorCtx.fillStyle = !active
+            ? 'rgba(255,255,255,0.16)'
+            : s > 11
+              ? '#ef4444'
+              : s > 8
+                ? '#facc15'
+                : '#22c55e';
+          fx6MonitorCtx.fillRect(mx, sy, 4, 5);
+        }
+      }
+
+      // 6. AtomOS Bottom Bar: Active Video Agency + Title + ATOMOS Wordmark
+      fx6MonitorCtx.fillStyle = '#f29f8b';
+      fx6MonitorCtx.font = 'bold 10px sans-serif';
+      fx6MonitorCtx.fillText(clip.agency.toUpperCase(), 12, H - 21);
+
+      fx6MonitorCtx.fillStyle = '#ffffff';
+      fx6MonitorCtx.font = 'bold 12px sans-serif';
+      const maxTitle = clip.title.length > 46 ? clip.title.slice(0, 44) + '…' : clip.title;
+      fx6MonitorCtx.fillText(maxTitle, 12, H - 7);
+
+      fx6MonitorCtx.fillStyle = 'rgba(255,255,255,0.65)';
+      fx6MonitorCtx.font = 'bold 10px monospace';
+      fx6MonitorCtx.fillText('ATOMOS', W - 56, H - 12);
+
+      fx6MonitorTexture.needsUpdate = true;
+    };
+
+    // ============================================================================
     // SUMMIT CROWN: Kinetic 3D Motion Sculpture (Elevated above Topographic Peak)
     // ============================================================================
     const summitObject = new THREE.Group();
@@ -1030,7 +1319,7 @@ export default function StudioMotionRig3D({ settings }: Props) {
       coralCinemaMat,
       opticalGlassMat,
       matteFoamMat,
-      lcdScreenMat,
+      lcdScreenMat: fx6MonitorVideoMat,
     });
     fx6StationGroup.add(fx6CameraMeshGroup);
     objectsGroup.add(fx6StationGroup);
@@ -1760,6 +2049,9 @@ export default function StudioMotionRig3D({ settings }: Props) {
         bar.scale.y = 1 + Math.sin(t * 2.1 + idx * 0.6) * 0.09;
       });
 
+      // Update Sony FX6 Side LCD Monitor with live video snippets from Matteo's published videos
+      updateFX6MonitorCanvas(t);
+
       // Update the 4 Orbiting Elements around the Topographic Model
       updateOrbitalStations(t, effectiveOrbitAngle, false);
 
@@ -1825,12 +2117,17 @@ export default function StudioMotionRig3D({ settings }: Props) {
     animate();
 
     return () => {
+      isDisposed = true;
       cancelAnimationFrame(reqId);
+      fx6VideoEl.pause();
+      fx6VideoEl.removeAttribute('src');
+      fx6VideoEl.load();
       window.removeEventListener('scroll', updateTargetOrbitFromScroll);
       window.removeEventListener('pointermove', onPointerMove);
       window.removeEventListener('portfolio:contact-interaction', onContactInteraction);
       window.removeEventListener('resize', onResize);
       ctx.revert();
+      fx6MonitorTexture.dispose();
       magnifierRenderTarget.dispose();
       studioEnv.dispose();
       renderer.dispose();
