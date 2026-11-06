@@ -1,32 +1,39 @@
 @import "tailwindcss";
 
 /* ==========================================================================
-   CREATIVE SELF-HOSTED TYPOGRAPHY
-   - Syne Variable (700-800): Expressive European Art-Directed Display
-   - Plus Jakarta Sans Variable (400-700): Crisp Geometric Body & UI
-   - JetBrains Mono Variable: Topographic Coordinates & Elevation Telemetry
+   DIPLOMATIC EDITORIAL TYPOGRAPHY: PLAYFAIR DISPLAY + INTER
+   - Playfair Display Variable (400-800): Authoritative Editorial Serif Headings
+   - Inter Variable (300-800): Crisp Swiss Neo-Grotesque Body, UI & Navigation
    ========================================================================== */
 
 @font-face {
-  font-family: 'Syne';
-  src: url('/fonts/syne-latin-wght-normal.woff2') format('woff2-variations');
+  font-family: 'Playfair Display';
+  src: url('/fonts/playfair-display-latin-wght-normal.woff2') format('woff2-variations');
   font-weight: 400 800;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'Plus Jakarta Sans';
-  src: url('/fonts/plus-jakarta-sans-latin-wght-normal.woff2') format('woff2-variations');
-  font-weight: 200 800;
+  font-family: 'Playfair Display';
+  src: url('/fonts/playfair-display-latin-wght-italic.woff2') format('woff2-variations');
+  font-weight: 400 800;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/inter-latin-wght-normal.woff2') format('woff2-variations');
+  font-weight: 300 800;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'Plus Jakarta Sans';
-  src: url('/fonts/plus-jakarta-sans-latin-wght-italic.woff2') format('woff2-variations');
-  font-weight: 200 800;
+  font-family: 'Inter';
+  src: url('/fonts/inter-latin-wght-italic.woff2') format('woff2-variations');
+  font-weight: 300 800;
   font-style: italic;
   font-display: swap;
 }
@@ -62,15 +69,20 @@
   --cv-contour-warm: #d8c8ca;
   --cv-contour-slate: #b6bece;
 
-  --font-display: 'Syne', system-ui, -apple-system, sans-serif;
-  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
+  --font-display: 'Playfair Display', Georgia, Cambria, 'Times New Roman', serif;
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
 html {
   background-color: var(--cv-paper-mist);
   color: var(--cv-navy-ink);
   font-family: var(--font-sans);
+  font-feature-settings: 'cv02' 1, 'cv03' 1, 'cv04' 1, 'cv11' 1;
+  line-height: 1.65;
+  letter-spacing: -0.006em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   scroll-behavior: auto;
   overflow-x: hidden;
 }
@@ -78,6 +90,7 @@ html {
 body {
   background-color: var(--cv-paper-mist);
   color: var(--cv-navy-ink);
+  font-family: var(--font-sans);
   overflow-x: hidden;
 }
 
@@ -86,18 +99,32 @@ body {
   color: #ffffff;
 }
 
-/* Typography Helpers */
+/* Typography Helpers — Tuned for Playfair Display + Inter Editorial Hierarchy */
 .font-display {
   font-family: var(--font-display);
-  letter-spacing: -0.03em;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  line-height: 1.12;
+  font-feature-settings: 'liga' 1, 'kern' 1;
 }
 
-.font-sans-body {
+/* Keep small 12px-14px UI labels & badges in crisp Inter SemiBold */
+.font-display.text-xs,
+.font-display.text-sm {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.font-sans-body,
+.font-sans {
   font-family: var(--font-sans);
 }
 
 .font-mono-tech {
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.03em;
 }
 
 /* ==========================================================================
