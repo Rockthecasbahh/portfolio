@@ -1325,116 +1325,593 @@ export default function StudioMotionRig3D({ settings }: Props) {
     objectsGroup.add(fx6StationGroup);
 
     // ============================================================================
-    // ORBITAL ELEMENT 1: COMMUNICATIONS STRATEGIES (Parabolic Dish & Signal Nodes)
+    // ORBITAL ELEMENT 1: SOCIAL MEDIA MARKETING (Flagship Smartphone + Flying Likes & Shares)
     // ============================================================================
     const commsStationGroup = new THREE.Group();
 
-    const dishAssembly = new THREE.Group();
-    dishAssembly.rotation.y = -0.35;
-    dishAssembly.rotation.x = -0.18;
+    const phoneAssembly = new THREE.Group();
+    // Tilted slightly back and angled toward the viewer so the screen & rising icons are prominently visible
+    phoneAssembly.rotation.x = -0.34;
+    phoneAssembly.rotation.y = 0.22;
+    phoneAssembly.rotation.z = -0.06;
+    phoneAssembly.position.set(0, -0.1, 0);
 
-    const dishPoints: THREE.Vector2[] = [];
-    for (let i = 0; i <= 24; i++) {
-      const r = (i / 24) * 0.42;
-      const z = r * r * 0.92;
-      dishPoints.push(new THREE.Vector2(r, z));
-    }
-    dishPoints.push(new THREE.Vector2(0.435, 0.18));
-    dishPoints.push(new THREE.Vector2(0.41, 0.15));
-    const dishLatheGeo = new THREE.LatheGeometry(dishPoints, 56);
-    dishLatheGeo.rotateX(Math.PI / 2);
-    const dishMesh = new THREE.Mesh(dishLatheGeo, machinedSilverMat);
-    dishAssembly.add(dishMesh);
-
-    for (let rib = 0; rib < 8; rib++) {
-      const a = (rib / 8) * Math.PI * 2;
-      const ribMesh = new THREE.Mesh(
-        new RoundedBoxGeometry(0.015, 0.34, 0.028, 2, 0.004),
-        brushedCobaltMat
-      );
-      ribMesh.position.set(Math.cos(a) * 0.19, Math.sin(a) * 0.19, 0.035);
-      ribMesh.rotation.z = a + Math.PI / 2;
-      dishAssembly.add(ribMesh);
-    }
-
-    const dishHub = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.11, 0.14, 0.12, 28),
-      fx6BodyMat
+    // 1. Machined Titanium/Cobalt Unibody Chassis (71.5mm x 147mm x 8.2mm aspect -> 0.48 x 0.96 x 0.064)
+    const phoneChassis = new THREE.Mesh(
+      new RoundedBoxGeometry(0.48, 0.96, 0.064, 6, 0.055),
+      brushedCobaltMat
     );
-    dishHub.rotation.x = Math.PI / 2;
-    dishHub.position.set(0, 0, -0.06);
-    dishAssembly.add(dishHub);
+    phoneAssembly.add(phoneChassis);
 
-    for (let s = 0; s < 4; s++) {
-      const a = (s / 4) * Math.PI * 2 + Math.PI / 4;
-      const strut = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.008, 0.008, 0.36, 12),
-        brushedCobaltMat
-      );
-      strut.position.set(Math.cos(a) * 0.15, Math.sin(a) * 0.15, 0.17);
-      strut.lookAt(0, 0, 0.34);
-      strut.rotateX(Math.PI / 2);
-      dishAssembly.add(strut);
+    // 2. Polished Silver Chamfered Perimeter Frame Band
+    const phonePerimeterBand = new THREE.Mesh(
+      new RoundedBoxGeometry(0.486, 0.966, 0.044, 6, 0.056),
+      machinedSilverMat
+    );
+    phoneAssembly.add(phonePerimeterBand);
+
+    // 3. Flush Obsidian Front Display Bezel
+    const phoneFrontGlass = new THREE.Mesh(
+      new RoundedBoxGeometry(0.452, 0.932, 0.014, 5, 0.046),
+      anodizedBlackMat
+    );
+    phoneFrontGlass.position.set(0, 0, 0.028);
+    phoneAssembly.add(phoneFrontGlass);
+
+    // 4. High-DPI Live-Scrolling Social Media Feed Canvas Texture (Fake Posts from Video Screenshots)
+    interface SocialFeedPost {
+      handle: string;
+      org: string;
+      avatarBg: string;
+      badgeText: string;
+      imageUrl: string;
+      captionLine1: string;
+      captionLine2: string;
+      baseLikes: number;
+      baseShares: number;
+      img?: HTMLImageElement;
     }
 
-    const feedHorn = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.042, 0.06, 0.08, 24),
-      coralCinemaMat
-    );
-    feedHorn.rotation.x = Math.PI / 2;
-    feedHorn.position.set(0, 0, 0.33);
-    dishAssembly.add(feedHorn);
-
-    const signalWaveRings: THREE.Mesh[] = [];
-    for (let w = 0; w < 3; w++) {
-      const waveRingGeo = new THREE.TorusGeometry(0.14 + w * 0.095, 0.01, 16, 64);
-      const waveRing = new THREE.Mesh(
-        waveRingGeo,
-        w % 2 === 0 ? coralCinemaMat : lcdScreenMat
-      );
-      waveRing.position.set(0, 0, 0.42 + w * 0.12);
-      dishAssembly.add(waveRing);
-      signalWaveRings.push(waveRing);
-    }
-
-    const dishPedestal = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.045, 0.17, 0.32, 28),
-      fx6BodyMat
-    );
-    dishPedestal.position.set(0, -0.3, -0.04);
-    commsStationGroup.add(dishPedestal);
-    commsStationGroup.add(dishAssembly);
-
-    const strategyNodesGroup = new THREE.Group();
-    strategyNodesGroup.position.set(-0.38, 0.2, 0.28);
-    const nodeOffsets: [number, number, number][] = [
-      [0, 0, 0],
-      [-0.26, 0.18, 0.12],
-      [-0.14, -0.2, 0.18],
-      [0.2, 0.22, -0.1],
-      [0.22, -0.15, 0.14],
+    const socialFeedPosts: SocialFeedPost[] = [
+      {
+        handle: '@iaeaorg',
+        org: 'Joint FAO/IAEA · COP28',
+        avatarBg: '#38bdf8',
+        badgeText: 'CLIMATE ACTION',
+        imageUrl: '/assets/social-posts/post-nuclear-1.jpg',
+        captionLine1: 'Nuclear techniques & plant biotechnology',
+        captionLine2: 'building climate-resilient crops #Atoms4Food',
+        baseLikes: 14820,
+        baseShares: 3410,
+      },
+      {
+        handle: '@undesa',
+        org: 'UN DESA · FINS Initiative',
+        avatarBg: '#f29f8b',
+        badgeText: 'SDG FINANCE',
+        imageUrl: '/assets/social-posts/post-fins-1.jpg',
+        captionLine1: 'Inside FINS: Raising Tax-to-GDP capacity',
+        captionLine2: 'across Small Island Developing States #SDGs',
+        baseLikes: 9640,
+        baseShares: 2180,
+      },
+      {
+        handle: '@fao',
+        org: 'UN Food & Agriculture',
+        avatarBg: '#304774',
+        badgeText: 'FIELD TELEMETRY',
+        imageUrl: '/assets/social-posts/post-nuclear-2.jpg',
+        captionLine1: 'Precision drone telemetry & isotope tracking',
+        captionLine2: 'to cut agricultural greenhouse emissions',
+        baseLikes: 22490,
+        baseShares: 5830,
+      },
+      {
+        handle: '@undesa',
+        org: 'INFF Facility · UN DESA',
+        avatarBg: '#f29f8b',
+        badgeText: 'POLICY BRIEF',
+        imageUrl: '/assets/social-posts/post-fins-2.jpg',
+        captionLine1: 'Integrated National Financing Frameworks:',
+        captionLine2: 'Connecting planning with public finance',
+        baseLikes: 11350,
+        baseShares: 2940,
+      },
+      {
+        handle: '@iaeaorg',
+        org: 'Joint FAO/IAEA Centre',
+        avatarBg: '#38bdf8',
+        badgeText: 'FOOD SECURITY',
+        imageUrl: '/assets/social-posts/post-nuclear-3.jpg',
+        captionLine1: 'From lab to market: nuclear science securing',
+        captionLine2: 'global nutrition and sustainable harvests',
+        baseLikes: 18710,
+        baseShares: 4290,
+      },
+      {
+        handle: '@undesa',
+        org: 'Financing for Sustainable Dev',
+        avatarBg: '#304774',
+        badgeText: 'IMPACT REPORT',
+        imageUrl: '/assets/social-posts/post-fins-3.jpg',
+        captionLine1: 'Effective domestic resource mobilization',
+        captionLine2: 'for resilient national budgets #FINS',
+        baseLikes: 13180,
+        baseShares: 3120,
+      },
     ];
-    nodeOffsets.forEach((pos, idx) => {
-      const nodeSphere = new THREE.Mesh(
-        new THREE.SphereGeometry(idx === 0 ? 0.068 : 0.048, 24, 24),
-        idx === 0 ? coralCinemaMat : idx % 2 === 0 ? machinedSilverMat : brushedCobaltMat
-      );
-      nodeSphere.position.set(pos[0], pos[1], pos[2]);
-      strategyNodesGroup.add(nodeSphere);
 
-      if (idx > 0) {
-        const curve = new THREE.LineCurve3(
-          new THREE.Vector3(0, 0, 0),
-          new THREE.Vector3(pos[0], pos[1], pos[2])
-        );
-        const linkTube = new THREE.Mesh(
-          new THREE.TubeGeometry(curve, 8, 0.009, 12, false),
-          machinedSilverMat
-        );
-        strategyNodesGroup.add(linkTube);
-      }
+    socialFeedPosts.forEach((post) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.src = post.imageUrl;
+      post.img = img;
     });
-    commsStationGroup.add(strategyNodesGroup);
+
+    const phoneScreenCanvas = document.createElement('canvas');
+    phoneScreenCanvas.width = 280;
+    phoneScreenCanvas.height = 580;
+    const phoneScreenCtx = phoneScreenCanvas.getContext('2d');
+
+    const phoneScreenTexture = new THREE.CanvasTexture(phoneScreenCanvas);
+    phoneScreenTexture.colorSpace = THREE.SRGBColorSpace;
+    phoneScreenTexture.minFilter = THREE.LinearFilter;
+    phoneScreenTexture.magFilter = THREE.LinearFilter;
+    const phoneScreenMat = new THREE.MeshBasicMaterial({
+      map: phoneScreenTexture,
+      toneMapped: false,
+    });
+
+    // Natural thumb-scroll easing (quintic ease-in-out with gentle settle)
+    const easeInOutQuint = (x: number): number =>
+      x < 0.5 ? 16 * x * x * x * x * x : 1 - Math.pow(-2 * x + 2, 5) / 2;
+
+    const updatePhoneScreenCanvas = (t: number) => {
+      if (!phoneScreenCtx) return;
+      const W = phoneScreenCanvas.width;
+      const H = phoneScreenCanvas.height;
+
+      // Each post cycle is 3.4s:
+      // - 0.00s..2.25s: Natural dwell/reading pause (with Like/Share tap pulse at ~0.8s)
+      // - 2.25s..3.40s: Smooth eased thumb-swipe transition to the next post
+      const CYCLE_SEC = 3.4;
+      const DWELL_SEC = 2.25;
+      const SWIPE_SEC = CYCLE_SEC - DWELL_SEC;
+
+      const totalCycles = Math.floor(t / CYCLE_SEC);
+      const cycleTime = t - totalCycles * CYCLE_SEC;
+      const swipeRaw = THREE.MathUtils.clamp((cycleTime - DWELL_SEC) / SWIPE_SEC, 0, 1);
+      const swipeEased = easeInOutQuint(swipeRaw);
+
+      // Subtle organic finger micro-drift during dwell so the feed feels alive
+      const dwellMicroDrift = Math.sin(cycleTime * 2.4) * 1.5 * (1 - swipeRaw);
+
+      const CARD_STRIDE = 416;
+      const scrollProgress = totalCycles + swipeEased;
+
+      // App Background
+      phoneScreenCtx.fillStyle = '#0d1824';
+      phoneScreenCtx.fillRect(0, 0, W, H);
+
+      // Render visible scrolling post cards in feed area
+      const baseIndex = Math.floor(scrollProgress);
+      const fracOffset = scrollProgress - baseIndex;
+
+      phoneScreenCtx.save();
+      phoneScreenCtx.beginPath();
+      phoneScreenCtx.rect(0, 58, W, H - 102);
+      phoneScreenCtx.clip();
+
+      for (let offset = -1; offset <= 2; offset++) {
+        const postIdx =
+          (((baseIndex + offset) % socialFeedPosts.length) + socialFeedPosts.length) %
+          socialFeedPosts.length;
+        const post = socialFeedPosts[postIdx];
+        const cardY = 66 + (offset - fracOffset) * CARD_STRIDE - dwellMicroDrift;
+
+        if (cardY > H || cardY + CARD_STRIDE < 40) continue;
+
+        // Post Card Container
+        phoneScreenCtx.fillStyle = '#152536';
+        phoneScreenCtx.strokeStyle = 'rgba(217, 235, 244, 0.12)';
+        phoneScreenCtx.lineWidth = 1;
+        phoneScreenCtx.beginPath();
+        phoneScreenCtx.roundRect(12, cardY, W - 24, CARD_STRIDE - 14, 18);
+        phoneScreenCtx.fill();
+        phoneScreenCtx.stroke();
+
+        // Author Avatar & Handle Row
+        phoneScreenCtx.fillStyle = post.avatarBg;
+        phoneScreenCtx.beginPath();
+        phoneScreenCtx.arc(34, cardY + 26, 13, 0, Math.PI * 2);
+        phoneScreenCtx.fill();
+
+        phoneScreenCtx.fillStyle = '#ffffff';
+        phoneScreenCtx.font = 'bold 11px sans-serif';
+        phoneScreenCtx.fillText(post.handle, 54, cardY + 23);
+
+        phoneScreenCtx.fillStyle = '#8ab4d0';
+        phoneScreenCtx.font = '9.5px sans-serif';
+        phoneScreenCtx.fillText(post.org, 54, cardY + 35);
+
+        // Category Pill on Top Right of Card
+        phoneScreenCtx.fillStyle = 'rgba(48, 71, 116, 0.65)';
+        phoneScreenCtx.beginPath();
+        phoneScreenCtx.roundRect(W - 96, cardY + 14, 74, 18, 9);
+        phoneScreenCtx.fill();
+        phoneScreenCtx.fillStyle = '#d9ebf4';
+        phoneScreenCtx.font = 'bold 7.5px sans-serif';
+        phoneScreenCtx.fillText(post.badgeText, W - 88, cardY + 26);
+
+        // Video Screenshot Frame (16:9 cropped cleanly into rounded media frame)
+        const imgX = 22;
+        const imgY = cardY + 48;
+        const imgW = W - 44;
+        const imgH = 196;
+
+        phoneScreenCtx.save();
+        phoneScreenCtx.beginPath();
+        phoneScreenCtx.roundRect(imgX, imgY, imgW, imgH, 12);
+        phoneScreenCtx.clip();
+
+        if (post.img && post.img.complete && post.img.naturalWidth > 0) {
+          // Cover-fit the 16:9 screenshot into the social post frame
+          const srcAspect = post.img.naturalWidth / post.img.naturalHeight;
+          const dstAspect = imgW / imgH;
+          let drawW = imgW;
+          let drawH = imgH;
+          let drawX = imgX;
+          let drawY = imgY;
+          if (srcAspect > dstAspect) {
+            drawW = imgH * srcAspect;
+            drawX = imgX - (drawW - imgW) * 0.5;
+          } else {
+            drawH = imgW / srcAspect;
+            drawY = imgY - (drawH - imgH) * 0.5;
+          }
+          phoneScreenCtx.drawImage(post.img, drawX, drawY, drawW, drawH);
+        } else {
+          const fallbackGrad = phoneScreenCtx.createLinearGradient(imgX, imgY, imgX + imgW, imgY + imgH);
+          fallbackGrad.addColorStop(0, '#304774');
+          fallbackGrad.addColorStop(1, '#172a3b');
+          phoneScreenCtx.fillStyle = fallbackGrad;
+          phoneScreenCtx.fillRect(imgX, imgY, imgW, imgH);
+        }
+
+        // Subtle Bottom Gradient & Video Duration Pill on Screenshot
+        const bottomScrim = phoneScreenCtx.createLinearGradient(0, imgY + imgH - 42, 0, imgY + imgH);
+        bottomScrim.addColorStop(0, 'rgba(13, 24, 36, 0)');
+        bottomScrim.addColorStop(1, 'rgba(13, 24, 36, 0.72)');
+        phoneScreenCtx.fillStyle = bottomScrim;
+        phoneScreenCtx.fillRect(imgX, imgY + imgH - 42, imgW, 42);
+
+        phoneScreenCtx.fillStyle = 'rgba(13, 24, 36, 0.78)';
+        phoneScreenCtx.beginPath();
+        phoneScreenCtx.roundRect(imgX + imgW - 44, imgY + imgH - 24, 36, 16, 6);
+        phoneScreenCtx.fill();
+        phoneScreenCtx.fillStyle = '#ffffff';
+        phoneScreenCtx.font = 'bold 8.5px monospace';
+        phoneScreenCtx.fillText('0:45', imgX + imgW - 37, imgY + imgH - 13);
+        phoneScreenCtx.restore();
+
+        // Simulate user tapping "Like" & "Share" while dwelling on the active card (offset === 0)
+        const isCurrentCard = offset === 0;
+        const likedActive = isCurrentCard ? cycleTime > 0.65 : offset < 0;
+        const tapBounce =
+          isCurrentCard && cycleTime > 0.65 && cycleTime < 1.05
+            ? Math.sin(((cycleTime - 0.65) / 0.4) * Math.PI) * 0.14
+            : 0;
+
+        const btnY = cardY + 256;
+
+        // 1) LIKE (Thumbs-Up + Heart) Pill Button
+        phoneScreenCtx.save();
+        phoneScreenCtx.translate(56, btnY + 14);
+        phoneScreenCtx.scale(1 + tapBounce, 1 + tapBounce);
+        phoneScreenCtx.translate(-56, -(btnY + 14));
+
+        phoneScreenCtx.fillStyle = likedActive ? '#f29f8b' : 'rgba(217, 235, 244, 0.12)';
+        phoneScreenCtx.beginPath();
+        phoneScreenCtx.roundRect(22, btnY, 74, 28, 14);
+        phoneScreenCtx.fill();
+
+        phoneScreenCtx.fillStyle = likedActive ? '#101e2e' : '#d9ebf4';
+        phoneScreenCtx.font = 'bold 10.5px sans-serif';
+        const likesCount = ((post.baseLikes + (likedActive ? 1 : 0)) / 1000).toFixed(1) + 'K';
+        phoneScreenCtx.fillText(`👍 ♥ ${likesCount}`, 30, btnY + 18);
+        phoneScreenCtx.restore();
+
+        // 2) SHARE Pill Button
+        phoneScreenCtx.fillStyle = likedActive ? '#38bdf8' : 'rgba(217, 235, 244, 0.12)';
+        phoneScreenCtx.beginPath();
+        phoneScreenCtx.roundRect(104, btnY, 72, 28, 14);
+        phoneScreenCtx.fill();
+
+        phoneScreenCtx.fillStyle = likedActive ? '#0c1824' : '#d9ebf4';
+        phoneScreenCtx.font = 'bold 10.5px sans-serif';
+        const sharesCount = (post.baseShares / 1000).toFixed(1) + 'K';
+        phoneScreenCtx.fillText(`↗ ${sharesCount}`, 116, btnY + 18);
+
+        // 3) Engagement Rate Badge
+        phoneScreenCtx.fillStyle = 'rgba(48, 71, 116, 0.45)';
+        phoneScreenCtx.beginPath();
+        phoneScreenCtx.roundRect(184, btnY, 74, 28, 14);
+        phoneScreenCtx.fill();
+        phoneScreenCtx.fillStyle = '#9ec5de';
+        phoneScreenCtx.font = 'bold 9.5px sans-serif';
+        phoneScreenCtx.fillText('● +18.4%', 196, btnY + 18);
+
+        // Post Caption Lines (from real video subjects)
+        phoneScreenCtx.fillStyle = '#f1f5f9';
+        phoneScreenCtx.font = 'bold 10.5px sans-serif';
+        phoneScreenCtx.fillText(post.captionLine1, 24, cardY + 306);
+
+        phoneScreenCtx.fillStyle = '#9ec5de';
+        phoneScreenCtx.font = '10px sans-serif';
+        phoneScreenCtx.fillText(post.captionLine2, 24, cardY + 322);
+
+        // Engagement Progress / Reach Bar at bottom of card
+        phoneScreenCtx.fillStyle = 'rgba(217, 235, 244, 0.1)';
+        phoneScreenCtx.beginPath();
+        phoneScreenCtx.roundRect(24, cardY + 338, W - 48, 6, 3);
+        phoneScreenCtx.fill();
+
+        const reachFill = likedActive ? 0.82 : 0.64;
+        phoneScreenCtx.fillStyle = likedActive ? '#f29f8b' : '#38bdf8';
+        phoneScreenCtx.beginPath();
+        phoneScreenCtx.roundRect(24, cardY + 338, (W - 48) * reachFill, 6, 3);
+        phoneScreenCtx.fill();
+      }
+
+      phoneScreenCtx.restore();
+
+      // Sticky Top Navigation Bar
+      phoneScreenCtx.fillStyle = 'rgba(13, 24, 36, 0.92)';
+      phoneScreenCtx.fillRect(0, 0, W, 56);
+      phoneScreenCtx.fillStyle = '#ffffff';
+      phoneScreenCtx.font = 'bold 12px sans-serif';
+      phoneScreenCtx.fillText('CAMPAIGN FEED', 22, 42);
+      phoneScreenCtx.fillStyle = '#f29f8b';
+      phoneScreenCtx.font = 'bold 10px sans-serif';
+      phoneScreenCtx.fillText('● LIVE ENGAGEMENT', W - 122, 42);
+
+      // Sticky Bottom App Tab Bar & Home Indicator
+      phoneScreenCtx.fillStyle = 'rgba(13, 24, 36, 0.94)';
+      phoneScreenCtx.fillRect(0, H - 44, W, 44);
+      phoneScreenCtx.fillStyle = 'rgba(255, 255, 255, 0.55)';
+      phoneScreenCtx.beginPath();
+      phoneScreenCtx.roundRect(95, H - 14, 90, 5, 2.5);
+      phoneScreenCtx.fill();
+
+      phoneScreenTexture.needsUpdate = true;
+    };
+
+    // Render initial social feed frame
+    updatePhoneScreenCanvas(0);
+
+    const phoneScreenMesh = new THREE.Mesh(
+      new THREE.PlaneGeometry(0.422, 0.892),
+      phoneScreenMat
+    );
+    phoneScreenMesh.position.set(0, 0, 0.036);
+    phoneAssembly.add(phoneScreenMesh);
+
+    // 5. Dynamic Island Pill Cutout at Top of Display
+    const dynamicIsland = new THREE.Mesh(
+      new RoundedBoxGeometry(0.125, 0.032, 0.006, 3, 0.015),
+      anodizedBlackMat
+    );
+    dynamicIsland.position.set(0, 0.405, 0.038);
+    phoneAssembly.add(dynamicIsland);
+
+    // 6. Side Tactile Buttons (Action Button, Volume Up/Down, Power Button)
+    const powerButton = new THREE.Mesh(
+      new RoundedBoxGeometry(0.012, 0.11, 0.018, 2, 0.004),
+      machinedSilverMat
+    );
+    powerButton.position.set(0.244, 0.14, 0);
+    phoneAssembly.add(powerButton);
+
+    for (let b = 0; b < 2; b++) {
+      const volButton = new THREE.Mesh(
+        new RoundedBoxGeometry(0.012, 0.075, 0.018, 2, 0.004),
+        machinedSilverMat
+      );
+      volButton.position.set(-0.244, 0.18 - b * 0.1, 0);
+      phoneAssembly.add(volButton);
+    }
+
+    // 7. Rear Pro Triple-Camera Plateau & Lenses (visible when phone rotates along orbit)
+    const rearCameraIsland = new THREE.Mesh(
+      new RoundedBoxGeometry(0.21, 0.22, 0.018, 4, 0.03),
+      fx6BodyMat
+    );
+    rearCameraIsland.position.set(-0.095, 0.31, -0.036);
+    phoneAssembly.add(rearCameraIsland);
+
+    const lensOffsets: [number, number][] = [
+      [-0.048, 0.052],
+      [-0.048, -0.052],
+      [0.048, 0.0],
+    ];
+    lensOffsets.forEach(([lx, ly]) => {
+      const lensRing = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.038, 0.038, 0.016, 24),
+        machinedSilverMat
+      );
+      lensRing.rotation.x = Math.PI / 2;
+      lensRing.position.set(-0.095 + lx, 0.31 + ly, -0.046);
+      phoneAssembly.add(lensRing);
+
+      const lensGlass = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.028, 0.028, 0.018, 24),
+        anodizedBlackMat
+      );
+      lensGlass.rotation.x = Math.PI / 2;
+      lensGlass.position.set(-0.095 + lx, 0.31 + ly, -0.048);
+      phoneAssembly.add(lensGlass);
+    });
+
+    commsStationGroup.add(phoneAssembly);
+
+    // ============================================================================
+    // UNCLUTTERED 3D LIKES (THUMBS-UP & HEARTS) + SHARES PARTICLES WITH EASES
+    // ============================================================================
+    // 1. Sculpted 3D Thumbs-Up ("Like") Silhouette
+    const thumbShape = new THREE.Shape();
+    thumbShape.moveTo(-0.035, -0.085);
+    thumbShape.lineTo(0.068, -0.085);
+    thumbShape.quadraticCurveTo(0.098, -0.085, 0.098, -0.055);
+    thumbShape.lineTo(0.098, 0.012);
+    thumbShape.quadraticCurveTo(0.098, 0.035, 0.072, 0.035);
+    thumbShape.lineTo(0.022, 0.035);
+    thumbShape.quadraticCurveTo(0.036, 0.095, 0.018, 0.118);
+    thumbShape.quadraticCurveTo(-0.008, 0.132, -0.022, 0.095);
+    thumbShape.lineTo(-0.045, 0.025);
+    thumbShape.lineTo(-0.045, -0.075);
+    thumbShape.quadraticCurveTo(-0.045, -0.085, -0.035, -0.085);
+
+    const thumbExtrudeGeo = new THREE.ExtrudeGeometry(thumbShape, {
+      depth: 0.028,
+      bevelEnabled: true,
+      bevelThickness: 0.01,
+      bevelSize: 0.009,
+      bevelSegments: 4,
+      curveSegments: 20,
+    });
+    thumbExtrudeGeo.center();
+
+    const thumbCuffGeo = new RoundedBoxGeometry(0.042, 0.115, 0.044, 3, 0.008);
+
+    // 2. Sculpted 3D Heart ("Love / Like")
+    const heartShape = new THREE.Shape();
+    heartShape.moveTo(0, -0.085);
+    heartShape.bezierCurveTo(0, -0.085, -0.105, -0.008, -0.105, 0.052);
+    heartShape.bezierCurveTo(-0.105, 0.1, -0.052, 0.125, 0, 0.07);
+    heartShape.bezierCurveTo(0.052, 0.125, 0.105, 0.1, 0.105, 0.052);
+    heartShape.bezierCurveTo(0.105, -0.008, 0, -0.085, 0, -0.085);
+
+    const heartExtrudeGeo = new THREE.ExtrudeGeometry(heartShape, {
+      depth: 0.028,
+      bevelEnabled: true,
+      bevelThickness: 0.011,
+      bevelSize: 0.009,
+      bevelSegments: 4,
+      curveSegments: 24,
+    });
+    heartExtrudeGeo.center();
+
+    // 3. Sculpted 3D Share Arrow ("Share")
+    const shareArrowShape = new THREE.Shape();
+    shareArrowShape.moveTo(-0.105, -0.05);
+    shareArrowShape.quadraticCurveTo(-0.055, 0.042, 0.018, 0.046);
+    shareArrowShape.lineTo(0.018, 0.098);
+    shareArrowShape.lineTo(0.118, 0.014);
+    shareArrowShape.lineTo(0.018, -0.07);
+    shareArrowShape.lineTo(0.018, -0.018);
+    shareArrowShape.quadraticCurveTo(-0.042, -0.018, -0.105, -0.05);
+
+    const shareArrowGeo = new THREE.ExtrudeGeometry(shareArrowShape, {
+      depth: 0.026,
+      bevelEnabled: true,
+      bevelThickness: 0.009,
+      bevelSize: 0.008,
+      bevelSegments: 3,
+      curveSegments: 20,
+    });
+    shareArrowGeo.center();
+
+    interface SocialFloatingIcon {
+      group: THREE.Group;
+      materials: THREE.MeshPhysicalMaterial[];
+      phaseOffset: number;
+      speed: number;
+      startX: number;
+      startY: number;
+      startZ: number;
+      driftX: number;
+      driftZ: number;
+      swayAmp: number;
+      swayFreq: number;
+      spinSpeed: number;
+      peakScale: number;
+    }
+
+    // Only 4 well-spaced icons (2 Thumbs-Up Likes, 1 Coral Heart Like, 1 Share Arrow)
+    // with zero bulky background discs so the silhouette stays crisp and uncluttered
+    const socialFloatingIcons: SocialFloatingIcon[] = [];
+    const iconConfigs = [
+      { kind: 'thumb', startX: -0.07, startY: -0.06, startZ: 0.09, driftX: -0.14, driftZ: 0.2, speed: 0.31, peakScale: 0.92 },
+      { kind: 'heart', startX: 0.06, startY: -0.04, startZ: 0.1, driftX: 0.14, driftZ: 0.22, speed: 0.31, peakScale: 0.88 },
+      { kind: 'share', startX: -0.02, startY: -0.02, startZ: 0.1, driftX: 0.1, driftZ: 0.24, speed: 0.31, peakScale: 0.88 },
+      { kind: 'thumb', startX: 0.05, startY: -0.05, startZ: 0.09, driftX: -0.11, driftZ: 0.21, speed: 0.31, peakScale: 0.86 },
+    ];
+
+    iconConfigs.forEach((cfg, idx) => {
+      const iconGroup = new THREE.Group();
+      const mats: THREE.MeshPhysicalMaterial[] = [];
+
+      const mainIconMat = new THREE.MeshPhysicalMaterial({
+        color: new THREE.Color(
+          cfg.kind === 'heart' ? '#f29f8b' : cfg.kind === 'thumb' ? '#38bdf8' : '#d9ebf4'
+        ),
+        emissive: new THREE.Color(
+          cfg.kind === 'heart' ? '#f29f8b' : cfg.kind === 'thumb' ? '#304774' : '#38bdf8'
+        ),
+        emissiveIntensity: 0.26,
+        metalness: cfg.kind === 'heart' ? 0.32 : 0.68,
+        roughness: 0.18,
+        clearcoat: 0.9,
+        transparent: true,
+        opacity: 1,
+        envMap: studioEnv,
+        envMapIntensity: 1.2,
+      });
+      mats.push(mainIconMat);
+
+      if (cfg.kind === 'thumb') {
+        const handMesh = new THREE.Mesh(thumbExtrudeGeo, mainIconMat);
+        handMesh.position.set(0.02, 0.01, 0);
+        iconGroup.add(handMesh);
+
+        const cuffMat = new THREE.MeshPhysicalMaterial({
+          color: new THREE.Color('#172a3b'),
+          metalness: 0.75,
+          roughness: 0.22,
+          clearcoat: 0.8,
+          transparent: true,
+          opacity: 1,
+          envMap: studioEnv,
+          envMapIntensity: 1.1,
+        });
+        const cuffMesh = new THREE.Mesh(thumbCuffGeo, cuffMat);
+        cuffMesh.position.set(-0.072, -0.032, 0);
+        iconGroup.add(cuffMesh);
+        mats.push(cuffMat);
+      } else {
+        const iconGeo = cfg.kind === 'heart' ? heartExtrudeGeo : shareArrowGeo;
+        const iconMesh = new THREE.Mesh(iconGeo, mainIconMat);
+        iconGroup.add(iconMesh);
+      }
+
+      commsStationGroup.add(iconGroup);
+      socialFloatingIcons.push({
+        group: iconGroup,
+        materials: mats,
+        phaseOffset: idx / iconConfigs.length,
+        speed: cfg.speed,
+        startX: cfg.startX,
+        startY: cfg.startY,
+        startZ: cfg.startZ,
+        driftX: cfg.driftX,
+        driftZ: cfg.driftZ,
+        swayAmp: 0.032,
+        swayFreq: 3.6,
+        spinSpeed: (idx % 2 === 0 ? 1 : -1) * 0.35,
+        peakScale: cfg.peakScale,
+      });
+    });
+
     objectsGroup.add(commsStationGroup);
 
     // ============================================================================
@@ -2027,13 +2504,38 @@ export default function StudioMotionRig3D({ settings }: Props) {
       knotMesh.rotation.y = t * 0.55;
       haloRing.rotation.z = -t * 0.45;
 
-      // Sub-element animations
-      signalWaveRings.forEach((ring, idx) => {
-        const pulse = (t * 0.65 + idx * 0.33) % 1;
-        ring.position.z = 0.36 + pulse * 0.36;
-        ring.scale.setScalar(0.65 + pulse * 0.6);
+      // Sub-element animations: Live-scrolling smartphone feed + eased Likes & Shares rising and fading
+      updatePhoneScreenCanvas(t);
+      phoneAssembly.rotation.z = -0.06 + Math.sin(t * 1.1) * 0.025;
+      socialFloatingIcons.forEach((item) => {
+        const life = (t * item.speed + item.phaseOffset) % 1;
+        // Natural ease-out upward trajectory (fast initial launch out of screen, decelerating gently as it fades)
+        const easedRise = 1 - Math.pow(1 - life, 2.2);
+        const riseY = item.startY + easedRise * 0.86;
+        const swayX = Math.sin(easedRise * item.swayFreq + item.phaseOffset * 6.28) * item.swayAmp;
+        item.group.position.set(
+          item.startX + item.driftX * easedRise + swayX,
+          riseY,
+          item.startZ + item.driftZ * Math.sin(easedRise * Math.PI * 0.85)
+        );
+
+        // Smooth eased pop-in at birth (0 -> 0.16), hold, then gentle shrink at fade-out (0.72 -> 1.0)
+        const popIn = THREE.MathUtils.smoothstep(life, 0.0, 0.16);
+        const shrinkOut = 1.0 - 0.32 * THREE.MathUtils.smoothstep(life, 0.72, 1.0);
+        item.group.scale.setScalar(Math.max(0.001, item.peakScale * popIn * shrinkOut));
+
+        // Gentle 3D tilt & yaw as the icon floats upward
+        item.group.rotation.y = Math.sin(t * 1.3 + item.phaseOffset * 6.28) * 0.26 + easedRise * item.spinSpeed;
+        item.group.rotation.z = Math.cos(t * 1.5 + item.phaseOffset * 6.28) * 0.11;
+
+        // Smooth fade-in from the screen and fade-out into the air above
+        const fadeIn = THREE.MathUtils.smoothstep(life, 0.0, 0.14);
+        const fadeOut = 1.0 - THREE.MathUtils.smoothstep(life, 0.56, 0.98);
+        const alpha = fadeIn * fadeOut;
+        item.materials.forEach((mat) => {
+          mat.opacity = alpha;
+        });
       });
-      strategyNodesGroup.rotation.y = t * 0.35;
 
       eqRingGroup.rotation.y = t * 0.45;
       eqBars.forEach((bar, bIdx) => {
@@ -2128,6 +2630,7 @@ export default function StudioMotionRig3D({ settings }: Props) {
       window.removeEventListener('resize', onResize);
       ctx.revert();
       fx6MonitorTexture.dispose();
+      phoneScreenTexture.dispose();
       magnifierRenderTarget.dispose();
       studioEnv.dispose();
       renderer.dispose();
