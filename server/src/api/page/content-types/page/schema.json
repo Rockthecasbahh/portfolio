@@ -4,8 +4,8 @@
   "info": {
     "singularName": "page",
     "pluralName": "pages",
-    "displayName": "Page",
-    "description": "Custom dynamic-zone pages rendered at /[slug]"
+    "displayName": "Custom Pages",
+    "description": "Standalone custom pages rendered at /[slug]"
   },
   "options": {
     "draftAndPublish": true

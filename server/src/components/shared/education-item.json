@@ -1,8 +1,8 @@
 {
   "collectionName": "components_shared_education_items",
   "info": {
-    "displayName": "Education Item",
-    "description": "Degree, university/school, and academic years"
+    "displayName": "University Degree / Education",
+    "description": "Academic degree, institution name, and graduation years"
   },
   "options": {},
   "attributes": {

@@ -1,8 +1,8 @@
 {
   "collectionName": "components_blocks_education_skills_strata",
   "info": {
-    "displayName": "Education & Skills Stratum",
-    "description": "4-cell UN impact telemetry row + two-column Education and Software Meters stratum"
+    "displayName": "06 · Metrics, Education & Skills",
+    "description": "Impact KPI telemetry cards paired with university degrees and grouped capabilities"
   },
   "options": {},
   "attributes": {

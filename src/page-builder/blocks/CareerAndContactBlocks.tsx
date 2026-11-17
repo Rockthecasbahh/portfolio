@@ -26,7 +26,7 @@ const linkFields = {
 
 export function createCareerAndContactBlocks(strapiImageUrl = 'http://localhost:1337') {
   const ExperienceCascade: ComponentConfig<any> = {
-    label: 'Work Experience Cascade',
+    label: '05 · Career Timeline (Roles & UN Missions)',
     fields: {
       sectionId: { type: 'text', label: 'Section Anchor ID' },
       heading: { type: 'text', label: 'Heading' },
@@ -177,7 +177,7 @@ export function createCareerAndContactBlocks(strapiImageUrl = 'http://localhost:
 
   // Faithful port of the existing DossierContact.astro block (design intentionally unchanged).
   const DossierContact: ComponentConfig<any> = {
-    label: 'Dossier & Contact',
+    label: '07 · Publications, CVs & Contact',
     fields: {
       sectionId: { type: 'text', label: 'Section Anchor ID' },
       heading: { type: 'text', label: 'Heading' },

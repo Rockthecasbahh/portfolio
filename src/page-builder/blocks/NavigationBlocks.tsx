@@ -7,7 +7,7 @@ const isTrue = (v: any) => v === true || v === 'true';
 
 export function createNavigationBlocks() {
   const HeaderNavigation: ComponentConfig<any> = {
-    label: 'Main Navigation Header',
+    label: 'Global · Site Navigation Bar',
     fields: {
       monogram: { type: 'text', label: 'Brand Monogram (e.g. MC)' },
       fullName: { type: 'text', label: 'Full Name' },
@@ -184,7 +184,7 @@ export function createNavigationBlocks() {
   };
 
   const FooterBlock: ComponentConfig<any> = {
-    label: 'Global Footer & Copyright',
+    label: 'Global · Site Footer',
     fields: {
       copyrightName: { type: 'text', label: 'Copyright Statement' },
       links: {

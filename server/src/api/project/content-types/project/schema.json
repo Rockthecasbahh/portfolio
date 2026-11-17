@@ -4,8 +4,8 @@
   "info": {
     "singularName": "project",
     "pluralName": "projects",
-    "displayName": "Project",
-    "description": "Portfolio Projects & Work Samples (Un-Portfolio Chapters 01-05)"
+    "displayName": "Case Studies & Projects",
+    "description": "Portfolio case studies & work samples organized across Chapters 01–05"
   },
   "options": {
     "draftAndPublish": true

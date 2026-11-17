@@ -1,8 +1,8 @@
 {
   "collectionName": "components_blocks_portfolio_chapters",
   "info": {
-    "displayName": "Portfolio Chapters",
-    "description": "Curated Un-Portfolio Chapters 01-05 with dual-track audience filter"
+    "displayName": "04 · Case Studies Archive",
+    "description": "Filterable portfolio grid organized across Chapters 01–05"
   },
   "options": {},
   "attributes": {

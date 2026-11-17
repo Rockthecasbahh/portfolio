@@ -1,8 +1,8 @@
 {
   "collectionName": "components_blocks_dossier_contacts",
   "info": {
-    "displayName": "Dossier & Contact",
-    "description": "Downloadable PDF CVs, Un-Portfolio Book, and Direct Contact stratum"
+    "displayName": "07 · Publications, CVs & Contact",
+    "description": "Downloadable CVs, portfolio PDFs, location availability badge, and direct contact CTA"
   },
   "options": {},
   "attributes": {

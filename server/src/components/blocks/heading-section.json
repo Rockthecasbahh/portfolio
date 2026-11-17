@@ -1,8 +1,8 @@
 {
   "collectionName": "components_blocks_heading_sections",
   "info": {
-    "displayName": "Heading Section",
-    "description": "Reusable section heading block"
+    "displayName": "Utility · Section Heading",
+    "description": "Standalone section title, subtitle, and anchor link separator"
   },
   "options": {},
   "attributes": {

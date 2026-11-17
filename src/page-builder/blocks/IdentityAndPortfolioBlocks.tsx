@@ -21,7 +21,7 @@ import {
 
 export function createIdentityAndPortfolioBlocks(strapiImageUrl = 'http://localhost:1337') {
   const HeroStratum: ComponentConfig<any> = {
-    label: 'Hero Stratum (CV Portrait & 3D Badge)',
+    label: '01 · Hero Banner (Portrait & 3D Badge)',
     fields: {
       taglineBadge: { type: 'text', label: 'Tagline Pill Badge' },
       fullName: { type: 'text', label: 'Full Name (supports {{title}})' },
@@ -208,7 +208,7 @@ export function createIdentityAndPortfolioBlocks(strapiImageUrl = 'http://localh
   };
 
   const LogoWall: ComponentConfig<any> = {
-    label: 'Partner & UN Agency Logo Wall',
+    label: '02 · Client & Partner Logos',
     fields: {
       ariaLabel: { type: 'text', label: 'Accessibility Label' },
       logos: {
@@ -269,7 +269,7 @@ export function createIdentityAndPortfolioBlocks(strapiImageUrl = 'http://localh
   };
 
   const EducationSkillsStratum: ComponentConfig<any> = {
-    label: 'Education, Metrics & 3D Pipeline Skills',
+    label: '06 · Metrics, Education & Skills',
     fields: {
       sectionId: { type: 'text', label: 'Section Anchor ID' },
       metrics: {
@@ -304,18 +304,11 @@ export function createIdentityAndPortfolioBlocks(strapiImageUrl = 'http://localh
       skillsHeading: { type: 'text', label: 'Skills Column Heading' },
       softwareMeters: {
         type: 'array',
-        label: 'Software & 3D Pipeline Meters',
-        getItemSummary: (item: any) => item?.name || 'Software',
+        label: 'Capability & Tool Groups',
+        getItemSummary: (item: any) => item?.name || 'Capability Tier',
         arrayFields: {
-          name: { type: 'text', label: 'Software / Pipeline Name' },
-          subtitle: { type: 'text', label: 'Capabilities Subtitle' },
-          segmentsFilled: {
-            type: 'slider',
-            label: 'Proficiency Score (out of 8)',
-            min: 1,
-            max: 8,
-            step: 1,
-          },
+          name: { type: 'text', label: 'Competency Tier (e.g., Primary Craft)' },
+          subtitle: { type: 'text', label: 'Grouped Capabilities / Tools (comma-separated)' },
         },
       },
     },
@@ -497,7 +490,7 @@ export function createIdentityAndPortfolioBlocks(strapiImageUrl = 'http://localh
   };
 
   const HorizontalShowreelBlock: ComponentConfig<any> = {
-    label: '3D & Motion Horizontal Showreel (GSAP)',
+    label: '03 · Video Showreel (GSAP Cinema)',
     fields: {
       sectionId: { type: 'text', label: 'Section Anchor ID' },
       eyebrow: { type: 'text', label: 'Eyebrow Label' },
@@ -567,7 +560,7 @@ export function createIdentityAndPortfolioBlocks(strapiImageUrl = 'http://localh
   };
 
   const PortfolioChaptersBlock: ComponentConfig<any> = {
-    label: 'Un-Portfolio Chapters Archive (01 - 05)',
+    label: '04 · Case Studies Archive (Chapters 01–05)',
     fields: {
       sectionId: { type: 'text', label: 'Section Anchor ID' },
       eyebrow: { type: 'text', label: 'Eyebrow Label' },
@@ -657,7 +650,7 @@ export function createIdentityAndPortfolioBlocks(strapiImageUrl = 'http://localh
   };
 
   const SingleProjectSpotlight: ComponentConfig<any> = {
-    label: 'Single Strapi Project Spotlight',
+    label: 'Case Study Spotlight Card (Single Project)',
     fields: {
       eyebrow: { type: 'text', label: 'Spotlight Badge' },
       stratumTheme: {

@@ -1,8 +1,8 @@
 {
   "collectionName": "components_blocks_experience_cascades",
   "info": {
-    "displayName": "Experience Cascade",
-    "description": "Alternating CV topographic wave strata for career timeline & UN missions"
+    "displayName": "05 · Career Timeline",
+    "description": "Alternating career history cards displaying roles and UN field missions"
   },
   "options": {},
   "attributes": {

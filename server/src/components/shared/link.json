@@ -1,8 +1,8 @@
 {
   "collectionName": "components_shared_links",
   "info": {
-    "displayName": "Link",
-    "description": "Reusable link or CTA button"
+    "displayName": "Navigation Link / Button",
+    "description": "Reusable URL link or styled Call-To-Action button"
   },
   "options": {},
   "attributes": {

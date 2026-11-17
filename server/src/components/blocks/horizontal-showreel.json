@@ -1,8 +1,8 @@
 {
   "collectionName": "components_blocks_horizontal_showreels",
   "info": {
-    "displayName": "Horizontal Showreel",
-    "description": "GSAP ScrollTrigger horizontal 3D & documentary cinema showreel"
+    "displayName": "03 · Video Showreel",
+    "description": "Horizontal scrolling cinema reel featuring flagship film and 3D motion projects"
   },
   "options": {},
   "attributes": {

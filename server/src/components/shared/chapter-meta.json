@@ -1,8 +1,8 @@
 {
   "collectionName": "components_shared_chapter_metas",
   "info": {
-    "displayName": "Chapter Meta",
-    "description": "Un-Portfolio chapter index definition (01-05)"
+    "displayName": "Portfolio Chapter Label",
+    "description": "Numbered chapter header & subtitle (Chapters 01–05)"
   },
   "options": {},
   "attributes": {

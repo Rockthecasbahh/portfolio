@@ -1,8 +1,8 @@
 {
   "collectionName": "components_blocks_hero_strata",
   "info": {
-    "displayName": "Hero Stratum",
-    "description": "CV-styled stepped topographic hero with portrait halo and 3D artifact badge"
+    "displayName": "01 · Hero Banner",
+    "description": "Main top section with portrait photo, headline, bio, primary CTAs, and 3D scene badge"
   },
   "options": {},
   "attributes": {

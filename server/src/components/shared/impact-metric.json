@@ -1,8 +1,8 @@
 {
   "collectionName": "components_shared_impact_metrics",
   "info": {
-    "displayName": "Impact Metric",
-    "description": "Verified UN or production impact telemetry card"
+    "displayName": "Key Impact KPI",
+    "description": "Highlighted quantitative impact figure, label, and organization"
   },
   "options": {},
   "attributes": {

@@ -4,8 +4,8 @@
   "info": {
     "singularName": "global",
     "pluralName": "globals",
-    "displayName": "Global",
-    "description": "Global header, footer, SEO, and 3D Topographic Rig configuration"
+    "displayName": "Site Header, Footer & 3D Rig",
+    "description": "Global site navigation, footer links, default SEO, and 3D Topographic Rig settings"
   },
   "options": {
     "draftAndPublish": true

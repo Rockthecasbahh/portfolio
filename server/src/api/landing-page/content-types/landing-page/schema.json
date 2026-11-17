@@ -4,8 +4,8 @@
   "info": {
     "singularName": "landing-page",
     "pluralName": "landing-pages",
-    "displayName": "Landing Page",
-    "description": "Main portfolio landing page composed of modular Dynamic Zone blocks"
+    "displayName": "Homepage (Main Portfolio)",
+    "description": "Main portfolio homepage composed of modular visual section blocks"
   },
   "options": {
     "draftAndPublish": true

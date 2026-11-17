@@ -49,32 +49,28 @@ export function createPageBuilderConfig({
 
   return {
     categories: {
-      navigation: {
-        title: 'Header & Navigation',
-        components: ['HeaderNavigation', 'FooterBlock'],
+      heroAndLogos: {
+        title: '1. Hero & Partner Logos',
+        components: ['HeroStratum', 'LogoWall'],
         defaultExpanded: true,
       },
-      identity: {
-        title: 'Identity & Hero',
-        components: ['HeroStratum', 'LogoWall', 'EducationSkillsStratum'],
-        defaultExpanded: true,
-      },
-      portfolio: {
-        title: 'Portfolio (Strapi Projects)',
+      showreelAndCases: {
+        title: '2. Showreel & Case Studies',
         components: ['HorizontalShowreel', 'PortfolioChapters', 'SingleProjectSpotlight'],
         defaultExpanded: true,
       },
-      career: {
-        title: 'Career & Contact',
-        components: ['ExperienceCascade', 'DossierContact'],
+      capabilitiesAndCareer: {
+        title: '3. Capabilities, Experience & Skills',
+        components: ['CardsGrid', 'ExperienceCascade', 'EducationSkillsStratum'],
+        defaultExpanded: true,
       },
-      content: {
-        title: 'Content',
-        components: ['SectionHeading', 'CardsGrid', 'ContentWithImage', 'MarkdownBlock'],
+      publicationsAndNav: {
+        title: '4. Publications, Contact & Navigation',
+        components: ['DossierContact', 'HeaderNavigation', 'FooterBlock'],
       },
-      layout: {
-        title: 'Layout',
-        components: ['TopoColumns', 'Spacer'],
+      customAndLayout: {
+        title: '5. Custom Text & Layout Blocks',
+        components: ['SectionHeading', 'ContentWithImage', 'MarkdownBlock', 'TopoColumns', 'Spacer'],
       },
     },
     components: {

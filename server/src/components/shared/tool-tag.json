@@ -1,8 +1,8 @@
 {
   "collectionName": "components_shared_tool_tags",
   "info": {
-    "displayName": "Tool Tag",
-    "description": "Software or production tool tag on a project"
+    "displayName": "Production Tool / Medium Tag",
+    "description": "Single software or medium badge shown on case studies (e.g., Blender 3D, Drupal 10)"
   },
   "options": {},
   "attributes": {

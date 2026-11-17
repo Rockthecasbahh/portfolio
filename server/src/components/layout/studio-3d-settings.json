@@ -1,8 +1,8 @@
 {
   "collectionName": "components_layout_studio_3d_settings",
   "info": {
-    "displayName": "Studio 3D Settings",
-    "description": "Three.js Topographic Strata, Cinema Camera & Video Light Rig settings"
+    "displayName": "3D Topographic Scene Rig",
+    "description": "Interactive Three.js background terrain, Spline fallback URL, and lighting settings"
   },
   "options": {},
   "attributes": {

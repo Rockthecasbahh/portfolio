@@ -1,8 +1,8 @@
 {
   "collectionName": "components_shared_partner_logos",
   "info": {
-    "displayName": "Partner Logo",
-    "description": "UN Agency or Broadcast Partner Logo"
+    "displayName": "Client / Agency Logo",
+    "description": "Single partner or UN agency logo with dark-mode option"
   },
   "options": {},
   "attributes": {

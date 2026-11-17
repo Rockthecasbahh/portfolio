@@ -1,8 +1,8 @@
 {
   "collectionName": "components_blocks_card_grids",
   "info": {
-    "displayName": "Card Grid",
-    "description": "Reusable grid of feature cards in CV topographic style"
+    "displayName": "08 · Capabilities & Feature Cards",
+    "description": "Reusable multi-column card grid for Services, Capabilities, or feature highlights"
   },
   "options": {},
   "attributes": {

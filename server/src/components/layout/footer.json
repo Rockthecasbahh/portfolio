@@ -1,8 +1,8 @@
 {
   "collectionName": "components_layout_footers",
   "info": {
-    "displayName": "Footer",
-    "description": "Global site footer"
+    "displayName": "Site Footer",
+    "description": "Global bottom footer with copyright notice and utility links"
   },
   "options": {},
   "attributes": {

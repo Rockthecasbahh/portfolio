@@ -1,8 +1,8 @@
 {
   "collectionName": "components_shared_highlight_bullets",
   "info": {
-    "displayName": "Highlight Bullet",
-    "description": "Individual bullet point in a career experience card"
+    "displayName": "Career Achievement Bullet",
+    "description": "Single accomplishment bullet point inside a Career Experience entry"
   },
   "options": {},
   "attributes": {

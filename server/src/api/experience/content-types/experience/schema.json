@@ -4,8 +4,8 @@
   "info": {
     "singularName": "experience",
     "pluralName": "experiences",
-    "displayName": "Experience",
-    "description": "Career Timeline & United Nations Missions"
+    "displayName": "Career Experience",
+    "description": "Career timeline, United Nations roles & field missions"
   },
   "options": {
     "draftAndPublish": true

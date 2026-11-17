@@ -1,8 +1,8 @@
 {
   "collectionName": "components_shared_software_meters",
   "info": {
-    "displayName": "Software Meter",
-    "description": "Production tool & proficiency meter (1-8 segments)"
+    "displayName": "Capability & Tool Group",
+    "description": "Grouped competency tier and toolkit list (e.g., Primary Craft, Technical & Web)"
   },
   "options": {},
   "attributes": {

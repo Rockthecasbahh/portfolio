@@ -1,8 +1,8 @@
 {
   "collectionName": "components_blocks_content_with_images",
   "info": {
-    "displayName": "Content With Image",
-    "description": "Two-column editorial text and image stratum"
+    "displayName": "Utility · Split Text & Image",
+    "description": "Two-column editorial text block paired with a media image and optional CTA"
   },
   "options": {},
   "attributes": {

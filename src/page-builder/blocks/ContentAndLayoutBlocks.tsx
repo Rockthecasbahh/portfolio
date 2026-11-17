@@ -23,7 +23,7 @@ const stratumClass = (theme?: string) =>
 
 export function createContentAndLayoutBlocks(strapiImageUrl = 'http://localhost:1337') {
   const SectionHeading: ComponentConfig<any> = {
-    label: 'Section Heading',
+    label: 'Utility · Section Heading',
     fields: {
       anchorLink: { type: 'text', label: 'Anchor ID (optional)' },
       subHeading: { type: 'text', label: 'Eyebrow / Sub-Heading' },
@@ -50,7 +50,7 @@ export function createContentAndLayoutBlocks(strapiImageUrl = 'http://localhost:
   };
 
   const CardsGrid: ComponentConfig<any> = {
-    label: 'Cards Grid',
+    label: '08 · Capabilities & Feature Cards',
     fields: {
       sectionId: { type: 'text', label: 'Section Anchor ID (optional)' },
       subHeading: { type: 'text', label: 'Eyebrow' },
@@ -128,7 +128,7 @@ export function createContentAndLayoutBlocks(strapiImageUrl = 'http://localhost:
   };
 
   const ContentWithImage: ComponentConfig<any> = {
-    label: 'Content With Image',
+    label: 'Utility · Split Text & Image',
     fields: {
       subHeading: { type: 'text', label: 'Eyebrow' },
       heading: { type: 'text', label: 'Heading' },
@@ -212,7 +212,7 @@ export function createContentAndLayoutBlocks(strapiImageUrl = 'http://localhost:
   };
 
   const MarkdownBlock: ComponentConfig<any> = {
-    label: 'Markdown Text',
+    label: 'Utility · Rich Text / Markdown',
     fields: {
       heading: { type: 'text', label: 'Heading' },
       content: { type: 'textarea', label: 'Markdown Content' },
@@ -245,7 +245,7 @@ export function createContentAndLayoutBlocks(strapiImageUrl = 'http://localhost:
 
   // Layout: two drop zones inside a topographic stratum (Elementor-style columns).
   const TopoColumns: ComponentConfig<any> = {
-    label: 'Two-Column Stratum (Drop Zones)',
+    label: 'Layout · Two-Column Container',
     fields: {
       ratio: {
         type: 'select',

@@ -1,8 +1,8 @@
 {
   "collectionName": "components_blocks_markdowns",
   "info": {
-    "displayName": "Markdown Block",
-    "description": "Rich text / Markdown block in a CV topographic wave stratum"
+    "displayName": "Utility · Rich Text / Markdown",
+    "description": "Freeform formatted text / Markdown content block"
   },
   "options": {},
   "attributes": {

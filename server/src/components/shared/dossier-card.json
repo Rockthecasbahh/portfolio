@@ -1,8 +1,8 @@
 {
   "collectionName": "components_shared_dossier_cards",
   "info": {
-    "displayName": "Dossier Card",
-    "description": "Downloadable CV or Portfolio PDF card"
+    "displayName": "Downloadable Document / Link Card",
+    "description": "Card linking to a downloadable PDF, CV, showreel, or external portfolio"
   },
   "options": {},
   "attributes": {
