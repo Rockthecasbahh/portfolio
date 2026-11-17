@@ -42,7 +42,9 @@ COPY --from=build /opt/app/scripts ./scripts
 COPY --from=build /opt/app/tsconfig.json ./tsconfig.json
 
 # Default storage directories for persistence
-RUN mkdir -p .tmp public/uploads
+RUN mkdir -p .tmp public/uploads && chown -R node:node /opt/app
+
+USER node
 
 EXPOSE 1337
 

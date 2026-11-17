@@ -9,18 +9,20 @@ services:
     container_name: portfolio-strapi
     restart: unless-stopped
     ports:
-      - "1337:1337"
+      - "${STRAPI_BIND_IP:-192.168.50.146}:1337:1337"
+    security_opt:
+      - no-new-privileges:true
     environment:
       - HOST=0.0.0.0
       - PORT=1337
       - NODE_ENV=production
       - DATABASE_CLIENT=sqlite
       - DATABASE_FILENAME=.tmp/data.db
-      - APP_KEYS=${STRAPI_APP_KEYS:-"f82e3914a1c5d988b01e,e84f2913b2c4e977a12d"}
-      - API_TOKEN_SALT=${STRAPI_API_TOKEN_SALT:-"salt_e71a93bd8c42a0b1"}
-      - ADMIN_JWT_SECRET=${STRAPI_ADMIN_JWT_SECRET:-"admin_jwt_b38c2910f54e61aa"}
-      - TRANSFER_TOKEN_SALT=${STRAPI_TRANSFER_TOKEN_SALT:-"transfer_931bfa8201de5c"}
-      - JWT_SECRET=${STRAPI_JWT_SECRET:-"jwt_5719abde02c48831"}
+      - APP_KEYS=${STRAPI_APP_KEYS:?Set STRAPI_APP_KEYS in .env}
+      - API_TOKEN_SALT=${STRAPI_API_TOKEN_SALT:?Set STRAPI_API_TOKEN_SALT in .env}
+      - ADMIN_JWT_SECRET=${STRAPI_ADMIN_JWT_SECRET:?Set STRAPI_ADMIN_JWT_SECRET in .env}
+      - TRANSFER_TOKEN_SALT=${STRAPI_TRANSFER_TOKEN_SALT:?Set STRAPI_TRANSFER_TOKEN_SALT in .env}
+      - JWT_SECRET=${STRAPI_JWT_SECRET:?Set STRAPI_JWT_SECRET in .env}
       - STRAPI_PAGE_BUILDER_API_KEY=${STRAPI_PAGE_BUILDER_API_KEY:-"b88aa5ad445af0080f9b4adfcb7b19c6"}
       - STRAPI_PAGE_BUILDER_EDITOR_URL=${STRAPI_PAGE_BUILDER_EDITOR_URL:-"https://matteocasling.com/editor"}
     volumes:
@@ -33,6 +35,8 @@ services:
     image: cloudflare/cloudflared:latest
     container_name: portfolio-cloudflared
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     command: tunnel --no-autoupdate run
     environment:
       # Paste your Cloudflare Zero Trust Tunnel Token below:

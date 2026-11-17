@@ -1,3 +1,11 @@
+const isProd = process.env.NODE_ENV === 'production';
+const devFrameOrigins = isProd
+  ? []
+  : ['http://localhost:4321', 'http://127.0.0.1:4321', 'http://localhost:3000'];
+const devAssetOrigins = isProd
+  ? []
+  : ['http://localhost:4321', 'http://127.0.0.1:4321', 'http://localhost:1337'];
+
 export default [
   'strapi::logger',
   'strapi::errors',
@@ -7,14 +15,12 @@ export default [
       contentSecurityPolicy: {
         useDefaults: true,
         directives: {
-          'connect-src': ["'self'", 'https:', 'http:'],
+          'connect-src': isProd ? ["'self'", 'https:'] : ["'self'", 'https:', 'http:'],
           'frame-src': [
             "'self'",
             'https://matteocasling.com',
-            'http://localhost:4321',
-            'http://127.0.0.1:4321',
-            'http://localhost:3000',
             'https://www.youtube.com',
+            ...devFrameOrigins,
           ],
           'img-src': [
             "'self'",
@@ -22,27 +28,37 @@ export default [
             'blob:',
             'market-assets.strapi.io',
             'https://matteocasling.com',
-            'http://localhost:4321',
-            'http://127.0.0.1:4321',
-            'http://localhost:1337',
             'https://cms.matteocasling.com',
+            ...devAssetOrigins,
           ],
           'media-src': [
             "'self'",
             'data:',
             'blob:',
             'https://matteocasling.com',
-            'http://localhost:4321',
-            'http://127.0.0.1:4321',
             'https://cms.matteocasling.com',
+            ...devFrameOrigins,
           ],
           upgradeInsecureRequests: null,
         },
       },
     },
   },
-  'strapi::cors',
-  'strapi::poweredBy',
+  {
+    name: 'strapi::cors',
+    config: {
+      origin: isProd
+        ? ['https://matteocasling.com', 'https://cms.matteocasling.com']
+        : [
+            'https://matteocasling.com',
+            'https://cms.matteocasling.com',
+            'http://localhost:4321',
+            'http://127.0.0.1:4321',
+            'http://localhost:1337',
+            'http://localhost:3000',
+          ],
+    },
+  },
   'strapi::query',
   'strapi::body',
   'strapi::session',
