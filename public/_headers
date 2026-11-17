@@ -1,0 +1,5 @@
+/documents/*
+  X-Robots-Tag: noindex, noarchive
+
+/editor
+  X-Robots-Tag: noindex, nofollow

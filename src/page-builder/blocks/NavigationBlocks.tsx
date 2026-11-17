@@ -88,15 +88,15 @@ export function createNavigationBlocks() {
     },
     defaultProps: {
       monogram: 'MC',
-      fullName: 'Matteo Louis Casling',
+      fullName: 'Matteo Casling',
       homeHref: '/#top',
       navItems: [
-        { label: '01 CINEMA', href: '#showreel', isExternal: 'false' },
-        { label: '02 PORTFOLIO', href: '#work', isExternal: 'false' },
+        { label: '01 SHOWREEL', href: '#showreel', isExternal: 'false' },
+        { label: '02 CASE STUDIES', href: '#work', isExternal: 'false' },
         { label: '03 EXPERIENCE', href: '#experience', isExternal: 'false' },
-        { label: '04 DOSSIERS', href: '#documents', isExternal: 'false' },
+        { label: '04 PUBLICATIONS', href: '#documents', isExternal: 'false' },
       ],
-      showCmsButton: 'true',
+      showCmsButton: 'false',
       cmsCta: {
         label: 'Strapi CMS',
         href: 'https://cms.matteocasling.com/admin',
@@ -105,7 +105,7 @@ export function createNavigationBlocks() {
       showPrimaryCta: 'true',
       primaryCta: {
         label: 'Contact',
-        href: 'mailto:matteocasling@gmail.com',
+        href: '#documents',
         isExternal: 'false',
       },
       isSticky: 'true',
@@ -214,12 +214,11 @@ export function createNavigationBlocks() {
       },
     },
     defaultProps: {
-      copyrightName: '© 2026 Matteo Louis Casling · UN Multimedia Producer & 3D Motion Strategist',
+      copyrightName: '© 2026 Matteo Casling · Senior Multimedia Producer & Communications Strategist',
       links: [
-        { label: 'Direct Email', href: 'mailto:matteocasling@gmail.com', isExternal: 'false' },
+        { label: 'Direct Email', href: 'mailto:matteo@matteocasling.com', isExternal: 'false' },
         { label: 'Topographic CV (PDF)', href: '/documents/Matteo_Casling_CV.pdf', isExternal: 'true' },
         { label: 'Portfolio Book (PDF)', href: '/documents/Matteo_Casling_Portfolio_Book.pdf', isExternal: 'true' },
-        { label: 'Strapi Admin Panel', href: 'https://cms.matteocasling.com/admin', isExternal: 'true' },
       ],
       showBackToTop: 'true',
     },

@@ -10,7 +10,7 @@ const isCobalt = data.stratumTheme === 'cobalt';
 const isIce = data.stratumTheme === 'ice';
 ---
 
-<section class="py-12">
+<section id={data.sectionId || undefined} class="py-12">
   <div class="max-w-[1440px] mx-auto px-4 sm:px-8">
     <div
       class={`cv-wave-slab p-7 sm:p-10 md:p-12 ${

@@ -29,15 +29,15 @@
     },
     "email": {
       "type": "string",
-      "default": "matteocasling@gmail.com"
+      "default": "matteo@matteocasling.com"
     },
     "phone": {
       "type": "string",
-      "default": "+39 327 662 4932"
+      "default": ""
     },
     "location": {
       "type": "string",
-      "default": "New York, NY / Rome, Italy"
+      "default": "New York, NY (EST) · Available Worldwide"
     },
     "linkedinLabel": {
       "type": "string",

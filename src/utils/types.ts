@@ -156,6 +156,7 @@ export interface DossierContactBlock extends BaseBlock {
   sectionId?: string;
   heading?: string;
   description?: string;
+  availabilityText?: string;
   dossierCards: DossierCardItem[];
   contactHeading?: string;
   email?: string;
@@ -178,6 +179,7 @@ export interface HeadingSectionBlock extends BaseBlock {
 
 export interface CardGridBlock extends BaseBlock {
   __component: 'blocks.card-grid';
+  sectionId?: string;
   heading?: string;
   subHeading?: string;
   stratumTheme?: 'ice' | 'cobalt' | 'paper';

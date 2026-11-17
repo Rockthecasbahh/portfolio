@@ -13,6 +13,7 @@ interface Props {
   globalData?: GlobalPageData;
   hideHeader?: boolean;
   hideFooter?: boolean;
+  noindex?: boolean;
 }
 
 const resolvedGlobal = Astro.props.globalData || (await getGlobalPageData());
@@ -21,6 +22,9 @@ const pageDescription = Astro.props.description || resolvedGlobal.description;
 const showContours = resolvedGlobal.studio3d?.showTopographicContours !== false;
 const hideHeader = Astro.props.hideHeader === true;
 const hideFooter = Astro.props.hideFooter === true;
+const isUntitled = /untitled/i.test(pageTitle);
+const shouldNoIndex = Astro.props.noindex === true || isUntitled;
+const canonicalUrl = new URL(Astro.url.pathname, 'https://matteocasling.com').toString();
 ---
 
 <!doctype html>
@@ -30,6 +34,12 @@ const hideFooter = Astro.props.hideFooter === true;
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{pageTitle}</title>
     <meta name="description" content={pageDescription} />
+    <link rel="canonical" href={canonicalUrl} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={pageDescription} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:type" content="website" />
+    {shouldNoIndex && <meta name="robots" content="noindex, nofollow" />}
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   </head>
   <body class="antialiased selection:bg-[#304774] selection:text-white">

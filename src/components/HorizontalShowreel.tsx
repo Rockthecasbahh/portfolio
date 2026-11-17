@@ -3,6 +3,7 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Play, ArrowUpRight, FilmStrip, X } from '@phosphor-icons/react';
 import type { ProjectItem } from '../lib/cms';
+import { useNativeModalDialog } from '../utils/dialog';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -28,6 +29,10 @@ export default function HorizontalShowreel({
   const sectionRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const [activeVideoProject, setActiveVideoProject] = useState<ProjectItem | null>(null);
+  const videoDialogRef = useNativeModalDialog(
+    Boolean(activeVideoProject),
+    () => setActiveVideoProject(null)
+  );
 
   const reelProjects = onlyFeatured ? projects.filter((p) => p.featuredInReel) : projects;
 
@@ -214,27 +219,31 @@ export default function HorizontalShowreel({
         </div>
       </div>
 
-      {activeVideoProject && (
-        <div
-          className="fixed inset-0 z-50 bg-[#172a3b]/85 backdrop-blur-md flex items-center justify-center p-4 md:p-10"
-          role="dialog"
-          aria-modal="true"
-          aria-label={activeVideoProject.title}
-        >
-          <div className="max-w-5xl w-full rounded-[32px] border border-[#d9ebf4] bg-white text-[#172a3b] shadow-2xl overflow-hidden">
+      <dialog
+        ref={videoDialogRef}
+        {...({ closedby: 'any' } as any)}
+        aria-labelledby="showreel-video-dialog-title"
+        onClose={() => setActiveVideoProject(null)}
+        className="m-auto max-w-5xl w-[calc(100%-2rem)] rounded-[32px] border border-[#d9ebf4] bg-white text-[#172a3b] shadow-2xl overflow-hidden p-0"
+      >
+        {activeVideoProject && (
+          <div>
             <div className="px-6 py-4 border-b border-[#d9ebf4] flex items-center justify-between bg-[#d9ebf4]/55">
-              <div className="flex items-center gap-3">
-                <span className="px-3 py-1 rounded-full bg-[#304774] text-white font-mono-tech text-xs font-bold">
+              <div className="flex items-center gap-3 min-w-0">
+                <span className="px-3 py-1 rounded-full bg-[#304774] text-white font-mono-tech text-xs font-bold flex-shrink-0">
                   {activeVideoProject.madeFor} ({activeVideoProject.year})
                 </span>
-                <h4 className="font-display font-bold text-base md:text-lg text-[#172a3b] truncate max-w-xl">
+                <h4
+                  id="showreel-video-dialog-title"
+                  className="font-display font-bold text-base md:text-lg text-[#172a3b] truncate max-w-xl"
+                >
                   {activeVideoProject.title}
                 </h4>
               </div>
               <button
                 type="button"
-                onClick={() => setActiveVideoProject(null)}
-                className="p-1.5 rounded-full text-[#304774] hover:bg-[#304774] hover:text-white transition-colors cursor-pointer"
+                onClick={() => videoDialogRef.current?.close()}
+                className="p-1.5 rounded-full text-[#304774] hover:bg-[#304774] hover:text-white transition-colors cursor-pointer flex-shrink-0"
                 aria-label="Close Video Player"
               >
                 <X size={20} weight="bold" />
@@ -270,8 +279,8 @@ export default function HorizontalShowreel({
               </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </dialog>
     </section>
   );
 }

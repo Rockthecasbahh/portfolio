@@ -10,14 +10,18 @@ import {
   BookOpenText,
   Globe,
   MicrophoneStage,
+  Headphones,
 } from '@phosphor-icons/react';
 import type { ProjectItem } from '../lib/cms';
+import { useNativeModalDialog } from '../utils/dialog';
 
 interface CustomChapterInput {
   chapterNumber: '01' | '02' | '03' | '04' | '05';
   title: string;
   subtitle: string;
 }
+
+type CategoryFilter = 'all' | 'film-motion' | '3d' | 'web-portals' | 'print-audio';
 
 interface Props {
   projects: ProjectItem[];
@@ -80,6 +84,64 @@ const CHAPTERS: ChapterMeta[] = [
   },
 ];
 
+const CATEGORY_FILTERS: Array<{ id: CategoryFilter; label: string }> = [
+  { id: 'all', label: 'All' },
+  { id: 'film-motion', label: 'Film & Motion' },
+  { id: '3d', label: '3D' },
+  { id: 'web-portals', label: 'Web & Portals' },
+  { id: 'print-audio', label: 'Print & Audio' },
+];
+
+function getMediumBadge(category: ProjectItem['category']): string {
+  switch (category) {
+    case 'video':
+      return 'Field Documentary';
+    case 'animation':
+      return '3D & Motion';
+    case 'design':
+      return 'Editorial Print';
+    case 'web':
+      return 'Web & Portals';
+    case 'podcast':
+      return 'Audio Podcast';
+    case 'story':
+      return 'Interactive Story';
+  }
+}
+
+function matchesCategory(project: ProjectItem, filter: CategoryFilter): boolean {
+  if (filter === 'all') return true;
+  switch (filter) {
+    case 'film-motion':
+      return (
+        project.category === 'video' ||
+        project.category === 'animation' ||
+        project.chapterNumber === '01' ||
+        project.chapterNumber === '02'
+      );
+    case '3d':
+      return (
+        project.category === 'animation' ||
+        project.chapterNumber === '02' ||
+        (project.tools || []).some((t) => /3d|blender|unreal/i.test(t))
+      );
+    case 'web-portals':
+      return project.category === 'web' || project.chapterNumber === '04';
+    case 'print-audio':
+      return (
+        project.category === 'design' ||
+        project.category === 'podcast' ||
+        project.category === 'story' ||
+        project.chapterNumber === '03' ||
+        project.chapterNumber === '05'
+      );
+  }
+}
+
+function normalizeText(text: string): string {
+  return text.replace(/\b3d\b/gi, '3D').replace(/\bdelIver\b/g, 'deliver');
+}
+
 function getChapterIcon(number: ChapterMeta['number']) {
   switch (number) {
     case '01':
@@ -101,24 +163,26 @@ export default function PortfolioChapters({
   eyebrow,
   heading,
   subHeading,
-  defaultTrackFilter = 'all',
   customChapters,
 }: Props) {
-  const [activeTrack, setActiveTrack] = useState<'all' | 'un-policy' | 'tech-motion'>(defaultTrackFilter);
+  const [activeCategory, setActiveCategory] = useState<CategoryFilter>('all');
   const [activeVideo, setActiveVideo] = useState<ProjectItem | null>(null);
   const [selectedWebSlug, setSelectedWebSlug] = useState<string | null>(null);
+
+  const videoDialogRef = useNativeModalDialog(Boolean(activeVideo), () => setActiveVideo(null));
 
   const chaptersList: ChapterMeta[] = CHAPTERS.map((base) => {
     const override = customChapters?.find((c) => c.chapterNumber === base.number);
     return override
-      ? { ...base, title: override.title || base.title, subtitle: override.subtitle || base.subtitle }
+      ? {
+          ...base,
+          title: normalizeText(override.title || base.title),
+          subtitle: normalizeText(override.subtitle || base.subtitle),
+        }
       : base;
   });
 
-  const filteredProjects = projects.filter((p) => {
-    if (activeTrack === 'all') return true;
-    return p.track === 'both' || p.track === activeTrack;
-  });
+  const filteredProjects = projects.filter((p) => matchesCategory(p, activeCategory));
 
   return (
     <div id={sectionId} className="relative z-10 py-20">
@@ -139,33 +203,44 @@ export default function PortfolioChapters({
           )}
         </div>
       )}
-      {/* Sticky CV-Styled Filter Bar */}
+
+      {/* Sticky Category Filter Bar (Single Horizontal Row) */}
       <div className="sticky top-[68px] z-30 bg-white/90 backdrop-blur-md border-y border-[#304774]/15 py-3.5 px-6 md:px-12 shadow-sm">
         <div className="max-w-[1440px] mx-auto flex flex-wrap items-center justify-between gap-4">
-          <div className="flex items-center gap-3 flex-wrap">
-            <SlidersHorizontal size={18} className="text-[#304774]" />
-            <span className="font-mono-tech text-xs font-semibold text-[#172a3b]">
-              Work Samples Filter:
+          <div className="flex items-center gap-3 min-w-0 max-w-full">
+            <SlidersHorizontal size={18} className="text-[#304774] flex-shrink-0" />
+            <span className="font-mono-tech text-xs font-semibold text-[#172a3b] flex-shrink-0 hidden sm:inline">
+              Filter by Medium:
             </span>
-            <div className="flex flex-wrap items-center gap-1.5">
-              {[
-                { id: 'all', label: 'All Work Samples' },
-                { id: 'un-policy', label: 'UN & Global Policy' },
-                { id: 'tech-motion', label: '3D, Motion & Web Code' },
-              ].map((tab) => (
-                <button
-                  key={tab.id}
-                  type="button"
-                  onClick={() => setActiveTrack(tab.id as typeof activeTrack)}
-                  className={`px-4 py-1.5 rounded-full font-mono-tech text-xs transition-all cursor-pointer ${
-                    activeTrack === tab.id
-                      ? 'bg-[#304774] text-white font-bold shadow-sm'
-                      : 'bg-[#d9ebf4]/60 text-[#172a3b] hover:bg-[#d9ebf4]'
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
+            <div
+              className="flex items-center gap-2 overflow-x-auto flex-nowrap py-1"
+              role="group"
+              aria-label="Filter case studies by medium"
+            >
+              {CATEGORY_FILTERS.map((tab) => {
+                const isSelected = activeCategory === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    aria-pressed={isSelected}
+                    onClick={(e) => {
+                      setActiveCategory(tab.id);
+                      e.currentTarget.scrollIntoView({
+                        block: 'nearest',
+                        inline: 'nearest',
+                      });
+                    }}
+                    className={`relative flex-none px-4 py-1.5 rounded-full font-mono-tech text-xs transition-colors cursor-pointer ${
+                      isSelected
+                        ? 'bg-[#304774] text-white font-bold shadow-sm after:content-[""] after:absolute after:inset-x-3 after:bottom-0.5 after:border-b-2 after:border-[#f29f8b]'
+                        : 'bg-[#d9ebf4]/60 text-[#172a3b] hover:bg-[#d9ebf4]'
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
@@ -183,7 +258,7 @@ export default function PortfolioChapters({
         </div>
       </div>
 
-      {/* Alternating Stepped Topographic Strata matching Matteo's Styled CV */}
+      {/* Alternating Stepped Topographic Strata */}
       <div className="max-w-[1440px] mx-auto px-4 sm:px-8 space-y-16 mt-12">
         {chaptersList.map((chapter) => {
           const chapterProjects = filteredProjects.filter(
@@ -195,12 +270,11 @@ export default function PortfolioChapters({
           const isIce = chapter.stratumStyle === 'ice';
           const isChapter04 = chapter.number === '04';
 
-          const activeWebSlug =
-            isChapter04
-              ? (selectedWebSlug === 'all' || chapterProjects.some((p) => p.slug === selectedWebSlug))
-                ? selectedWebSlug
-                : chapterProjects[0]?.slug
-              : null;
+          const activeWebSlug = isChapter04
+            ? selectedWebSlug === 'all' || chapterProjects.some((p) => p.slug === selectedWebSlug)
+              ? selectedWebSlug
+              : chapterProjects[0]?.slug
+            : null;
 
           const displayedProjects =
             isChapter04 && activeWebSlug && activeWebSlug !== 'all'
@@ -213,7 +287,6 @@ export default function PortfolioChapters({
               id={`chapter-${chapter.number}`}
               className="relative scroll-mt-32"
             >
-              {/* Stepped Topographic Backing Layer for 3D Depth */}
               <div
                 aria-hidden="true"
                 className={`cv-wave-slab absolute -inset-x-2 -top-3 -bottom-3 pointer-events-none ${
@@ -234,7 +307,6 @@ export default function PortfolioChapters({
                     : 'cv-stratum-paper'
                 }`}
               >
-                {/* CV Work-Samples Style Header with Circular Icon Badge */}
                 <div
                   className={`pb-8 mb-10 border-b ${
                     isCobalt ? 'border-white/20' : 'border-[#304774]/15'
@@ -328,11 +400,12 @@ export default function PortfolioChapters({
                   </div>
                 )}
 
-                {/* Project Cards inside the Topographic Stratum */}
+                {/* Project Cards */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                   {displayedProjects.map((project, index) => {
                     const isFeaturedSpan = displayedProjects.length % 2 === 1 && index === 0;
                     const activeImgSrc = project.thumbnail;
+                    const normalizedTools = (project.tools || []).map((t) => normalizeText(t));
 
                     return (
                       <article
@@ -347,7 +420,7 @@ export default function PortfolioChapters({
                         <div className={isFeaturedSpan ? 'lg:col-span-7' : 'mb-6'}>
                           <div className="relative overflow-hidden rounded-[20px] border border-[#d9ebf4] bg-[#172a3b] group">
                             <img
-                              src={activeImgSrc}
+                              src={activeImgSrc || ''}
                               alt={project.title}
                               loading="lazy"
                               className={`w-full ${
@@ -378,33 +451,95 @@ export default function PortfolioChapters({
                           } flex flex-col justify-between flex-1 space-y-5`}
                         >
                           <div>
+                            {/* Medium & Top Tool Tags */}
+                            <div className="flex flex-wrap items-center gap-1.5 mb-2.5">
+                              <span className="px-2.5 py-0.5 rounded-full bg-[#304774] text-white font-mono-tech text-[11px] font-bold">
+                                {getMediumBadge(project.category)}
+                              </span>
+                              {normalizedTools.slice(0, 3).map((tool) => (
+                                <span
+                                  key={tool}
+                                  className="font-mono-tech text-[11px] px-2.5 py-0.5 rounded-full bg-[#d9ebf4]/75 text-[#172a3b] font-semibold"
+                                >
+                                  {tool}
+                                </span>
+                              ))}
+                            </div>
+
                             <div className="font-mono-tech text-xs text-[#52637a] mb-1">
                               {project.location}
                             </div>
-                            <h3 className="font-display font-bold text-2xl text-[#172a3b] leading-tight mb-4">
+                            <h3 className="font-display font-bold text-2xl text-[#172a3b] leading-tight mb-3">
                               {project.title}
                             </h3>
 
+                            {/* Plain-English 1-sentence hook */}
+                            <p className="rounded-2xl bg-[#f4f9fc] border-l-4 border-[#304774] p-4 text-sm md:text-base font-medium text-[#172a3b] leading-relaxed mb-4">
+                              {normalizeText(project.shortDescription)}
+                            </p>
+
                             <div className="rounded-2xl bg-[#f4f9fc] border border-[#d9ebf4] p-3.5 space-y-2 mb-4">
                               <div className="flex items-center justify-between font-mono-tech text-xs">
-                                <span className="leader-line text-[#52637a]">
-                                  MADE FOR:
-                                </span>
-                                <span className="text-[#172a3b] font-bold">
-                                  {project.madeFor}
-                                </span>
+                                <span className="leader-line text-[#52637a]">MADE FOR:</span>
+                                <span className="text-[#172a3b] font-bold">{project.madeFor}</span>
                               </div>
                               <div className="flex items-center justify-between font-mono-tech text-xs border-t border-[#d9ebf4] pt-2">
                                 <span className="leader-line text-[#52637a]">YEAR:</span>
-                                <span className="text-[#172a3b] font-bold">
-                                  {project.year}
-                                </span>
+                                <span className="text-[#172a3b] font-bold">{project.year}</span>
                               </div>
                             </div>
 
-                            <p className="text-sm md:text-base text-[#29323e] leading-relaxed mb-4">
-                              {project.shortDescription}
-                            </p>
+                            {/* Lightweight Audio & Podcast Listen Card */}
+                            {project.category === 'podcast' && (
+                              <div className="mb-4 rounded-2xl bg-[#d9ebf4]/45 border border-[#304774]/20 p-4 space-y-3">
+                                <div className="flex items-center justify-between gap-2">
+                                  <div className="inline-flex items-center gap-2 font-mono-tech text-xs font-bold text-[#304774]">
+                                    <Headphones size={16} weight="duotone" />
+                                    <span>Audio Series Preview</span>
+                                  </div>
+                                  <span className="font-mono-tech text-[11px] text-[#52637a]">
+                                    Multi-Track Mastered
+                                  </span>
+                                </div>
+                                <audio
+                                  controls
+                                  preload="none"
+                                  aria-label={`Audio preview for ${project.title}`}
+                                  className="w-full h-9"
+                                />
+                                <div className="flex flex-wrap items-center gap-2">
+                                  {project.externalUrl && (
+                                    <a
+                                      href={project.externalUrl}
+                                      target="_blank"
+                                      rel="noreferrer"
+                                      className="px-3 py-1 rounded-full bg-[#304774] text-white hover:bg-[#172a3b] font-mono-tech text-[11px] font-bold inline-flex items-center gap-1 transition-colors"
+                                    >
+                                      <span>IFAD Podcasts</span>
+                                      <ArrowUpRight size={12} weight="bold" />
+                                    </a>
+                                  )}
+                                  <a
+                                    href="https://open.spotify.com/search/Roots%20IFAD"
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="px-3 py-1 rounded-full bg-white border border-[#304774]/20 text-[#172a3b] hover:border-[#304774] font-mono-tech text-[11px] font-semibold inline-flex items-center gap-1 transition-colors"
+                                  >
+                                    <span>Spotify</span>
+                                    <ArrowUpRight size={12} weight="bold" />
+                                  </a>
+                                  <a
+                                    href="https://podcasts.apple.com/us/search?term=Roots%20IFAD"
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="px-3 py-1 rounded-full bg-white border border-[#304774]/20 text-[#172a3b] hover:border-[#304774] font-mono-tech text-[11px] font-semibold inline-flex items-center gap-1 transition-colors"
+                                  >
+                                    <span>Apple Podcasts</span>
+                                    <ArrowUpRight size={12} weight="bold" />
+                                  </a>
+                                </div>
+                              </div>
+                            )}
 
                             <div className="space-y-3 pt-3 border-t border-[#d9ebf4] text-xs md:text-sm">
                               <div>
@@ -428,7 +563,7 @@ export default function PortfolioChapters({
 
                           <div className="pt-4 border-t border-[#d9ebf4] space-y-4">
                             <div className="flex flex-wrap gap-1.5">
-                              {project.tools.map((tool) => (
+                              {normalizedTools.map((tool) => (
                                 <span
                                   key={tool}
                                   className="font-mono-tech text-[11px] px-2.5 py-0.5 rounded-full bg-[#d9ebf4]/65 text-[#304774] font-medium"
@@ -477,26 +612,32 @@ export default function PortfolioChapters({
         })}
       </div>
 
-      {activeVideo && (
-        <div
-          className="fixed inset-0 z-50 bg-[#172a3b]/85 backdrop-blur-md flex items-center justify-center p-4 md:p-10"
-          role="dialog"
-          aria-modal="true"
-        >
-          <div className="max-w-5xl w-full rounded-[32px] border border-[#d9ebf4] bg-white text-[#172a3b] shadow-2xl overflow-hidden">
+      {/* Native Modal Dialog for Video Playback */}
+      <dialog
+        ref={videoDialogRef}
+        {...({ closedby: 'any' } as any)}
+        aria-labelledby="portfolio-video-dialog-title"
+        onClose={() => setActiveVideo(null)}
+        className="m-auto max-w-5xl w-[calc(100%-2rem)] rounded-[32px] border border-[#d9ebf4] bg-white text-[#172a3b] shadow-2xl overflow-hidden p-0"
+      >
+        {activeVideo && (
+          <div>
             <div className="px-6 py-4 border-b border-[#d9ebf4] flex items-center justify-between bg-[#d9ebf4]/55">
-              <div className="flex items-center gap-3">
-                <span className="px-3 py-1 rounded-full bg-[#304774] text-white font-mono-tech text-xs font-bold">
+              <div className="flex items-center gap-3 min-w-0">
+                <span className="px-3 py-1 rounded-full bg-[#304774] text-white font-mono-tech text-xs font-bold flex-shrink-0">
                   {activeVideo.madeFor} ({activeVideo.year})
                 </span>
-                <h4 className="font-display font-bold text-base md:text-lg text-[#172a3b] truncate max-w-xl">
+                <h4
+                  id="portfolio-video-dialog-title"
+                  className="font-display font-bold text-base md:text-lg text-[#172a3b] truncate max-w-xl"
+                >
                   {activeVideo.title}
                 </h4>
               </div>
               <button
                 type="button"
-                onClick={() => setActiveVideo(null)}
-                className="p-1.5 rounded-full text-[#304774] hover:bg-[#304774] hover:text-white cursor-pointer"
+                onClick={() => videoDialogRef.current?.close()}
+                className="p-1.5 rounded-full text-[#304774] hover:bg-[#304774] hover:text-white cursor-pointer flex-shrink-0"
                 aria-label="Close modal"
               >
                 <X size={20} weight="bold" />
@@ -512,8 +653,8 @@ export default function PortfolioChapters({
               />
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </dialog>
     </div>
   );
 }

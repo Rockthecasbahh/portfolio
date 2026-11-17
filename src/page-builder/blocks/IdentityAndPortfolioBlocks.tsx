@@ -12,7 +12,12 @@ import HorizontalShowreel from '../../components/HorizontalShowreel';
 import PortfolioChapters from '../../components/PortfolioChapters';
 import { resolvePbMediaUrl, normalizePbProject, pbProps } from '../helpers';
 import type { ProjectItem } from '../../lib/cms';
-import { getReadableLogoUrl } from '../../utils/loaders';
+import {
+  getReadableLogoUrl,
+  filterUniversityEducation,
+  cleanSkillsHeading,
+  buildSkillTiers,
+} from '../../utils/loaders';
 
 export function createIdentityAndPortfolioBlocks(strapiImageUrl = 'http://localhost:1337') {
   const HeroStratum: ComponentConfig<any> = {
@@ -354,43 +359,31 @@ export function createIdentityAndPortfolioBlocks(strapiImageUrl = 'http://localh
           school: 'John Cabot University',
           years: '2014 - 2017',
         },
-        {
-          degree: 'Diploma Scuola Superiore - Graphic Design',
-          school: 'Liceo Artistico Via di Ripetta, Rome',
-          years: '2008 - 2013',
-        },
       ],
-      skillsHeading: 'Skills & 3D Pipeline',
+      skillsHeading: 'Core Capabilities & Technical Stack',
       softwareMeters: [
         {
-          name: 'ADOBE CREATIVE CLOUD',
-          subtitle: 'Premiere Pro · After Effects · Photoshop · InDesign · Illustrator · Audition',
+          name: 'Primary Craft',
+          subtitle: 'Documentary Production · Location Directing · 2D/3D Motion · Blender 3D · After Effects · Sound Mastering',
           segmentsFilled: 8,
         },
         {
-          name: 'BLENDER 3D & MOTION',
-          subtitle: '3D Modeling · Cycles/EEVEE · Procedural Shaders · GLTF Pipelines',
-          segmentsFilled: 7,
+          name: 'Technical & Web',
+          subtitle: 'Drupal 10 · WordPress · HTML5 / CSS3 / JS · Astro · Python · Information Architecture',
+          segmentsFilled: 8,
         },
         {
-          name: 'UNREAL ENGINE 5',
-          subtitle: 'Real-Time Environments · Virtual Production · Sequencer',
-          segmentsFilled: 6,
-        },
-        {
-          name: 'WEB & CMS ARCHITECTURE',
-          subtitle: 'Drupal 10 · WordPress · HTML5 · CSS3 · JavaScript · Astro',
-          segmentsFilled: 7,
-        },
-        {
-          name: 'CODE & AUTOMATION',
-          subtitle: 'Python · Remotion · GSAP 3D · Analytics & Telemetry',
-          segmentsFilled: 6,
+          name: 'Strategy & Reach',
+          subtitle: 'Campaign Strategy · UN Policy Communications · Digital Analytics · Paid Media · Press Engagement',
+          segmentsFilled: 8,
         },
       ],
     },
     render: (rawProps) => {
       const data = pbProps(rawProps);
+      const universityEducation = filterUniversityEducation(data.educationItems || []);
+      const skillsTitle = cleanSkillsHeading(data.skillsHeading);
+      const skillTiers = buildSkillTiers(data.softwareMeters);
       return (
         <section id={data.sectionId || 'education-skills'} className="py-16">
           <div className="max-w-[1440px] mx-auto px-4 sm:px-8 space-y-10">
@@ -445,7 +438,7 @@ export function createIdentityAndPortfolioBlocks(strapiImageUrl = 'http://localh
                       </h2>
                     </div>
                     <div className="space-y-5">
-                      {(data.educationItems || []).map((edu: any, idx: number) => (
+                      {universityEducation.map((edu: any, idx: number) => (
                         <div
                           key={`${edu?.degree}-${idx}`}
                           className="bg-white/80 rounded-2xl p-5 border border-white shadow-xs"
@@ -468,24 +461,28 @@ export function createIdentityAndPortfolioBlocks(strapiImageUrl = 'http://localh
                     <div className="flex items-center gap-3 pb-3 border-b-2 border-[#172a3b]">
                       <Lightning size={28} weight="duotone" className="text-[#304774]" />
                       <h2 className="font-display font-extrabold text-2xl md:text-3xl text-[#172a3b]">
-                        {data.skillsHeading || 'Skills & 3D Pipeline'}
+                        {skillsTitle}
                       </h2>
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      {(data.softwareMeters || []).map((sw: any, idx: number) => (
+                    <div className="space-y-4">
+                      {skillTiers.map((tier, idx: number) => (
                         <div
-                          key={`${sw?.name}-${idx}`}
-                          className="bg-white/85 rounded-2xl p-4 border border-white shadow-xs flex flex-col justify-between gap-2"
+                          key={`${tier.name}-${idx}`}
+                          className="bg-white/85 rounded-2xl p-4 sm:p-5 border border-white shadow-xs space-y-3"
                         >
-                          <div className="flex items-center justify-between gap-2">
-                            <span className="font-display font-bold text-sm text-[#172a3b]">
-                              {sw?.name}
-                            </span>
-                            <span className="px-2 py-0.5 rounded-full bg-[#304774] text-white font-mono-tech text-[11px] font-bold">
-                              {sw?.segmentsFilled ?? 8}/8
-                            </span>
+                          <h3 className="font-display font-bold text-sm uppercase tracking-wider text-[#304774]">
+                            {tier.name}
+                          </h3>
+                          <div className="flex flex-wrap gap-2">
+                            {tier.tags.map((tag) => (
+                              <span
+                                key={tag}
+                                className="bg-[#d9ebf4]/65 text-[#172a3b] font-mono-tech text-xs font-medium px-3 py-1 rounded-full border border-[#304774]/15"
+                              >
+                                {tag}
+                              </span>
+                            ))}
                           </div>
-                          <p className="text-xs text-[#29323e] leading-relaxed">{sw?.subtitle}</p>
                         </div>
                       ))}
                     </div>

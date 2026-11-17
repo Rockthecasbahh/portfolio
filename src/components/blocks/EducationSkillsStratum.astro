@@ -1,12 +1,20 @@
 ---
 import type { EducationSkillsStratumBlock } from '../../utils/types';
 import { GraduationCap, Lightning } from '@phosphor-icons/react';
+import {
+  filterUniversityEducation,
+  cleanSkillsHeading,
+  buildSkillTiers,
+} from '../../utils/loaders';
 
 interface Props {
   data: EducationSkillsStratumBlock;
 }
 
 const { data } = Astro.props;
+const universityEducation = filterUniversityEducation(data.educationItems || []);
+const skillsTitle = cleanSkillsHeading(data.skillsHeading);
+const skillTiers = buildSkillTiers(data.softwareMeters);
 ---
 
 <section id={data.sectionId || 'education-skills'} class="py-16">
@@ -66,7 +74,7 @@ const { data } = Astro.props;
             </div>
 
             <div class="space-y-5">
-              {(data.educationItems || []).map((edu) => (
+              {universityEducation.map((edu) => (
                 <div class="bg-white/80 rounded-2xl p-5 border border-white shadow-xs">
                   <h3 class="font-display font-bold text-base md:text-lg text-[#172a3b] leading-snug">
                     {edu.degree}
@@ -82,29 +90,28 @@ const { data } = Astro.props;
             </div>
           </div>
 
-          <!-- Right Column: Skills & Production Stack (Exact CV Structure + Meters) -->
+          <!-- Right Column: Core Capabilities & Technical Stack (3 Competency Tiers) -->
           <div class="lg:col-span-6 space-y-6">
             <div class="flex items-center gap-3 pb-3 border-b-2 border-[#172a3b]">
               <Lightning size={28} weight="duotone" className="text-[#304774]" />
               <h2 class="font-display font-extrabold text-2xl md:text-3xl text-[#172a3b]">
-                {data.skillsHeading || 'Skills & 3D Pipeline'}
+                {skillsTitle}
               </h2>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {(data.softwareMeters || []).map((sw) => (
-                <div class="bg-white/85 rounded-2xl p-4 border border-white shadow-xs flex flex-col justify-between gap-2">
-                  <div class="flex items-center justify-between gap-2">
-                    <span class="font-display font-bold text-sm text-[#172a3b]">
-                      {sw.name}
-                    </span>
-                    <span class="px-2 py-0.5 rounded-full bg-[#304774] text-white font-mono-tech text-[11px] font-bold">
-                      {sw.segmentsFilled}/8
-                    </span>
+            <div class="space-y-4">
+              {skillTiers.map((tier) => (
+                <div class="bg-white/85 rounded-2xl p-4 sm:p-5 border border-white shadow-xs space-y-3">
+                  <h3 class="font-display font-bold text-sm uppercase tracking-wider text-[#304774]">
+                    {tier.name}
+                  </h3>
+                  <div class="flex flex-wrap gap-2">
+                    {tier.tags.map((tag) => (
+                      <span class="bg-[#d9ebf4]/65 text-[#172a3b] font-mono-tech text-xs font-medium px-3 py-1 rounded-full border border-[#304774]/15">
+                        {tag}
+                      </span>
+                    ))}
                   </div>
-                  <p class="text-xs text-[#29323e] leading-relaxed">
-                    {sw.subtitle}
-                  </p>
                 </div>
               ))}
             </div>

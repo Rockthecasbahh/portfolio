@@ -4,12 +4,12 @@ import {
   FilePdf,
   FilmSlate,
   Browsers,
-  EnvelopeSimple,
-  Sliders,
+  MapPin,
 } from '@phosphor-icons/react';
 import { normalizePbExperience, pbProps } from '../helpers';
 import type { ExperienceItem } from '../../lib/cms';
 import { getReadableLogoUrl } from '../../utils/loaders';
+import ContactInteractivePanel from '../../components/ContactInteractivePanel';
 
 const linkFields = {
   label: { type: 'text', label: 'Label' },
@@ -23,8 +23,6 @@ const linkFields = {
     ],
   },
 } as const;
-
-const isTrue = (v: any) => v === true || v === 'true';
 
 export function createCareerAndContactBlocks(strapiImageUrl = 'http://localhost:1337') {
   const ExperienceCascade: ComponentConfig<any> = {
@@ -184,6 +182,7 @@ export function createCareerAndContactBlocks(strapiImageUrl = 'http://localhost:
       sectionId: { type: 'text', label: 'Section Anchor ID' },
       heading: { type: 'text', label: 'Heading' },
       description: { type: 'textarea', label: 'Description' },
+      availabilityText: { type: 'text', label: 'Availability & Location Banner' },
       dossierCards: {
         type: 'array',
         label: 'Dossier Cards',
@@ -216,9 +215,11 @@ export function createCareerAndContactBlocks(strapiImageUrl = 'http://localhost:
     },
     defaultProps: {
       sectionId: 'documents',
-      heading: 'CV Dossiers & Direct Contact',
+      heading: 'Publications, CVs & Direct Contact',
       description:
-        "Download Matteo's original topographic PDF CVs and 13-page portfolio book, or connect directly for global communications strategy and digital production.",
+        "Download Matteo's styled PDF CVs and 13-page portfolio book, copy the direct studio email, or send a project inquiry below.",
+      availabilityText:
+        'Based in New York (EST) · Available for select UN P3/P4 consultancies, 3D motion direction, and senior roles',
       dossierCards: [
         {
           title: 'UN & Policy CV',
@@ -240,14 +241,14 @@ export function createCareerAndContactBlocks(strapiImageUrl = 'http://localhost:
         },
       ],
       contactHeading: 'Direct Contact',
-      email: 'matteocasling@gmail.com',
-      phone: '+1 332 262 9369',
-      location: 'New York, USA · Vienna · Rome',
+      email: 'matteo@matteocasling.com',
+      phone: '',
+      location: 'New York, NY (EST) · Available Worldwide',
       linkedinLabel: 'in/matteo-louis-casling',
       linkedinUrl: 'https://www.linkedin.com/in/matteo-louis-casling-7285a8150/',
       cmsLabel: '',
       cmsUrl: '',
-      primaryCta: { label: 'Send Email', href: 'mailto:matteocasling@gmail.com', isExternal: 'false' },
+      primaryCta: { label: 'Email Matteo', href: 'mailto:matteo@matteocasling.com', isExternal: 'false' },
       secondaryCta: {
         label: 'LinkedIn Profile',
         href: 'https://www.linkedin.com/in/matteo-louis-casling-7285a8150/',
@@ -256,11 +257,12 @@ export function createCareerAndContactBlocks(strapiImageUrl = 'http://localhost:
     },
     render: (rawProps) => {
       const data = pbProps(rawProps);
-      const pExt = isTrue(data.primaryCta?.isExternal);
-      const sExt = isTrue(data.secondaryCta?.isExternal);
       const displayHeading =
         (data.heading || '').replace('& Strapi Headless CMS', '& Direct Contact') ||
-        'CV Dossiers & Direct Contact';
+        'Publications, CVs & Direct Contact';
+      const availabilityBanner =
+        data.availabilityText ||
+        'Based in New York (EST) · Available for select UN P3/P4 consultancies, 3D motion direction, and senior roles';
       const linkedinUrl =
         data.linkedinUrl || 'https://www.linkedin.com/in/matteo-louis-casling-7285a8150/';
       const linkedinLabel = data.linkedinLabel || 'in/matteo-louis-casling';
@@ -276,7 +278,12 @@ export function createCareerAndContactBlocks(strapiImageUrl = 'http://localhost:
       return (
         <section id={data.sectionId || 'documents'} className="py-20">
           <div className="max-w-[1440px] mx-auto px-4 sm:px-8">
-            <div className="cv-wave-slab cv-stratum-cobalt p-8 sm:p-12">
+            <div className="cv-wave-slab cv-stratum-cobalt p-8 sm:p-12 space-y-8">
+              <div className="rounded-2xl bg-[#d9ebf4]/15 border border-[#d9ebf4]/30 px-4 py-3 flex items-center gap-2.5 text-[#d9ebf4] font-mono-tech text-xs font-semibold">
+                <MapPin size={16} weight="duotone" className="text-[#f29f8b] flex-shrink-0" />
+                <span>{availabilityBanner}</span>
+              </div>
+
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
                 <div className="lg:col-span-7 space-y-6">
                   <h2 className="font-display font-extrabold text-3xl md:text-4xl text-white">
@@ -320,64 +327,16 @@ export function createCareerAndContactBlocks(strapiImageUrl = 'http://localhost:
                   <h3 className="font-display font-extrabold text-2xl text-[#172a3b]">
                     {data.contactHeading || 'Direct Contact'}
                   </h3>
-                  <div className="space-y-3 font-mono-tech text-xs">
-                    {data.email && (
-                      <div className="flex items-center justify-between py-2 border-b border-[#304774]/15">
-                        <span className="text-[#52637a]">EMAIL</span>
-                        <a href={`mailto:${data.email}`} className="text-[#1c72b4] hover:underline font-bold">
-                          {data.email}
-                        </a>
-                      </div>
-                    )}
-                    {data.phone && (
-                      <div className="flex items-center justify-between py-2 border-b border-[#304774]/15">
-                        <span className="text-[#52637a]">MOBILE</span>
-                        <a href={`tel:${data.phone}`} className="text-[#172a3b] font-bold hover:text-[#1c72b4]">
-                          {data.phone}
-                        </a>
-                      </div>
-                    )}
-                    {data.location && (
-                      <div className="flex items-center justify-between py-2 border-b border-[#304774]/15">
-                        <span className="text-[#52637a]">BASE</span>
-                        <span className="text-[#172a3b] font-bold">{data.location}</span>
-                      </div>
-                    )}
-                    <div className="flex items-center justify-between py-2 border-b border-[#304774]/15">
-                      <span className="text-[#52637a]">LINKEDIN</span>
-                      <a
-                        href={linkedinUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-[#1c72b4] hover:underline font-bold truncate max-w-[240px]"
-                      >
-                        {linkedinLabel}
-                      </a>
-                    </div>
-                  </div>
-                  <div className="pt-2 flex flex-wrap gap-3">
-                    {data.primaryCta?.label && (
-                      <a
-                        href={data.primaryCta.href}
-                        target={pExt ? '_blank' : undefined}
-                        rel={pExt ? 'noreferrer' : undefined}
-                        className="px-5 py-3 rounded-full bg-[#304774] text-white hover:bg-[#172a3b] font-mono-tech text-xs font-bold inline-flex items-center gap-2 transition-colors"
-                      >
-                        <EnvelopeSimple size={16} weight="bold" />
-                        <span>{data.primaryCta.label}</span>
-                      </a>
-                    )}
-                    {secondaryCtaLabel && (
-                      <a
-                        href={secondaryCtaHref}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="px-4 py-3 rounded-full bg-white border border-[#304774]/25 text-[#172a3b] hover:bg-[#304774] hover:text-white font-mono-tech text-xs font-bold inline-flex items-center gap-2 transition-colors"
-                      >
-                        <span>{secondaryCtaLabel}</span>
-                      </a>
-                    )}
-                  </div>
+                  <ContactInteractivePanel
+                    email={data.email || 'matteo@matteocasling.com'}
+                    location={data.location || 'New York, NY (EST) · Available Worldwide'}
+                    linkedinUrl={linkedinUrl}
+                    linkedinLabel={linkedinLabel}
+                    primaryCtaLabel={data.primaryCta?.label || 'Email Matteo'}
+                    primaryCtaHref={data.primaryCta?.href}
+                    secondaryCtaLabel={secondaryCtaLabel}
+                    secondaryCtaHref={secondaryCtaHref}
+                  />
                 </div>
               </div>
             </div>

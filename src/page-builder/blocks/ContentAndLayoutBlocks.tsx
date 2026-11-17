@@ -52,6 +52,7 @@ export function createContentAndLayoutBlocks(strapiImageUrl = 'http://localhost:
   const CardsGrid: ComponentConfig<any> = {
     label: 'Cards Grid',
     fields: {
+      sectionId: { type: 'text', label: 'Section Anchor ID (optional)' },
       subHeading: { type: 'text', label: 'Eyebrow' },
       heading: { type: 'text', label: 'Heading' },
       stratumTheme: themeField as any,
@@ -69,6 +70,7 @@ export function createContentAndLayoutBlocks(strapiImageUrl = 'http://localhost:
       },
     },
     defaultProps: {
+      sectionId: '',
       subHeading: '',
       heading: 'Featured Highlights',
       stratumTheme: 'ice',
@@ -78,7 +80,7 @@ export function createContentAndLayoutBlocks(strapiImageUrl = 'http://localhost:
       const data = pbProps(rawProps);
       const isCobalt = data.stratumTheme === 'cobalt';
       return (
-        <section className="py-12">
+        <section id={data.sectionId || undefined} className="py-12">
           <div className="max-w-[1440px] mx-auto px-4 sm:px-8">
             <div className={`cv-wave-slab p-7 sm:p-10 md:p-12 ${stratumClass(data.stratumTheme)}`}>
               {(data.heading || data.subHeading) && (

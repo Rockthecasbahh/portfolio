@@ -5,7 +5,7 @@ function buildHomepagePageBuilderTemplateJson(profile: any) {
   return {
     root: {
       props: {
-        title: `${profile.name} - Portfolio & 3D Motion Studio`,
+        title: 'Matteo Casling — Senior Multimedia Producer & Communications Strategist',
         show3DRig: 'true',
         showTopographicContours: 'true',
         cameraRigScale: 1.15,
@@ -16,27 +16,47 @@ function buildHomepagePageBuilderTemplateJson(profile: any) {
     zones: {},
     content: [
       {
+        type: 'HeaderNavigation',
+        props: {
+          id: 'HeaderNavigation-main',
+          monogram: 'MC',
+          fullName: 'Matteo Casling',
+          homeHref: '/#top',
+          navItems: [
+            { label: '01 SHOWREEL', href: '#showreel', isExternal: 'false' },
+            { label: '02 CASE STUDIES', href: '#work', isExternal: 'false' },
+            { label: '03 EXPERIENCE', href: '#experience', isExternal: 'false' },
+            { label: '04 PUBLICATIONS', href: '#documents', isExternal: 'false' },
+          ],
+          showCmsButton: 'false',
+          cmsCta: { label: '', href: '', isExternal: 'true' },
+          showPrimaryCta: 'true',
+          primaryCta: { label: 'Contact', href: '#documents', isExternal: 'false' },
+          isSticky: 'true',
+        },
+      },
+      {
         type: 'HeroStratum',
         props: {
           id: 'HeroStratum-home-1',
           taglineBadge: profile.tagline,
-          fullName: profile.name,
+          fullName: 'Matteo Casling',
           quoteText:
             'Six years translating global policy, development finance, and climate science into documentary cinema, Blender 3D animations, and Drupal 10 platforms.',
           portraitImage: '/assets/matteo-portrait-cutout.webp',
           primaryCta: {
-            label: 'Explore Work',
+            label: 'Explore Case Studies',
             href: '#work',
             isExternal: 'false',
           },
           secondaryCta: {
-            label: 'Download Styled CV',
+            label: 'Download CV',
             href: '/documents/Matteo_Casling_CV.pdf',
             isExternal: 'true',
           },
-          floatingArtifactTitle: '3D & Motion Layers',
-          floatingArtifactSubtitle: 'Blender + Three.js + GSAP',
-          floatingArtifactHref: '#chapter-02',
+          floatingArtifactTitle: '3D & Motion Showreel',
+          floatingArtifactSubtitle: 'Blender 3D · Unreal 5 · GSAP',
+          floatingArtifactHref: '#showreel',
           floatingArtifactImage: '/assets/projects/locust-3d-sculpture.png',
         },
       },
@@ -85,51 +105,14 @@ function buildHomepagePageBuilderTemplateJson(profile: any) {
         },
       },
       {
-        type: 'EducationSkillsStratum',
-        props: {
-          id: 'EducationSkillsStratum-home-1',
-          sectionId: 'education-skills',
-          metrics: (profile.metrics || []).map((m: any, idx: number) => ({
-            value: m.value,
-            label: m.label,
-            agency: m.agency,
-            theme: idx % 2 === 0 ? 'paper' : 'cobalt',
-          })),
-          educationHeading: 'Education',
-          educationItems: [
-            {
-              degree: 'MA Marketing, Buying Behaviour and Digital Communication',
-              school: 'John Cabot University',
-              years: '2019-2020',
-            },
-            {
-              degree: 'Bachelor of Arts in Communications',
-              school: 'John Cabot University',
-              years: '2014-2017',
-            },
-            {
-              degree: 'Diploma Scuola Superiore - Graphic Design',
-              school: 'Liceo Artistico Via di Ripetta, Rome',
-              years: '2008-2013',
-            },
-          ],
-          skillsHeading: 'Skills & 3D Pipeline',
-          softwareMeters: (profile.softwareMeters || []).map((sw: any) => ({
-            name: sw.name,
-            subtitle: sw.subtitle,
-            segmentsFilled: sw.segmentsFilled ?? 8,
-          })),
-        },
-      },
-      {
         type: 'HorizontalShowreel',
         props: {
           id: 'HorizontalShowreel-home-1',
           sectionId: 'showreel',
-          eyebrow: 'GSAP ScrollTrigger Horizontal Cinema',
-          heading: '3D & Motion Showreel',
+          eyebrow: '01 · Flagship Showreel',
+          heading: 'Documentary Cinema & 3D Motion',
           subHeading:
-            'Scroll to scrub through selected UN documentary films, Blender 3D scientific visualizations, and motion graphics.',
+            'Scroll horizontally through flagship UN documentaries, COP28 summit films, and Blender 3D scientific visualizations.',
           onlyFeatured: 'true',
           pinnedProjects: [],
         },
@@ -139,10 +122,10 @@ function buildHomepagePageBuilderTemplateJson(profile: any) {
         props: {
           id: 'PortfolioChapters-home-1',
           sectionId: 'work',
-          eyebrow: 'Curated Un-Portfolio Index (Chapters 01 - 05)',
-          heading: 'Work Samples & Production Archive',
+          eyebrow: '02 · Case Studies & Production Archive',
+          heading: 'Selected Case Studies',
           subHeading:
-            "Filter by audience focus or jump directly across the five chapters of Matteo's portfolio.",
+            'Filter by medium or explore all five production chapters — each paired with plain-English summaries, mandate context, and production tools.',
           defaultTrackFilter: 'all',
           chapters: [
             {
@@ -180,6 +163,39 @@ function buildHomepagePageBuilderTemplateJson(profile: any) {
         },
       },
       {
+        type: 'CardsGrid',
+        props: {
+          id: 'CardsGrid-capabilities',
+          sectionId: 'capabilities',
+          subHeading: 'Capabilities & How I Work',
+          heading: 'Production Toolkit & Advisory Scope',
+          stratumTheme: 'ice',
+          cards: [
+            {
+              badge: '01 · DOCUMENTARY & FIELD PRODUCTION',
+              heading: 'Documentary & Field Storytelling',
+              subHeading: 'COP28, UN DESA & Broadcast Cinema',
+              text: 'End-to-end location directing, multilingual field interviews, and high-retention policy documentaries for global summits and UN agencies.',
+              href: '#chapter-01',
+            },
+            {
+              badge: '02 · 2D/3D MOTION DIRECTION',
+              heading: '2D/3D Motion & Scientific Visualization',
+              subHeading: 'Blender 3D · Unreal Engine 5 · After Effects',
+              text: 'Custom 3D modeling, procedural shaders, and modular motion graphics that turn complex technical and biological processes into clear visual narratives.',
+              href: '#chapter-02',
+            },
+            {
+              badge: '03 · DIGITAL PLATFORMS & CAMPAIGNS',
+              heading: 'Digital Knowledge Portals & Strategy',
+              subHeading: 'Drupal 10 · Astro · Multilingual Outreach',
+              text: 'Full-stack institutional platforms, high-impact scrollytelling features (3M+ views), and data-driven communications strategies.',
+              href: '#chapter-04',
+            },
+          ],
+        },
+      },
+      {
         type: 'ExperienceCascade',
         props: {
           id: 'ExperienceCascade-home-1',
@@ -191,13 +207,47 @@ function buildHomepagePageBuilderTemplateJson(profile: any) {
         },
       },
       {
+        type: 'EducationSkillsStratum',
+        props: {
+          id: 'EducationSkillsStratum-home-1',
+          sectionId: 'education-skills',
+          metrics: (profile.metrics || []).map((m: any, idx: number) => ({
+            value: m.value,
+            label: m.label,
+            agency: m.agency,
+            theme: idx % 2 === 0 ? 'paper' : 'cobalt',
+          })),
+          educationHeading: 'Education',
+          educationItems: [
+            {
+              degree: 'MA Marketing, Buying Behaviour and Digital Communication',
+              school: 'John Cabot University',
+              years: '2019–2020',
+            },
+            {
+              degree: 'Bachelor of Arts in Communications',
+              school: 'John Cabot University',
+              years: '2014–2017',
+            },
+          ],
+          skillsHeading: 'Core Capabilities & Technical Stack',
+          softwareMeters: (profile.softwareMeters || []).map((sw: any) => ({
+            name: sw.name,
+            subtitle: sw.subtitle,
+            segmentsFilled: sw.segmentsFilled ?? 8,
+          })),
+        },
+      },
+      {
         type: 'DossierContact',
         props: {
           id: 'DossierContact-home-1',
           sectionId: 'documents',
-          heading: 'CV Dossiers & Strapi Headless CMS',
+          heading: 'Publications, CVs & Direct Contact',
           description:
-            "Download Matteo's original topographic PDF CVs and 13-page portfolio book, or launch the Strapi v5 Admin Panel to manage page blocks, projects, career milestones, and 3D topographic scenes visually.",
+            "Download Matteo's styled PDF CVs and 13-page portfolio book, copy the direct studio email, or send a project inquiry below.",
+          availabilityText:
+            'Based in New York (EST) · Available for select UN P3/P4 consultancies, 3D motion direction, and senior roles',
           dossierCards: [
             {
               title: 'UN & Policy CV',
@@ -220,12 +270,12 @@ function buildHomepagePageBuilderTemplateJson(profile: any) {
           ],
           contactHeading: 'Direct Contact',
           email: profile.email,
-          phone: profile.phone,
+          phone: '',
           location: profile.location,
           linkedinLabel: 'in/matteo-louis-casling',
           linkedinUrl: 'https://www.linkedin.com/in/matteo-louis-casling-7285a8150/',
           primaryCta: {
-            label: 'Send Email',
+            label: 'Email Matteo',
             href: `mailto:${profile.email}`,
             isExternal: 'false',
           },
@@ -234,6 +284,19 @@ function buildHomepagePageBuilderTemplateJson(profile: any) {
             href: 'https://www.linkedin.com/in/matteo-louis-casling-7285a8150/',
             isExternal: 'true',
           },
+        },
+      },
+      {
+        type: 'FooterBlock',
+        props: {
+          id: 'FooterBlock-main',
+          copyrightName: '© 2026 Matteo Casling · Senior Multimedia Producer & Communications Strategist',
+          links: [
+            { label: 'Direct Email', href: `mailto:${profile.email}`, isExternal: 'false' },
+            { label: 'Topographic CV (PDF)', href: '/documents/Matteo_Casling_CV.pdf', isExternal: 'true' },
+            { label: 'Portfolio Book (PDF)', href: '/documents/Matteo_Casling_Portfolio_Book.pdf', isExternal: 'true' },
+          ],
+          showBackToTop: 'true',
         },
       },
     ],
@@ -458,11 +521,11 @@ export async function ensurePortfolioSeeded(strapi: any, force = false) {
     const profile = fs.existsSync(profilePath)
       ? JSON.parse(fs.readFileSync(profilePath, 'utf-8'))
       : {
-          name: 'Matteo Louis Casling',
-          tagline: 'Senior Multimedia Producer, 3D Motion Designer & UN Communications Strategist',
-          location: 'New York, NY / Rome, Italy',
-          email: 'matteocasling@gmail.com',
-          phone: '+39 327 662 4932',
+          name: 'Matteo Casling',
+          tagline: 'Senior Multimedia Producer & Communications Strategist',
+          location: 'New York, NY (EST) · Available Worldwide',
+          email: 'matteo@matteocasling.com',
+          phone: '',
           softwareMeters: [],
           metrics: [],
         };
@@ -610,40 +673,39 @@ export async function ensurePortfolioSeeded(strapi: any, force = false) {
 
     await strapi.documents('api::global.global').create({
       data: {
-        title: `${profile.name} - Multimedia Producer, 3D Motion Designer & UN Communications Specialist`,
+        title: 'Matteo Casling — Senior Multimedia Producer & Communications Strategist',
         description:
-          'Portfolio of Matteo Louis Casling: Senior Multimedia Producer, 3D/Motion Systems Designer (Blender, Unreal Engine 5, After Effects), and Strategic Communications Specialist (UN DESA, IAEA, FAO, IFAD, PBS News).',
+          'Portfolio of Matteo Casling: Senior Multimedia Producer, 3D/Motion Systems Designer (Blender 3D, Unreal Engine 5, After Effects), and Strategic Communications Specialist (UN DESA, IAEA, FAO, IFAD, PBS News).',
         header: {
           monogram: 'MC',
-          fullName: profile.name,
+          fullName: 'Matteo Casling',
           navItems: [
-            { label: 'Education & Skills', href: '#education-skills', isExternal: false, isButtonLink: false, type: 'GHOST' },
-            { label: '3D & Motion Reel', href: '#showreel', isExternal: false, isButtonLink: false, type: 'GHOST' },
-            { label: 'Work Samples', href: '#work', isExternal: false, isButtonLink: false, type: 'GHOST' },
-            { label: 'Work Experience', href: '#experience', isExternal: false, isButtonLink: false, type: 'GHOST' },
-            { label: 'CV & Dossier', href: '#documents', isExternal: false, isButtonLink: false, type: 'GHOST' },
+            { label: '01 SHOWREEL', href: '#showreel', isExternal: false, isButtonLink: false, type: 'GHOST' },
+            { label: '02 CASE STUDIES', href: '#work', isExternal: false, isButtonLink: false, type: 'GHOST' },
+            { label: '03 EXPERIENCE', href: '#experience', isExternal: false, isButtonLink: false, type: 'GHOST' },
+            { label: '04 PUBLICATIONS', href: '#documents', isExternal: false, isButtonLink: false, type: 'GHOST' },
           ],
           cmsCta: {
             label: 'Strapi CMS',
-            href: 'http://localhost:1337/admin',
+            href: 'https://cms.matteocasling.com/admin',
             isExternal: true,
-            isButtonLink: true,
+            isButtonLink: false,
             type: 'SECONDARY',
           },
           primaryCta: {
-            label: 'Send Email',
-            href: `mailto:${profile.email}`,
+            label: 'Contact',
+            href: '#documents',
             isExternal: false,
             isButtonLink: true,
             type: 'PRIMARY',
           },
         },
         footer: {
-          copyrightName: profile.name,
+          copyrightName: '© 2026 Matteo Casling · Senior Multimedia Producer & Communications Strategist',
           links: [
             { label: 'Back to Top', href: '#top', isExternal: false, isButtonLink: false, type: 'GHOST' },
-            { label: 'Strapi Admin Panel', href: 'http://localhost:1337/admin', isExternal: true, isButtonLink: false, type: 'GHOST' },
-            { label: 'REST API (/api/landing-page)', href: 'http://localhost:1337/api/landing-page', isExternal: true, isButtonLink: false, type: 'GHOST' },
+            { label: 'Direct Email', href: `mailto:${profile.email}`, isExternal: false, isButtonLink: false, type: 'GHOST' },
+            { label: 'CV (PDF)', href: '/documents/Matteo_Casling_CV.pdf', isExternal: true, isButtonLink: false, type: 'GHOST' },
           ],
         },
         studio3d: {
@@ -675,34 +737,34 @@ export async function ensurePortfolioSeeded(strapi: any, force = false) {
 
     const createdLanding = await strapi.documents('api::landing-page.landing-page').create({
       data: {
-        title: `${profile.name} - Portfolio & 3D Motion Studio`,
+        title: 'Matteo Casling — Senior Multimedia Producer & Communications Strategist',
         description:
           'Six years translating global policy, development finance, and climate science into documentary cinema, Blender 3D animations, and Drupal 10 platforms.',
         blocks: [
           {
             __component: 'blocks.hero-stratum',
             taglineBadge: profile.tagline,
-            fullName: profile.name,
+            fullName: 'Matteo Casling',
             quoteText:
               'Six years translating global policy, development finance, and climate science into documentary cinema, Blender 3D animations, and Drupal 10 platforms.',
             portraitImageUrl: '/assets/matteo-portrait-cutout.webp',
             primaryCta: {
-              label: 'Explore Work',
+              label: 'Explore Case Studies',
               href: '#work',
               isExternal: false,
               isButtonLink: true,
               type: 'PRIMARY',
             },
             secondaryCta: {
-              label: 'Download Styled CV',
+              label: 'Download CV',
               href: '/documents/Matteo_Casling_CV.pdf',
               isExternal: true,
               isButtonLink: true,
               type: 'SECONDARY',
             },
-            floatingArtifactTitle: '3D & Motion Layers',
-            floatingArtifactSubtitle: 'Blender + Three.js + GSAP',
-            floatingArtifactHref: '#chapter-02',
+            floatingArtifactTitle: '3D & Motion Showreel',
+            floatingArtifactSubtitle: 'Blender 3D · Unreal 5 · GSAP',
+            floatingArtifactHref: '#showreel',
             floatingArtifactImageUrl: '/assets/projects/locust-3d-sculpture.png',
           },
           {
@@ -754,55 +816,21 @@ export async function ensurePortfolioSeeded(strapi: any, force = false) {
             ],
           },
           {
-            __component: 'blocks.education-skills-stratum',
-            sectionId: 'education-skills',
-            metrics: (profile.metrics || []).map((m: any, idx: number) => ({
-              value: m.value,
-              label: m.label,
-              agency: m.agency,
-              theme: idx % 2 === 0 ? 'paper' : 'cobalt',
-            })),
-            educationHeading: 'Education',
-            educationItems: [
-              {
-                degree: 'MA Marketing, Buying Behaviour and Digital Communication',
-                school: 'John Cabot University',
-                years: '2019-2020',
-              },
-              {
-                degree: 'Bachelor of Arts in Communications',
-                school: 'John Cabot University',
-                years: '2014-2017',
-              },
-              {
-                degree: 'Diploma Scuola Superiore - Graphic Design',
-                school: 'Liceo Artistico Via di Ripetta, Rome',
-                years: '2008-2013',
-              },
-            ],
-            skillsHeading: 'Skills & 3D Pipeline',
-            softwareMeters: (profile.softwareMeters || []).map((sw: any) => ({
-              name: sw.name,
-              subtitle: sw.subtitle,
-              segmentsFilled: sw.segmentsFilled ?? 8,
-            })),
-          },
-          {
             __component: 'blocks.horizontal-showreel',
             sectionId: 'showreel',
-            eyebrow: 'GSAP ScrollTrigger Horizontal Cinema',
-            heading: '3D & Motion Showreel',
+            eyebrow: '01 · Flagship Showreel',
+            heading: 'Documentary Cinema & 3D Motion',
             subHeading:
-              'Scroll to scrub through selected UN documentary films, Blender 3D scientific visualizations, and motion graphics.',
+              'Scroll horizontally through flagship UN documentaries, COP28 summit films, and Blender 3D scientific visualizations.',
             onlyFeatured: true,
           },
           {
             __component: 'blocks.portfolio-chapters',
             sectionId: 'work',
-            eyebrow: 'Curated Un-Portfolio Index (Chapters 01 - 05)',
-            heading: 'Work Samples & Production Archive',
+            eyebrow: '02 · Case Studies & Production Archive',
+            heading: 'Selected Case Studies',
             subHeading:
-              "Filter by audience focus or jump directly across the five chapters of Matteo's portfolio.",
+              'Filter by medium or explore all five production chapters — each paired with plain-English summaries, mandate context, and production tools.',
             defaultTrackFilter: 'all',
             chapters: [
               {
@@ -833,6 +861,35 @@ export async function ensurePortfolioSeeded(strapi: any, force = false) {
             ],
           },
           {
+            __component: 'blocks.card-grid',
+            heading: 'Production Toolkit & Advisory Scope',
+            subHeading: 'Capabilities & How I Work',
+            stratumTheme: 'ice',
+            cards: [
+              {
+                badge: '01 · DOCUMENTARY & FIELD PRODUCTION',
+                heading: 'Documentary & Field Storytelling',
+                subHeading: 'COP28, UN DESA & Broadcast Cinema',
+                text: 'End-to-end location directing, multilingual field interviews, and high-retention policy documentaries for global summits and UN agencies.',
+                href: '#chapter-01',
+              },
+              {
+                badge: '02 · 2D/3D MOTION DIRECTION',
+                heading: '2D/3D Motion & Scientific Visualization',
+                subHeading: 'Blender 3D · Unreal Engine 5 · After Effects',
+                text: 'Custom 3D modeling, procedural shaders, and modular motion graphics that turn complex technical and biological processes into clear visual narratives.',
+                href: '#chapter-02',
+              },
+              {
+                badge: '03 · DIGITAL PLATFORMS & CAMPAIGNS',
+                heading: 'Digital Knowledge Portals & Strategy',
+                subHeading: 'Drupal 10 · Astro · Multilingual Outreach',
+                text: 'Full-stack institutional platforms, high-impact scrollytelling features (3M+ views), and data-driven communications strategies.',
+                href: '#chapter-04',
+              },
+            ],
+          },
+          {
             __component: 'blocks.experience-cascade',
             sectionId: 'experience',
             heading: 'Work Experience',
@@ -840,11 +897,40 @@ export async function ensurePortfolioSeeded(strapi: any, force = false) {
               'Six years of end-to-end multimedia production, location directing, 3D animation, and Drupal/WordPress web architecture across United Nations agencies and broadcast news.',
           },
           {
+            __component: 'blocks.education-skills-stratum',
+            sectionId: 'education-skills',
+            metrics: (profile.metrics || []).map((m: any, idx: number) => ({
+              value: m.value,
+              label: m.label,
+              agency: m.agency,
+              theme: idx % 2 === 0 ? 'paper' : 'cobalt',
+            })),
+            educationHeading: 'Education',
+            educationItems: [
+              {
+                degree: 'MA Marketing, Buying Behaviour and Digital Communication',
+                school: 'John Cabot University',
+                years: '2019–2020',
+              },
+              {
+                degree: 'Bachelor of Arts in Communications',
+                school: 'John Cabot University',
+                years: '2014–2017',
+              },
+            ],
+            skillsHeading: 'Core Capabilities & Technical Stack',
+            softwareMeters: (profile.softwareMeters || []).map((sw: any) => ({
+              name: sw.name,
+              subtitle: sw.subtitle,
+              segmentsFilled: sw.segmentsFilled ?? 8,
+            })),
+          },
+          {
             __component: 'blocks.dossier-contact',
             sectionId: 'documents',
-            heading: 'CV Dossiers & Strapi Headless CMS',
+            heading: 'Publications, CVs & Direct Contact',
             description:
-              "Download Matteo's original topographic PDF CVs and 13-page portfolio book, or launch the Strapi v5 Admin Panel to manage page blocks, projects, career milestones, and 3D topographic scenes visually.",
+              "Download Matteo's styled PDF CVs and 13-page portfolio book, copy the direct studio email, or send a project inquiry below.",
             dossierCards: [
               {
                 title: 'UN & Policy CV',
@@ -867,12 +953,12 @@ export async function ensurePortfolioSeeded(strapi: any, force = false) {
             ],
             contactHeading: 'Direct Contact',
             email: profile.email,
-            phone: profile.phone,
+            phone: '',
             location: profile.location,
             linkedinLabel: 'in/matteo-louis-casling',
             linkedinUrl: 'https://www.linkedin.com/in/matteo-louis-casling-7285a8150/',
             primaryCta: {
-              label: 'Send Email',
+              label: 'Email Matteo',
               href: `mailto:${profile.email}`,
               isExternal: false,
               isButtonLink: true,
